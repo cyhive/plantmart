@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 import { AdminNavbar } from '@/components/admin/AdminNavbar';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { AdminNotificationBar } from '@/components/admin/AdminNotificationBar';
 
 export default function AdminLayout({
   children,
@@ -44,6 +45,7 @@ export default function AdminLayout({
 
       {/* Main Content Area */}
       <div className="flex-grow flex flex-col h-screen overflow-hidden">
+        <AdminNotificationBar />
         <AdminNavbar />
 
         {/* Page Content */}
