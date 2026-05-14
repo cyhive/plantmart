@@ -18,10 +18,16 @@ interface Product {
   category: string;
   images: string[];
   stock: number;
-  seller: { name: string; shopName: string };
+  seller: { _id?: string; name: string; shopName: string };
   careTips: { sunlight: string; watering: string; difficulty: string };
   ratings: { average: number; count: number };
 }
+
+const DEFAULT_CARE_TIPS = {
+  sunlight: 'Indirect light',
+  watering: 'Weekly',
+  difficulty: 'Beginner',
+};
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -36,28 +42,49 @@ export default function ProductDetailPage() {
   const { addItem } = useCart();
 
   useEffect(() => {
-    // Simulate API Fetch with Mock Data
-    const mockProducts: Record<string, Product> = {
-      '1': { _id: '1', name: 'Monstera Deliciosa', description: 'The Swiss Cheese plant is a classic favorite for its large, iconic leaves.', price: 1299, category: 'Indoor', images: ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800'], stock: 10, seller: { name: 'Green Garden', shopName: 'Green Garden Nursery' }, careTips: { sunlight: 'Partial Shade', watering: 'Weekly', difficulty: 'Beginner' }, ratings: { average: 4.9, count: 128 } },
-      '2': { _id: '2', name: 'Snake Plant', description: 'Perfect for beginners, this hardy plant can survive in low light and irregular watering.', price: 899, category: 'Indoor', images: ['https://images.unsplash.com/photo-1593482892290-f54927ae1bbc?auto=format&fit=crop&q=80&w=800'], stock: 15, seller: { name: 'Air Purifiers', shopName: 'Pure Air Nursery' }, careTips: { sunlight: 'Low Light', watering: 'Bi-weekly', difficulty: 'Beginner' }, ratings: { average: 4.8, count: 95 } },
-      '3': { _id: '3', name: 'Fiddle Leaf Fig', description: 'An elegant statement piece with large, waxy leaves that love bright, indirect light.', price: 2499, category: 'Outdoor', images: ['https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=800'], stock: 5, seller: { name: 'Tree Experts', shopName: 'Expert Tree Farm' }, careTips: { sunlight: 'Bright Indirect', watering: 'Weekly', difficulty: 'Intermediate' }, ratings: { average: 4.7, count: 64 } },
-      '4': { _id: '4', name: 'Peace Lily', description: 'Known for its beautiful white blooms and air-purifying qualities.', price: 699, category: 'Indoor', images: ['https://images.unsplash.com/photo-1593691509543-c55fb32e7355?auto=format&fit=crop&q=80&w=800'], stock: 20, seller: { name: 'Bloom Valley', shopName: 'Bloom Valley Florals' }, careTips: { sunlight: 'Partial Shade', watering: 'Twice Weekly', difficulty: 'Beginner' }, ratings: { average: 4.9, count: 82 } }
+    let cancelled = false;
+
+    const loadProduct = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/catalog/products/${id}`);
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (!res.ok || !data.product) {
+          setProduct(null);
+          return;
+        }
+        setProduct({
+          ...data.product,
+          careTips: DEFAULT_CARE_TIPS,
+        });
+        setActiveImage(0);
+
+        if (user) {
+          setUserAddress({
+            street: '88 Green Avenue',
+            city: 'Bangalore',
+            state: 'Karnataka',
+            zipCode: '560001',
+          });
+        }
+      } catch {
+        if (!cancelled) setProduct(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
 
-    setTimeout(() => {
-      const foundProduct = mockProducts[id as string] || mockProducts['1']; // Fallback to first mock product
-      setProduct(foundProduct);
+    if (typeof id === 'string') {
+      loadProduct();
+    } else {
+      setProduct(null);
       setLoading(false);
+    }
 
-      if (user) {
-        setUserAddress({
-          street: '88 Green Avenue',
-          city: 'Bangalore',
-          state: 'Karnataka',
-          zipCode: '560001'
-        });
-      }
-    }, 600);
+    return () => {
+      cancelled = true;
+    };
   }, [id, user]);
 
   const handleAddToCart = () => {

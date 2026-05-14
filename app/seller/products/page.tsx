@@ -38,8 +38,8 @@ export default function SellerProductsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -63,19 +63,39 @@ export default function SellerProductsPage() {
     }, 1500);
   };
 
-  const fetchProducts = () => {
+  const [uploading, setUploading] = useState(false);
+
+  const buildPayload = () => {
+    const images = formData.images.map((url) => url.trim()).filter(Boolean);
+    return {
+      name: formData.name.trim(),
+      description: formData.description.trim(),
+      price: Number(formData.price),
+      category: formData.category,
+      stock: Number(formData.stock),
+      images,
+    };
+  };
+
+  const fetchProducts = async () => {
     if (!user) return;
     setLoading(true);
-    // Mock Products Fetch
-    setTimeout(() => {
-      const mockProducts: Product[] = [
-        { _id: '1', name: 'Monstera Deliciosa', description: 'Swiss cheese plant', price: 1299, category: 'Indoor', stock: 10, images: ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800'], isApproved: true },
-        { _id: '2', name: 'Snake Plant', description: 'Hardy indoor plant', price: 899, category: 'Indoor', stock: 15, images: ['https://images.unsplash.com/photo-1593482892290-f54927ae1bbc?auto=format&fit=crop&q=80&w=800'], isApproved: true },
-        { _id: 'p3', name: 'Rare Blue Fern', description: 'Exotic blue fern', price: 3499, category: 'Indoor', stock: 2, images: ['https://images.unsplash.com/photo-1599202860130-f600f4948364?auto=format&fit=crop&q=80&w=800'], isApproved: false },
-      ];
-      setProducts(mockProducts);
+    setError('');
+    try {
+      const res = await fetch('/api/products', { credentials: 'include' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(typeof data.error === 'string' ? data.error : 'Failed to load products');
+        setProducts([]);
+        return;
+      }
+      setProducts(data.products ?? []);
+    } catch {
+      setError('Network error while loading products');
+      setProducts([]);
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
   useEffect(() => {
@@ -84,16 +104,47 @@ export default function SellerProductsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
-    // Mock Submit Logic
-    setTimeout(() => {
+    setError('');
+    setSubmitting(true);
+
+    const payload = buildPayload();
+    if (payload.images.length === 0) {
+      setError('Add at least one product image URL');
+      setSubmitting(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        editingProduct ? `/api/products/${editingProduct._id}` : '/api/products',
+        {
+          method: editingProduct ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      );
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg =
+          typeof data.error === 'string'
+            ? data.error
+            : data.details && typeof data.details === 'object'
+              ? Object.values(data.details as Record<string, string[]>).flat().join(' ')
+              : 'Failed to save product';
+        setError(msg || 'Failed to save product');
+        return;
+      }
+
       setIsModalOpen(false);
       setEditingProduct(null);
       setFormData({ name: '', description: '', price: '', category: 'Indoor', stock: '', images: [''] });
-      fetchProducts();
-      setLoading(false);
-    }, 1000);
+      await fetchProducts();
+    } catch {
+      setError('Network error while saving product');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleEdit = (product: Product) => {
@@ -111,8 +162,21 @@ export default function SellerProductsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this specimen?')) return;
-    // Mock Delete
-    setProducts(prev => prev.filter(p => p._id !== id));
+    setError('');
+    try {
+      const res = await fetch(`/api/products/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(typeof data.error === 'string' ? data.error : 'Failed to delete product');
+        return;
+      }
+      setProducts((prev) => prev.filter((p) => p._id !== id));
+    } catch {
+      setError('Network error while deleting product');
+    }
   };
 
   const filteredProducts = products.filter(p => 
@@ -129,12 +193,18 @@ export default function SellerProductsPage() {
           <p className="text-slate-500 font-medium italic">Manage your botanical collection and stock levels.</p>
         </div>
         <button 
-          onClick={() => { setEditingProduct(null); setIsModalOpen(true); }}
+          onClick={() => { setEditingProduct(null); setError(''); setIsModalOpen(true); }}
           className="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold text-sm flex items-center gap-3 hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 active:scale-95"
         >
           <Plus className="w-5 h-5" /> Add New Specimen
         </button>
       </div>
+
+      {error && !isModalOpen && (
+        <motion.div className="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-bold border border-red-100">
+          {error}
+        </motion.div>
+      )}
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -306,6 +376,11 @@ export default function SellerProductsPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {error && (
+                    <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-bold border border-red-100">
+                      {error}
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2 col-span-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Plant Name</label>
@@ -351,6 +426,7 @@ export default function SellerProductsPage() {
                         <option>Succulents</option>
                         <option>Medicinal</option>
                         <option>Pots</option>
+                        <option>Other</option>
                       </select>
                     </div>
                     <div className="space-y-2 col-span-2">
@@ -410,11 +486,12 @@ export default function SellerProductsPage() {
                     >
                       Cancel
                     </button>
-                    <button 
+                    <button
                       type="submit"
-                      className="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-bold hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 active:scale-[0.98] flex items-center justify-center gap-3"
+                      disabled={submitting}
+                      className="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-bold hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {editingProduct ? 'Save Changes' : 'List Specimen'} <ChevronRight className="w-5 h-5" />
+                      {submitting ? 'Saving…' : editingProduct ? 'Save Changes' : 'List Specimen'} <ChevronRight className="w-5 h-5" />
                     </button>
                   </div>
                 </form>

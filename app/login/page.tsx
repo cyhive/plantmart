@@ -23,23 +23,31 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
-    // Mock Login Logic
-    setTimeout(() => {
-      if (email && password) {
-        const mockUser = {
-          id: 'u1',
-          name: email.split('@')[0],
-          email: email,
-          role: email.includes('admin') ? 'admin' : email.includes('seller') ? 'seller' : 'buyer'
-        };
-        login(mockUser as any);
-        router.push(mockUser.role === 'seller' ? '/seller' : mockUser.role === 'admin' ? '/admin' : '/');
-      } else {
-        setError('Please enter both email and password');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(typeof data.error === 'string' ? data.error : 'Sign in failed');
+        return;
       }
+      if (!data.user) {
+        setError('Unexpected response from server');
+        return;
+      }
+      login(data.user);
+      const r = data.user.role as string;
+      router.push(r === 'seller' ? '/seller' : r === 'admin' ? '/admin' : '/');
+    } catch {
+      setError('Network error. Try again.');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleSendOtp = async (e: React.FormEvent) => {

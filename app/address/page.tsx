@@ -284,8 +284,8 @@ export default function AddressPage() {
               ) : (
                 <div className="h-[400px] rounded-3xl overflow-hidden border border-slate-100 shadow-inner">
                    <AddressMap 
-                     address={{...formData, id: 'temp'}}
-                     setAddress={(addr: any) => setFormData({...formData, coordinates: addr.coordinates})}
+                     address={{ coordinates: formData.coordinates }}
+                     setAddress={(updater) => setFormData((prev) => updater(prev))}
                      setActiveTab={setActiveTab}
                      handleGetLiveLocation={() => {}}
                    />

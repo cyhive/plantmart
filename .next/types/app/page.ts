@@ -1,4 +1,4 @@
-// File: D:\New folder (6)\plantmart---multi-vendor-plant-marketplace\app\page.tsx
+// File: D:\plantmart\app\page.tsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

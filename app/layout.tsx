@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './globals.css'; // Simplified import
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
@@ -22,7 +23,9 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-              <Navbar/>
+              <Suspense fallback={<div className="h-16 bg-white border-b border-slate-100" aria-hidden />}>
+                <Navbar />
+              </Suspense>
               <main className="flex-grow">
                 {children}
               </main>
