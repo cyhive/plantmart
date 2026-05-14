@@ -175,17 +175,7 @@ export function Navbar() {
                           <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover/link:opacity-100 -translate-x-2 group-hover/link:translate-x-0 transition-all" />
                         </Link>
 
-                        <Link href="/seller" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-2xl font-bold group/link">
-                          <Store className="w-4 h-4 group-hover/link:scale-110 transition-transform" /> 
-                          <span>Seller Console</span>
-                          <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover/link:opacity-100 -translate-x-2 group-hover/link:translate-x-0 transition-all" />
-                        </Link>
-
-                        <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-2xl font-bold group/link">
-                          <ShieldCheck className="w-4 h-4 group-hover/link:scale-110 transition-transform" /> 
-                          <span>Admin Dashboard</span>
-                          <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover/link:opacity-100 -translate-x-2 group-hover/link:translate-x-0 transition-all" />
-                        </Link>
+                        
                       </div>
 
                       <div className="h-px bg-slate-100 my-2 mx-4" />
