@@ -12,8 +12,9 @@ export function Footer() {
 
   const isAdminPage = pathname?.startsWith('/admin');
   const isSellerPage = pathname?.startsWith('/seller');
+  const isBecomeSellerPage = pathname === '/become-a-seller';
 
-  if (isAdminPage || isSellerPage) {
+  if (isAdminPage || isSellerPage || isBecomeSellerPage) {
     return (
       <footer className="bg-[#0F172B] border-t border-white/5 py-6 text-center">
         <p className="text-xs text-slate-400 font-medium">

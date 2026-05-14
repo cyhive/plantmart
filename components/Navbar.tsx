@@ -24,8 +24,9 @@ export function Navbar() {
   
   const isSellerPage = pathname?.startsWith('/seller');
   const isAdminPage = pathname?.startsWith('/admin');
+  const isBecomeSellerPage = pathname === '/become-a-seller';
   
-  if (isSellerPage || isAdminPage) return null;
+  if (isSellerPage || isAdminPage || isBecomeSellerPage) return null;
   
   const currentCategory = searchParams.get('category') || '';
 
