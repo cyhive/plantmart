@@ -369,7 +369,10 @@ export default function HomePage() {
             <h2 className="text-5xl font-display font-bold text-slate-900 tracking-tight">Top Rated Nurseries</h2>
             <p className="text-slate-500 text-lg font-medium max-w-xl">Buying from local experts ensures you get plants adapted to your climate.</p>
           </div>
-          <button className="text-emerald-600 font-bold hover:underline flex items-center gap-2">View All Sellers <ArrowRight className="w-4 h-4" /></button>
+          <Link href="/sellers" className="text-emerald-600 font-bold hover:underline flex items-center gap-2 group">
+            View All Sellers 
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
