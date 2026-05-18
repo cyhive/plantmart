@@ -43,7 +43,7 @@ export default function SellerSettingsPage() {
     lastName: user?.name?.split(' ')[1] || 'Garden',
     email: user?.email || 'alexander@green-garden.com',
     phone: '+91 98765 43210',
-    shopName: user?.shopName || 'Green Garden Nursery',
+    shopName: (user as any)?.shopName || 'Green Garden Nursery',
     shopCategory: 'Nursery',
     description: 'Specializing in exotic indoor foliage and rare succulents. Our family-run nursery has been providing high-quality botanical specimens since 2012.',
     address: '123 Green Lane, Botanical District',

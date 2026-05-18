@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
@@ -16,18 +18,34 @@ import {
   CheckCircle2, 
   Info,
   Package,
-  Star
+  Star,
+  Tag,
+  Gift
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-
 export default function CartPage() {
   const { items, removeItem, updateQuantity, totalAmount, totalItems } = useCart();
   const { user } = useAuth();
+  const [couponCode, setCouponCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [isCouponApplied, setIsCouponApplied] = useState(false);
 
   const shipping = totalAmount > 2000 ? 0 : 150;
-  const tax = totalAmount * 0.18; // 18% GST
-  const finalTotal = totalAmount + shipping + tax;
+  const tax = (totalAmount - discount) * 0.18; // 18% GST after discount
+  const finalTotal = totalAmount - discount + shipping + tax;
+
+  const applyCoupon = () => {
+    if (couponCode.toUpperCase() === 'MONSOON20') {
+      setDiscount(totalAmount * 0.2);
+      setIsCouponApplied(true);
+    } else if (couponCode.toUpperCase() === 'WELCOME100') {
+      setDiscount(100);
+      setIsCouponApplied(true);
+    } else {
+      alert('Invalid Coupon Code');
+    }
+  };
 
   const breadcrumbs = [
     { label: 'Botanical Bag' }
@@ -192,6 +210,13 @@ export default function CartPage() {
                   <span className="flex items-center gap-2 italic">Botanical Value</span>
                   <span className="text-slate-900">₹{totalAmount}</span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between items-center text-emerald-600 font-bold text-lg">
+                    <span className="flex items-center gap-2 italic">Promotional Saving</span>
+                    <span>- ₹{discount.toFixed(0)}</span>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center text-slate-600 font-bold text-lg">
                   <div className="flex items-center gap-3">
                     <span className="italic">Courier Service</span>
@@ -215,6 +240,40 @@ export default function CartPage() {
                      <span className="text-6xl font-display font-black text-emerald-900 tracking-tighter">{finalTotal.toFixed(0)}</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Promo Code Input */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-slate-400 font-black uppercase tracking-widest text-[9px]">
+                  <Tag className="w-4 h-4 text-emerald-600" />
+                  <span>Promotional Code</span>
+                </div>
+                <div className="flex gap-3">
+                  <input 
+                    type="text" 
+                    placeholder="Enter Code (e.g. MONSOON20)"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    disabled={isCouponApplied}
+                    className="flex-grow bg-white/50 border-2 border-slate-100 rounded-2xl px-5 py-3 text-sm font-bold focus:border-emerald-500/30 focus:bg-white outline-none transition-all placeholder:text-slate-300 disabled:opacity-50"
+                  />
+                  <button 
+                    onClick={applyCoupon}
+                    disabled={isCouponApplied || !couponCode}
+                    className="px-6 py-3 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:bg-slate-200"
+                  >
+                    {isCouponApplied ? 'Applied' : 'Apply'}
+                  </button>
+                </div>
+                {isCouponApplied && (
+                  <motion.p 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-[10px] font-bold text-emerald-600 italic flex items-center gap-2"
+                  >
+                    <CheckCircle2 className="w-3 h-3" /> Offer successfully reflected in your investment.
+                  </motion.p>
+                )}
               </div>
 
               {/* Delivery info */}

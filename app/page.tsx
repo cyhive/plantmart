@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Leaf, ArrowRight, Truck, ShieldCheck, Zap, Star, Quote, Mail, ShoppingBag, Store, MapPin, CheckCircle2, Droplets, Sun, Wind, Home, Trees, Sprout, HeartPulse, Box, Heart } from 'lucide-react';
+import { Leaf, ArrowRight, Truck, ShieldCheck, Zap, Star, Quote, Mail, ShoppingBag, Store, MapPin, CheckCircle2, Droplets, Sun, Wind, Home, Trees, Sprout, HeartPulse, Box, Heart, Tag, Gift, Clock, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 
@@ -55,11 +55,11 @@ const careTips = [
 ];
 
 const categories = [
-  { name: 'Indoor Plants', icon: <Home className="w-14 h-14" />, count: 120, color: 'bg-emerald-500/10 text-emerald-600' },
-  { name: 'Outdoor Plants', icon: <Trees className="w-14 h-14" />, count: 85, color: 'bg-green-500/10 text-green-600' },
-  { name: 'Succulents', icon: <Sprout className="w-14 h-14" />, count: 45, color: 'bg-teal-500/10 text-teal-600' },
-  { name: 'Medicinal', icon: <HeartPulse className="w-14 h-14" />, count: 30, color: 'bg-rose-500/10 text-rose-600' },
-  { name: 'Pots & Tools', icon: <Box className="w-14 h-14" />, count: 60, color: 'bg-amber-500/10 text-amber-600' },
+  { name: 'Indoor Plants', slug: 'Indoor', icon: <Home className="w-14 h-14" />, count: 120, color: 'bg-emerald-500/10 text-emerald-600' },
+  { name: 'Outdoor Plants', slug: 'Outdoor', icon: <Trees className="w-14 h-14" />, count: 85, color: 'bg-green-500/10 text-green-600' },
+  { name: 'Succulents', slug: 'Succulents', icon: <Sprout className="w-14 h-14" />, count: 45, color: 'bg-teal-500/10 text-teal-600' },
+  { name: 'Medicinal', slug: 'Medicinal', icon: <HeartPulse className="w-14 h-14" />, count: 30, color: 'bg-rose-500/10 text-rose-600' },
+  { name: 'Pots & Tools', slug: 'Pots', icon: <Box className="w-14 h-14" />, count: 60, color: 'bg-amber-500/10 text-amber-600' },
 ];
 
 const bestSellers = [
@@ -75,10 +75,50 @@ const testimonials = [
   { name: 'Elena D.', role: 'New Hobbyist', text: 'Great customer support and very healthy plants. Highly recommend for beginners!', stars: 4 },
 ];
 
+const offers = [
+  {
+    id: 'monsoon',
+    title: 'Monsoon Magic',
+    discount: '20% OFF',
+    desc: 'Transform your home into a lush indoor garden with our Monsoon Special collection.',
+    code: 'MONSOON20',
+    color: 'emerald',
+    icon: <Tag className="w-10 h-10" />,
+    badge: 'Limited Time'
+  },
+  {
+    id: 'welcome',
+    title: 'Welcome Bonus',
+    discount: '₹150 OFF',
+    desc: 'New to the plant parent community? Start your journey with an exclusive discount.',
+    code: 'PLANTLOVE',
+    color: 'blue',
+    icon: <Gift className="w-10 h-10" />,
+    badge: 'New Users'
+  },
+  {
+    id: 'flash',
+    title: 'Flash Friday',
+    discount: 'Free Pot',
+    desc: 'Get a premium ceramic pot free with every purchase of an outdoor specimen.',
+    code: 'FREEPOT',
+    color: 'amber',
+    icon: <Sparkles className="w-10 h-10" />,
+    badge: 'Today Only'
+  }
+];
+
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const { addItem } = useCart();
+
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -151,9 +191,9 @@ export default function HomePage() {
                   <Link href="/plants" className="bg-emerald-500 text-white px-10 py-5 rounded-[24px] font-bold flex items-center gap-2 hover:bg-emerald-400 hover:text-emerald-950 transition-all shadow-2xl shadow-emerald-500/40 hover:-translate-y-1 group">
                     Shop Collection <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                   </Link>
-                  <button className="glass text-white px-10 py-5 rounded-[24px] font-bold hover:bg-white/20 transition-all">
+                  {/* <Link href="/about" className="glass text-white px-10 py-5 rounded-[24px] font-bold hover:bg-white/20 transition-all text-center">
                     Our Story
-                  </button>
+                  </Link> */}
                 </motion.div>
               </div>
 
@@ -227,6 +267,90 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Promotions & Offers Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-4">
+            <h2 className="text-5xl font-display font-bold text-slate-900 tracking-tight">Exclusive Offers</h2>
+            <p className="text-slate-500 text-lg font-medium">Grab these botanical deals before they vanish!</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {offers.map((offer, i) => (
+            <motion.div
+              key={offer.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className={`group relative p-10 rounded-[56px] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-700 bg-white overflow-hidden`}
+            >
+              {/* Background Accent */}
+              <div className={`absolute top-0 right-0 w-48 h-48 bg-${offer.color}-500/5 rounded-full blur-[80px] -mr-24 -mt-24 group-hover:bg-${offer.color}-500/10 transition-colors`} />
+              
+              <div className="relative z-10 space-y-8">
+                <div className="flex items-start justify-between">
+                  <div className={`w-20 h-20 bg-${offer.color}-600 rounded-[28px] flex items-center justify-center text-white shadow-xl shadow-${offer.color}-600/20 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                    {offer.icon}
+                  </div>
+                  <div className={`px-4 py-1.5 bg-${offer.color}-50 rounded-full text-${offer.color}-700 text-[10px] font-black uppercase tracking-widest border border-${offer.color}-100`}>
+                    {offer.badge}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="text-3xl font-display font-black text-slate-900 leading-tight">
+                    {offer.title} <br />
+                    <span className={`text-${offer.color}-600`}>{offer.discount}</span>
+                  </h3>
+                  <p className="text-slate-500 text-sm font-medium leading-relaxed italic">{offer.desc}</p>
+                </div>
+
+                <div className="pt-6 border-t border-slate-50">
+                  <div className="flex items-center justify-between p-2 bg-slate-50 rounded-[24px] border border-slate-100 group-hover:bg-white group-hover:border-slate-200 transition-all">
+                    <div className="px-6 py-3">
+                      <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest block mb-0.5">Promo Code</span>
+                      <span className="text-xl font-display font-black text-slate-900 tracking-widest">{offer.code}</span>
+                    </div>
+                    <button 
+                      onClick={() => handleCopyCode(offer.code)}
+                      className={`relative px-8 py-4 rounded-[18px] text-[10px] font-black uppercase tracking-widest transition-all overflow-hidden ${
+                        copiedCode === offer.code 
+                          ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' 
+                          : `bg-slate-900 text-white hover:bg-${offer.color}-600 shadow-lg`
+                      }`}
+                    >
+                      <AnimatePresence mode="wait">
+                        {copiedCode === offer.code ? (
+                          <motion.span 
+                            key="copied"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -20, opacity: 0 }}
+                            className="flex items-center gap-2"
+                          >
+                            <CheckCircle2 className="w-3 h-3" /> Copied!
+                          </motion.span>
+                        ) : (
+                          <motion.span 
+                            key="copy"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -20, opacity: 0 }}
+                          >
+                            Copy Code
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* Best Sellers */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="text-center space-y-4">
@@ -234,59 +358,61 @@ export default function HomePage() {
           <p className="text-slate-500 text-lg font-medium">Most loved plants by our community</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {bestSellers.map((product, i) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="group bg-white rounded-[40px] border border-slate-100 hover:shadow-2xl transition-all duration-500 p-4"
+              className="group bg-white rounded-[24px] border border-slate-100 hover:shadow-xl transition-all duration-500 p-3 flex flex-col h-full"
             >
-              <Link href={`/plants/${product.id}`}>
-                <div className="relative aspect-square overflow-hidden rounded-[32px] bg-slate-50 mb-6">
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-100 transition-transform duration-700" />
-                  <div className="absolute top-4 left-4 glass py-1 px-3 rounded-xl text-[10px] font-bold text-emerald-900 uppercase tracking-widest">
-                    {product.category}
+              <Link href={`/plants/${product.id}`} className="flex flex-col h-full justify-between">
+                <div>
+                  <div className="relative aspect-square overflow-hidden rounded-[18px] bg-slate-50 mb-4">
+                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-100 transition-transform duration-700" />
+                    <div className="absolute top-3 left-3 glass py-1 px-2.5 rounded-lg text-[9px] font-bold text-emerald-900 uppercase tracking-widest">
+                      {product.category}
+                    </div>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
                   </div>
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-                </div>
-                <div className="px-4 space-y-2">
-                  <h3 className="font-bold text-xl text-slate-900 group-hover:text-emerald-700 transition-colors">{product.name}</h3>
-                  <div className="flex items-center justify-between">
-                    <p className="text-emerald-700 font-bold text-lg">₹{product.price}</p>
-                    <div className="flex items-center gap-1 text-amber-400">
-                      <Star className="w-4 h-4 fill-amber-400" />
-                      <span className="text-slate-400 text-sm font-bold">4.9</span>
+                  <div className="px-1.5 space-y-2">
+                    <h3 className="font-bold text-sm sm:text-base text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-1">{product.name}</h3>
+                    <div className="flex items-center justify-between">
+                      <p className="text-emerald-700 font-bold text-sm sm:text-base">₹{product.price}</p>
+                      <div className="flex items-center gap-0.5 sm:gap-1 text-amber-400">
+                        <Star className="w-3.5 h-3.5 fill-amber-400" />
+                        <span className="text-slate-400 text-xs font-bold">4.9</span>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-3 pt-4 mt-2 border-t border-slate-100">
-                    <button 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (typeof addItem !== 'undefined') {
-                          addItem({
-                            id: product.id,
-                            name: product.name,
-                            price: product.price,
-                            image: product.image,
-                            quantity: 1,
-                            seller: { name: 'Verified Seller', shopName: 'PlantMart Direct' }
-                          });
-                        }
-                      }}
-                      className="flex-grow bg-slate-900 text-white py-3 rounded-[16px] text-xs font-bold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/20"
-                    >
-                      <ShoppingBag className="w-4 h-4" /> Add to Cart
-                    </button>
-                    <button 
-                      onClick={(e) => toggleFavorite(product.id, e)}
-                      className={`w-12 h-12 rounded-[16px] flex items-center justify-center transition-all border ${favorites?.includes(product.id) ? 'bg-rose-50 border-rose-100 shadow-inner' : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-sm'}`}
-                    >
-                      <Heart className={`w-5 h-5 ${favorites?.includes(product.id) ? 'fill-rose-500 text-rose-500' : 'text-slate-400'}`} />
-                    </button>
-                  </div>
+                </div>
+                
+                <div className="px-1.5 pt-3 mt-3 border-t border-slate-100 flex items-center gap-2">
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (typeof addItem !== 'undefined') {
+                        addItem({
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          image: product.image,
+                          quantity: 1,
+                          seller: { name: 'Verified Seller', shopName: 'PlantMart Direct' }
+                        });
+                      }
+                    }}
+                    className="flex-grow bg-slate-900 text-white py-2 rounded-xl text-[10px] sm:text-xs font-bold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-1.5 shadow-md hover:shadow-emerald-500/20"
+                  >
+                    <ShoppingBag className="w-3.5 h-3.5" /> Add
+                  </button>
+                  <button 
+                    onClick={(e) => toggleFavorite(product.id, e)}
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-all border flex-shrink-0 ${favorites?.includes(product.id) ? 'bg-rose-50 border-rose-100 shadow-inner' : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-sm'}`}
+                  >
+                    <Heart className={`w-3.5 h-3.5 ${favorites?.includes(product.id) ? 'fill-rose-500 text-rose-500' : 'text-slate-400'}`} />
+                  </button>
                 </div>
               </Link>
             </motion.div>
@@ -333,31 +459,32 @@ export default function HomePage() {
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {categories.map((cat, i) => (
-            <motion.div
-              key={cat.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="group relative"
-            >
-              <div className="glass p-10 rounded-[48px] text-center cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_32px_64px_-16px_rgba(16,185,129,0.1)] border-white/40 relative z-10 overflow-hidden">
-                {/* Accent Glow */}
-                <div className={`absolute -top-10 -right-10 w-32 h-32 ${cat.color} opacity-20 blur-[40px] group-hover:opacity-40 transition-opacity duration-500`} />
+            <Link href={`/plants?category=${cat.slug}`} key={cat.name} className="block group">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="relative"
+              >
+                <div className="glass p-10 rounded-[48px] text-center cursor-pointer transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_32px_64px_-16px_rgba(16,185,129,0.1)] border-white/40 relative z-10 overflow-hidden">
+                  {/* Accent Glow */}
+                  <div className={`absolute -top-10 -right-10 w-32 h-32 ${cat.color} opacity-20 blur-[40px] group-hover:opacity-40 transition-opacity duration-500`} />
 
-                <div className="relative z-20 space-y-6">
-                  <div className={`w-24 h-24 mx-auto ${cat.color} rounded-3xl flex items-center justify-center text-5xl shadow-inner group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
-                    {cat.icon}
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-slate-900 text-xl tracking-tight">{cat.name}</h4>
-                    <p className="text-[10px] text-emerald-600 font-black uppercase tracking-[0.2em] mt-2 opacity-60 group-hover:opacity-100 transition-opacity">{cat.count}+ Varieties</p>
+                  <div className="relative z-20 space-y-6">
+                    <div className={`w-24 h-24 mx-auto ${cat.color} rounded-3xl flex items-center justify-center text-5xl shadow-inner group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                      {cat.icon}
+                    </div>
+                    <div>
+                      <h4 className="font-display font-bold text-slate-900 text-xl tracking-tight">{cat.name}</h4>
+                      <p className="text-[10px] text-emerald-600 font-black uppercase tracking-[0.2em] mt-2 opacity-60 group-hover:opacity-100 transition-opacity">{cat.count}+ Varieties</p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Shadow/Glow effect behind the card */}
-              <div className="absolute inset-x-8 -bottom-2 h-10 bg-emerald-500/5 blur-2xl -z-10 group-hover:bg-emerald-500/10 transition-colors" />
-            </motion.div>
+                {/* Shadow/Glow effect behind the card */}
+                <div className="absolute inset-x-8 -bottom-2 h-10 bg-emerald-500/5 blur-2xl -z-10 group-hover:bg-emerald-500/10 transition-colors" />
+              </motion.div>
+            </Link>
           ))}
         </div>
       </section>
@@ -445,7 +572,7 @@ export default function HomePage() {
               ))}
             </div>
 
-            <button className="bg-white text-slate-900 px-10 py-5 rounded-[24px] font-black hover:bg-emerald-500 hover:text-white transition-all">Read Care Journal</button>
+            <Link href="/care-journal" className="bg-white text-slate-900 px-10 py-5 rounded-[24px] font-black hover:bg-emerald-500 hover:text-white transition-all inline-block">Read Care Journal</Link>
           </div>
 
           <div className="relative">

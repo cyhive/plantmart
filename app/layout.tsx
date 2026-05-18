@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   keywords: 'plants, indoor plants, outdoor plants, succulents, nursery, buy plants online',
 };
 
+import { Suspense } from 'react';
+
 export default function RootLayout({
   children,
 }: {
@@ -22,7 +24,9 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-              <Navbar/>
+              <Suspense fallback={<div className="h-20 bg-white border-b border-slate-100" />}>
+                <Navbar/>
+              </Suspense>
               <main className="flex-grow">
                 {children}
               </main>

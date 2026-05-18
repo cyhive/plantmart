@@ -36,7 +36,7 @@ export function SellerNavbar() {
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold text-slate-900">{user?.name}</p>
-            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{user?.shopName || 'Premium Seller'}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{(user as any)?.shopName || 'Premium Seller'}</p>
           </div>
           <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-700 font-bold border border-emerald-200">
             {user?.name?.charAt(0) || 'S'}

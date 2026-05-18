@@ -162,28 +162,35 @@ export default function SellersPage() {
 
       {/* Filter & Search Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
-        <div className="glass p-8 rounded-[40px] shadow-2xl border border-white/40 flex flex-col lg:flex-row items-center gap-8">
-          <div className="relative flex-grow w-full">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Search by nursery name or city..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-16 pr-6 py-4 bg-slate-50 border-none rounded-3xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900"
-            />
+        <div className="space-y-8">
+          {/* Search Box */}
+          <div className="glass p-4 md:p-6 rounded-[40px] shadow-2xl border border-white/40 max-w-4xl mx-auto">
+            <div className="relative w-full">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Search by nursery name or city..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-16 pr-8 py-6 bg-slate-50 border-none rounded-[32px] focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900 md:text-lg"
+              />
+            </div>
           </div>
           
-          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar w-full lg:w-auto pb-2 lg:pb-0">
-            <Filter className="w-5 h-5 text-slate-400 hidden lg:block mr-2" />
+          {/* Category Chips */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex items-center gap-2 mr-4 px-4 py-2 bg-slate-200/50 rounded-xl text-slate-500 font-black text-[10px] uppercase tracking-tighter">
+              <Filter className="w-3.5 h-3.5" />
+              Filter By
+            </div>
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${
+                className={`px-8 py-4 rounded-[20px] text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-500 ${
                   selectedCategory === cat 
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20' 
-                    : 'bg-white text-slate-500 hover:bg-slate-100'
+                    ? 'bg-emerald-600 text-white shadow-2xl shadow-emerald-600/40 -translate-y-1.5 scale-110' 
+                    : 'bg-white/60 backdrop-blur-sm text-slate-500 hover:bg-white hover:text-emerald-600 border border-white shadow-lg shadow-slate-200/50'
                 }`}
               >
                 {cat}

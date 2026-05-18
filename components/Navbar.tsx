@@ -5,7 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { 
   Search, ShoppingCart, User, LogOut, LayoutDashboard, Leaf, 
   MapPin, ChevronRight, ShieldCheck, Home, Trees, Sprout, 
-  HeartPulse, Box, Store, X, Sparkles 
+  HeartPulse, Box, Store, X, Sparkles, Package 
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -46,41 +46,6 @@ export function Navbar() {
 
   return (
     <>
-      {/* Top Offer Banner */}
-      <AnimatePresence>
-        {showBanner && (
-          <motion.div 
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="bg-emerald-900 text-emerald-50 overflow-hidden relative"
-          >
-            <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-center min-h-[40px]">
-              <div className="flex items-center gap-2 text-xs sm:text-sm font-medium">
-                <Sparkles className="w-4 h-4 text-amber-400 animate-pulse hidden sm:block" />
-                <p className="text-center">
-                  <span className="opacity-90">Limited Time Offer:</span> 
-                  <span className="font-bold text-white mx-1">GET 20% OFF</span> 
-                  <span className="opacity-90">on all Medicinal Plants!</span>
-                  <Link href="/plants?category=Medicinal" className="ml-2 underline underline-offset-4 hover:text-white transition-colors font-bold">
-                    Shop Collection
-                  </Link>
-                </p>
-                <Sparkles className="w-4 h-4 text-amber-400 animate-pulse hidden sm:block" />
-              </div>
-              
-              <button 
-                onClick={() => setShowBanner(false)}
-                className="absolute right-4 p-1 hover:bg-white/10 rounded-full transition-colors"
-                aria-label="Close banner"
-              >
-                <X className="w-4 h-4 text-emerald-200" />
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <nav className="glass sticky top-0 z-50 transition-all duration-300 border-b border-slate-100">
         {/* Main Navbar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -160,6 +125,12 @@ export function Navbar() {
                         <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-2xl font-bold group/link">
                           <User className="w-4 h-4 group-hover/link:scale-110 transition-transform" /> 
                           <span>My Profile</span>
+                          <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover/link:opacity-100 -translate-x-2 group-hover/link:translate-x-0 transition-all" />
+                        </Link>
+                        
+                        <Link href="/track" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-2xl font-bold group/link">
+                          <Package className="w-4 h-4 group-hover/link:scale-110 transition-transform" /> 
+                          <span>Track Order</span>
                           <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover/link:opacity-100 -translate-x-2 group-hover/link:translate-x-0 transition-all" />
                         </Link>
                         

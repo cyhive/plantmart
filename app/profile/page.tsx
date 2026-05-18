@@ -304,7 +304,8 @@ export default function ProfilePage() {
                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Botanical Support</h4>
                    <div className="space-y-4">
                       {[
-                        { label: 'Help Center', href: '/help' },
+                        { label: 'Track Order', href: '/track' },
+                        { label: 'Help Center', href: '/support' },
                         { label: 'Live Chat', href: '#' },
                         { label: 'Platform Terms', href: '/terms' }
                       ].map((item, i) => (
