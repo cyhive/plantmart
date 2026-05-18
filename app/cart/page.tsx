@@ -20,7 +20,11 @@ import {
   Package,
   Star,
   Tag,
-  Gift
+  Gift,
+  Sparkles,
+  Wind,
+  Sun,
+  Leaf
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -53,38 +57,92 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-[85vh] flex items-center justify-center px-4">
+      <div className="min-h-[85vh] flex items-center justify-center px-4 relative">
+        {/* Soft glowing ambient circles */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-100/30 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-50/40 rounded-full blur-3xl pointer-events-none -z-10" />
+
         <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-xl w-full text-center space-y-10 glass p-16 rounded-[80px] border-4 border-white shadow-2xl relative overflow-hidden"
+          initial={{ opacity: 0, scale: 0.96, y: 15 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="max-w-xl w-full text-center space-y-6 glass py-8 px-6 md:py-10 md:px-12 rounded-[40px] md:rounded-[48px] border border-white/60 shadow-[0_15px_40px_rgba(0,0,0,0.05)] relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 p-12 opacity-5">
-             <ShoppingBag className="w-64 h-64 text-slate-900" />
+          {/* Subtle botanical patterns in glass corner */}
+          <div className="absolute -top-6 -left-6 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl" />
+          <div className="absolute top-6 right-6 text-emerald-955/5 rotate-[45deg] select-none pointer-events-none">
+            <Leaf className="w-12 h-12" />
           </div>
           
-          <div className="w-40 h-40 bg-emerald-50 rounded-[56px] flex items-center justify-center mx-auto shadow-inner relative z-10">
-            <ShoppingBag className="w-20 h-20 text-emerald-600" />
-            <motion.div 
-              animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 4, repeat: Infinity }}
-              className="absolute -top-4 -right-4 w-12 h-12 bg-white rounded-2xl border-4 border-emerald-50 flex items-center justify-center shadow-lg"
+          {/* Stylized Illustrated Botanical Basket */}
+          <div className="w-36 h-36 bg-gradient-to-tr from-emerald-50/80 to-amber-50/50 rounded-[40px] flex items-center justify-center mx-auto shadow-inner relative z-10 border border-white/60">
+            <div className="relative">
+              {/* Background glowing circle */}
+              <div className="absolute inset-0 m-auto w-24 h-24 bg-emerald-500/10 rounded-full blur-lg animate-pulse" />
+              
+              {/* Animated Floating primary icon */}
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="relative"
+              >
+                <ShoppingBag className="w-16 h-16 text-emerald-955 stroke-[1.25]" />
+                <Leaf className="w-6 h-6 text-emerald-600 fill-emerald-100 absolute -top-1 -right-1 transform rotate-12" />
+              </motion.div>
+
+              {/* Sparkling star */}
+              <motion.div
+                animate={{ scale: [1, 1.2, 1], opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute -bottom-1 -left-1 w-7 h-7 bg-white rounded-lg shadow-xs border border-slate-100 flex items-center justify-center"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+              </motion.div>
+            </div>
+          </div>
+          
+          {/* Typography */}
+          <div className="space-y-3 relative z-10 max-w-md mx-auto">
+            <h1 className="text-3xl md:text-4xl font-display font-black text-slate-900 tracking-tight leading-tight">
+              Your botanical bag is <span className="text-emerald-800">awaiting life.</span>
+            </h1>
+            <p className="text-slate-500/85 font-serif italic text-xs md:text-sm leading-relaxed px-2">
+              &quot;Bring the soothing presence of organic air-purifiers and rare foliage into your personal living sanctuary.&quot;
+            </p>
+          </div>
+
+          {/* Quick Categories Navigation */}
+          <div className="space-y-2.5 pt-1">
+            <span className="text-[8px] text-slate-400 font-black uppercase tracking-widest block">Quick Browse Conservatories</span>
+            <div className="grid grid-cols-3 gap-2.5 max-w-sm mx-auto relative z-10">
+              {[
+                { label: 'Indoor Foliage', href: '/plants?category=Indoor', icon: <Leaf className="w-3.5 h-3.5 text-emerald-700" /> },
+                { label: 'Outdoor Specimens', href: '/plants?category=Outdoor', icon: <Sun className="w-3.5 h-3.5 text-amber-600" /> },
+                { label: 'Pure Air Plants', href: '/plants?category=Indoor', icon: <Wind className="w-3.5 h-3.5 text-blue-600" /> }
+              ].map(cat => (
+                <Link 
+                  key={cat.label}
+                  href={cat.href}
+                  className="flex flex-col items-center gap-1.5 p-3 bg-white/70 hover:bg-emerald-50/40 rounded-xl border border-slate-200/40 hover:border-emerald-500/20 shadow-xs hover:shadow-xs transition-all active:scale-95 text-center group cursor-pointer"
+                >
+                  <div className="w-7.5 h-7.5 rounded-lg bg-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform border border-slate-100/50">
+                    {cat.icon}
+                  </div>
+                  <span className="text-[8px] font-black uppercase tracking-wider text-slate-600 leading-tight">
+                    {cat.label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          
+          <div className="pt-2">
+            <Link 
+              href="/plants" 
+              className="inline-flex items-center gap-2.5 bg-slate-900 text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-700/10 transition-all active:scale-[0.98] group cursor-pointer"
             >
-               <Star className="w-6 h-6 text-amber-400 fill-amber-400" />
-            </motion.div>
+              Venture to Catalog <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
-          
-          <div className="space-y-4 relative z-10">
-            <h1 className="text-5xl font-display font-black text-slate-900 tracking-tight leading-tight italic">Your bag is seeking greenery.</h1>
-            <p className="text-slate-500 text-xl font-medium max-w-sm mx-auto">Explore our curated collection of verified specimens to start your indoor jungle.</p>
-          </div>
-          
-          <Link 
-            href="/plants" 
-            className="inline-flex items-center gap-4 bg-slate-900 text-white px-12 py-6 rounded-[32px] font-black text-lg hover:bg-emerald-600 transition-all shadow-2xl shadow-slate-900/10 active:scale-95 group"
-          >
-            Explore Catalog <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-          </Link>
         </motion.div>
       </div>
     );
