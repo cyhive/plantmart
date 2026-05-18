@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { loginWithRole } from '@/lib/auth/login-client';
+import { loginAsAdmin } from '@/lib/auth/login-client';
+import { useRedirectIfRole } from '@/lib/auth/use-auth-guard';
 import { ShieldCheck, ArrowRight, Mail, Key, Fingerprint, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -16,17 +17,14 @@ export default function AdminLoginPage() {
   const { login } = useAuth();
   const router = useRouter();
 
+  useRedirectIfRole('admin', '/admin');
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const result = await loginWithRole(
-      email,
-      password,
-      'admin',
-      'This account does not have administrator access.',
-    );
+    const result = await loginAsAdmin(email, password);
 
     if (!result.ok) {
       setError(result.error);

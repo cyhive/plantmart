@@ -31,6 +31,21 @@ interface Product {
   isApproved: boolean;
 }
 
+/** Valid HTTPS URL used when the seller has not set an image yet (API requires ≥1 image). */
+const DEFAULT_SPECIMEN_IMAGE =
+  'https://images.unsplash.com/photo-1416879595882-3373a0480a5f?auto=format&fit=crop&q=80&w=800';
+
+function emptySpecimenForm() {
+  return {
+    name: '',
+    description: '',
+    price: '',
+    category: 'Indoor',
+    stock: '',
+    images: [DEFAULT_SPECIMEN_IMAGE],
+  };
+}
+
 export default function SellerProductsPage() {
   const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
@@ -42,14 +57,7 @@ export default function SellerProductsPage() {
   const [submitting, setSubmitting] = useState(false);
   
   // Form State
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: 'Indoor',
-    stock: '',
-    images: [''],
-  });
+  const [formData, setFormData] = useState(emptySpecimenForm);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -66,13 +74,16 @@ export default function SellerProductsPage() {
   const [uploading, setUploading] = useState(false);
 
   const buildPayload = () => {
-    const images = formData.images.map((url) => url.trim()).filter(Boolean);
+    const trimmed = formData.images.map((url) => url.trim()).filter(Boolean);
+    const images = trimmed.length > 0 ? trimmed : [DEFAULT_SPECIMEN_IMAGE];
+    const price = Number(formData.price);
+    const stock = Math.max(0, Math.floor(Number(formData.stock)));
     return {
       name: formData.name.trim(),
       description: formData.description.trim(),
-      price: Number(formData.price),
+      price,
       category: formData.category,
-      stock: Number(formData.stock),
+      stock,
       images,
     };
   };
@@ -108,8 +119,23 @@ export default function SellerProductsPage() {
     setSubmitting(true);
 
     const payload = buildPayload();
-    if (payload.images.length === 0) {
-      setError('Add at least one product image URL');
+    if (!payload.name) {
+      setError('Plant name is required.');
+      setSubmitting(false);
+      return;
+    }
+    if (!payload.description) {
+      setError('Description is required.');
+      setSubmitting(false);
+      return;
+    }
+    if (!Number.isFinite(payload.price) || payload.price <= 0) {
+      setError('Enter a valid price greater than zero.');
+      setSubmitting(false);
+      return;
+    }
+    if (!Number.isFinite(payload.stock) || payload.stock < 0) {
+      setError('Enter a valid stock (0 or more).');
       setSubmitting(false);
       return;
     }
@@ -138,7 +164,7 @@ export default function SellerProductsPage() {
 
       setIsModalOpen(false);
       setEditingProduct(null);
-      setFormData({ name: '', description: '', price: '', category: 'Indoor', stock: '', images: [''] });
+      setFormData(emptySpecimenForm());
       await fetchProducts();
     } catch {
       setError('Network error while saving product');
@@ -155,7 +181,7 @@ export default function SellerProductsPage() {
       price: product.price.toString(),
       category: product.category,
       stock: product.stock.toString(),
-      images: product.images.length > 0 ? product.images : [''],
+      images: product.images.length > 0 ? product.images : [DEFAULT_SPECIMEN_IMAGE],
     });
     setIsModalOpen(true);
   };
@@ -193,7 +219,13 @@ export default function SellerProductsPage() {
           <p className="text-slate-500 font-medium italic">Manage your botanical collection and stock levels.</p>
         </div>
         <button 
-          onClick={() => { setEditingProduct(null); setError(''); setIsModalOpen(true); }}
+          type="button"
+          onClick={() => {
+            setEditingProduct(null);
+            setError('');
+            setFormData(emptySpecimenForm());
+            setIsModalOpen(true);
+          }}
           className="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold text-sm flex items-center gap-3 hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 active:scale-95"
         >
           <Plus className="w-5 h-5" /> Add New Specimen
@@ -335,7 +367,25 @@ export default function SellerProductsPage() {
                     <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Box className="w-10 h-10 text-emerald-200" />
                     </div>
-                    <p className="text-slate-400 font-medium italic">No specimens found matching your criteria.</p>
+                    <p className="text-slate-400 font-medium italic">
+                      {searchQuery
+                        ? 'No specimens found matching your criteria.'
+                        : 'No specimens in your inventory yet.'}
+                    </p>
+                    {!searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingProduct(null);
+                          setError('');
+                          setFormData(emptySpecimenForm());
+                          setIsModalOpen(true);
+                        }}
+                        className="mt-4 inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20"
+                      >
+                        <Plus className="w-5 h-5" /> Add your first specimen
+                      </button>
+                    )}
                   </td>
                 </tr>
               )}
@@ -428,6 +478,27 @@ export default function SellerProductsPage() {
                         <option>Pots</option>
                         <option>Other</option>
                       </select>
+                    </div>
+                    <div className="space-y-2 col-span-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                        Image URL (https)
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.images[0] ?? ''}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            images: [e.target.value],
+                          }))
+                        }
+                        className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold focus:ring-4 focus:ring-emerald-500/5 transition-all"
+                        placeholder="https://images.unsplash.com/..."
+                      />
+                      <p className="text-[10px] text-slate-400 font-medium">
+                        Paste a direct link to your plant photo, or use the default. You can also pick a file below to
+                        replace it with a sample image.
+                      </p>
                     </div>
                     <div className="space-y-2 col-span-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Plant Image</label>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { loginWithRole } from '@/lib/auth/login-client';
+import { useRedirectIfRole } from '@/lib/auth/use-auth-guard';
 import { Store, ArrowRight, Mail, Lock, ShieldCheck, Briefcase } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -15,6 +16,8 @@ export default function SellerLoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
+
+  useRedirectIfRole('seller', '/seller');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

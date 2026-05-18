@@ -63,31 +63,15 @@ export default function ProductDetailPage() {
       setProduct(foundProduct);
       setLoading(false);
 
-        if (user) {
-          setUserAddress({
-            street: '88 Green Avenue',
-            city: 'Bangalore',
-            state: 'Karnataka',
-            zipCode: '560001',
-          });
-        }
-      } catch {
-        if (!cancelled) setProduct(null);
-      } finally {
-        if (!cancelled) setLoading(false);
+      if (user) {
+        setUserAddress({
+          street: '88 Green Avenue',
+          city: 'Bangalore',
+          state: 'Karnataka',
+          zipCode: '560001',
+        });
       }
-    };
-
-    if (typeof id === 'string') {
-      loadProduct();
-    } else {
-      setProduct(null);
-      setLoading(false);
-    }
-
-    return () => {
-      cancelled = true;
-    };
+    }, 600);
   }, [id, user]);
 
   const handleAddToCart = () => {

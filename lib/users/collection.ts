@@ -1,7 +1,8 @@
 import { getDb } from '@/lib/mongodb';
 import { USERS_COLLECTION, type UserDocument } from '@/lib/models/user';
+import { ensureSeededAdmin } from '@/lib/auth/seedAdmin';
 
-let indexReady: Promise<void> | null = null;
+let initReady: Promise<void> | null = null;
 
 async function ensureUserIndexes() {
   const db = await getDb();
@@ -10,14 +11,21 @@ async function ensureUserIndexes() {
   await col.createIndex({ role: 1 });
 }
 
+async function ensureDbReady() {
+  await ensureUserIndexes();
+  await ensureSeededAdmin().catch((err) => {
+    console.error('[plantmart] Admin seed failed:', err);
+  });
+}
+
 export async function getUsersCollection() {
-  if (!indexReady) {
-    indexReady = ensureUserIndexes().catch((err) => {
-      indexReady = null;
+  if (!initReady) {
+    initReady = ensureDbReady().catch((err) => {
+      initReady = null;
       throw err;
     });
   }
-  await indexReady;
+  await initReady;
   const db = await getDb();
   return db.collection<UserDocument>(USERS_COLLECTION);
 }

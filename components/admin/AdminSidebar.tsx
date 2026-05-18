@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   BarChart3, 
   Users, 
@@ -24,7 +24,13 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/admin/login');
+  };
 
   const menuItems = [
     { id: 'overview', href: '/admin', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics' },
@@ -99,7 +105,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           </div>
 
           <button 
-            onClick={logout}
+            onClick={handleLogout}
             className="w-full flex items-center gap-4 px-4 py-3 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-2xl font-bold text-sm transition-all"
           >
             <LogOut className="w-5 h-5" /> Sign Out

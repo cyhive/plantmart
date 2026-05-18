@@ -21,6 +21,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { registerAccount } from '@/lib/auth/register-client';
 
 const steps = [
   { id: 1, title: 'Identity', icon: User },
@@ -117,42 +118,21 @@ export default function BecomeSellerPage() {
     }
 
     setIsSubmitting(true);
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          name: `${formData.firstName} ${formData.lastName}`.trim(),
-          email: formData.email,
-          password: formData.password,
-          role: 'seller',
-          shopName: formData.shopName,
-          phone: formData.phone,
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const msg =
-          typeof data.error === 'string'
-            ? data.error
-            : data.details && typeof data.details === 'object'
-              ? Object.values(data.details as Record<string, string[]>).flat().join(' ')
-              : 'Seller registration failed';
-        setSubmitError(msg || 'Seller registration failed');
-        return;
-      }
-      if (!data.user) {
-        setSubmitError('Unexpected response from server');
-        return;
-      }
-      login(data.user);
+    const result = await registerAccount({
+      name: `${formData.firstName} ${formData.lastName}`.trim(),
+      email: formData.email,
+      password: formData.password,
+      role: 'seller',
+      shopName: formData.shopName,
+      phone: formData.phone,
+    });
+    if (!result.ok) {
+      setSubmitError(result.error);
+    } else {
+      login(result.user);
       setIsCompleted(true);
-    } catch {
-      setSubmitError('Network error. Try again.');
-    } finally {
-      setIsSubmitting(false);
     }
+    setIsSubmitting(false);
   };
 
   if (isCompleted) {

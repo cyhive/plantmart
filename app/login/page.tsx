@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { loginWithRole } from '@/lib/auth/login-client';
-import { Leaf, ArrowRight, Mail, Phone, ShieldCheck, Timer } from 'lucide-react';
+import { useRedirectIfRole } from '@/lib/auth/use-auth-guard';
+import { Leaf, ArrowRight, Mail, Phone, ShieldCheck, Timer, Store } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function LoginPage() {
@@ -19,6 +20,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
+
+  useRedirectIfRole('buyer', '/');
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -246,9 +249,15 @@ export default function LoginPage() {
             Don't have an account?{' '}
             <Link href="/register" className="text-emerald-600 font-bold hover:underline">Create one here</Link>
           </p>
-          <div className="pt-2">
-            <Link 
-              href="/become-a-seller" 
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/seller/login"
+              className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-600 bg-slate-100 px-6 py-3 rounded-full hover:bg-slate-200 transition-all border border-slate-200"
+            >
+              <Store className="w-3.5 h-3.5" /> Seller Login
+            </Link>
+            <Link
+              href="/become-a-seller"
               className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-6 py-3 rounded-full hover:bg-emerald-100 transition-all border border-emerald-100"
             >
               <Leaf className="w-3.5 h-3.5" /> Become a Seller

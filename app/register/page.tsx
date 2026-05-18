@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { registerAccount } from '@/lib/auth/register-client';
 import { Leaf, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 
-export default function RegisterPage() {
-  const role = 'buyer';
+function RegisterForm() {
+  const searchParams = useSearchParams();
+  const [role, setRole] = useState<'buyer' | 'seller'>('buyer');
   const [formData, setFormData] = useState({ name: '', email: '', password: '', shopName: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,41 +28,21 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
 
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role,
-          ...(role === 'seller' ? { shopName: formData.shopName } : {}),
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const msg =
-          typeof data.error === 'string'
-            ? data.error
-            : data.details && typeof data.details === 'object'
-              ? Object.values(data.details as Record<string, string[]>).flat().join(' ')
-              : 'Registration failed';
-        setError(msg || 'Registration failed');
-        return;
-      }
-      if (!data.user) {
-        setError('Unexpected response from server');
-        return;
-      }
-      login(data.user);
-      router.push(data.user.role === 'seller' ? '/seller' : '/');
-    } catch {
-      setError('Network error. Try again.');
-    } finally {
-      setLoading(false);
+    const result = await registerAccount({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role,
+      ...(role === 'seller' ? { shopName: formData.shopName } : {}),
+    });
+
+    if (!result.ok) {
+      setError(result.error);
+    } else {
+      login(result.user);
+      router.push(result.user.role === 'seller' ? '/seller' : '/');
     }
+    setLoading(false);
   };
 
   return (

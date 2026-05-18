@@ -1,23 +1,7 @@
 'use client';
 
-import { useAuth } from '@/context/AuthContext';
-import { useRouter, usePathname } from 'next/navigation';
-import { useEffect } from 'react';
-import Link from 'next/link';
-import { 
-  BarChart3, 
-  Users, 
-  ShoppingCart, 
-  ShieldCheck, 
-  LogOut, 
-  Bell, 
-  Search,
-  Menu,
-  X,
-  Leaf,
-  ShieldAlert,
-  Settings
-} from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useRequireRole } from '@/lib/auth/use-auth-guard';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -30,19 +14,25 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
   const isLoginPage = pathname === '/admin/login';
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-    </div>
-  );
+  const { loading, authorized } = useRequireRole('admin', '/admin/login');
 
   if (isLoginPage) {
     return <>{children}</>;
+  }
+
+  if (loading || !authorized) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-screen flex items-center justify-center bg-slate-50"
+      >
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </motion.div>
+    );
   }
 
   return (

@@ -12,8 +12,6 @@ export const metadata: Metadata = {
   keywords: 'plants, indoor plants, outdoor plants, succulents, nursery, buy plants online',
 };
 
-import { Suspense } from 'react';
-
 export default function RootLayout({
   children,
 }: {

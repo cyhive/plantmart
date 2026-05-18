@@ -641,17 +641,3 @@ function CatalogPageContent() {
     </div>
   );
 }
-
-export default function CatalogPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-[50vh] flex items-center justify-center text-slate-500 font-medium">
-          Loading…
-        </div>
-      }
-    >
-      <CatalogPageContent />
-    </Suspense>
-  );
-} 

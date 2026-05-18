@@ -47,8 +47,13 @@ export async function PATCH(req: Request, context: RouteContext) {
     const json = await req.json();
     const parsed = updateProductSchema.safeParse(json);
     if (!parsed.success) {
+      const flat = parsed.error.flatten();
+      const fieldMsg = [flat.fieldErrors, flat.formErrors]
+        .flatMap((o) => (typeof o === 'object' && o ? Object.values(o).flat() : []))
+        .filter((x): x is string => typeof x === 'string')
+        .join(' ');
       return NextResponse.json(
-        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+        { error: fieldMsg || 'Invalid input', details: flat.fieldErrors },
         { status: 400 },
       );
     }

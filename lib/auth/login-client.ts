@@ -53,3 +53,25 @@ export async function loginWithRole(
   }
   return result;
 }
+
+/** Admin portal login — uses /api/admin/auth/login (non-admins never receive a session). */
+export async function loginAsAdmin(email: string, password: string): Promise<LoginSuccess | LoginFailure> {
+  try {
+    const res = await fetch('/api/admin/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { ok: false, error: typeof data.error === 'string' ? data.error : 'Invalid email or password' };
+    }
+    if (!data.user) {
+      return { ok: false, error: 'Unexpected response from server' };
+    }
+    return { ok: true, user: data.user as AuthUser };
+  } catch {
+    return { ok: false, error: 'Network error. Try again.' };
+  }
+}
