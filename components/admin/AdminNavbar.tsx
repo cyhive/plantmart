@@ -3,6 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { Bell, Search, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
+import Link from 'next/link';
 
 export function AdminNavbar() {
   const { user } = useAuth();
@@ -21,10 +22,12 @@ export function AdminNavbar() {
       </div>
 
       <div className="flex items-center gap-6">
-        <button className="relative p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-        </button>
+        <Link href="/admin/notifications">
+          <button className="relative p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+          </button>
+        </Link>
         <div className="w-px h-8 bg-slate-100" />
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">

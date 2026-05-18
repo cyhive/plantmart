@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 import { AdminNavbar } from '@/components/admin/AdminNavbar';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { AdminNotificationBar } from '@/components/admin/AdminNotificationBar';
 
 export default function AdminLayout({
   children,
@@ -31,6 +32,8 @@ export default function AdminLayout({
 }) {
   const { user, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const isLoginPage = pathname === '/admin/login';
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -38,12 +41,17 @@ export default function AdminLayout({
     </div>
   );
 
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col lg:flex-row">
       <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Main Content Area */}
       <div className="flex-grow flex flex-col h-screen overflow-hidden">
+        <AdminNotificationBar />
         <AdminNavbar />
 
         {/* Page Content */}

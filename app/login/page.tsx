@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { loginWithRole } from '@/lib/auth/login-client';
 import { Leaf, ArrowRight, Mail, Phone, ShieldCheck, Timer } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -24,30 +25,22 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(typeof data.error === 'string' ? data.error : 'Sign in failed');
-        return;
-      }
-      if (!data.user) {
-        setError('Unexpected response from server');
-        return;
-      }
-      login(data.user);
-      const r = data.user.role as string;
-      router.push(r === 'seller' ? '/seller' : r === 'admin' ? '/admin' : '/');
-    } catch {
-      setError('Network error. Try again.');
-    } finally {
+    const result = await loginWithRole(
+      email,
+      password,
+      'buyer',
+      'Use the seller or admin login page for that account type.',
+    );
+
+    if (!result.ok) {
+      setError(result.error);
       setLoading(false);
+      return;
     }
+
+    login(result.user);
+    router.push('/');
+    setLoading(false);
   };
 
   const handleSendOtp = async (e: React.FormEvent) => {
@@ -248,11 +241,19 @@ export default function LoginPage() {
           )}
         </div>
 
-        <div className="text-center pt-4 border-t border-slate-100">
+        <div className="text-center pt-8 border-t border-slate-100 space-y-4">
           <p className="text-sm font-medium text-slate-500">
             Don't have an account?{' '}
             <Link href="/register" className="text-emerald-600 font-bold hover:underline">Create one here</Link>
           </p>
+          <div className="pt-2">
+            <Link 
+              href="/become-a-seller" 
+              className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-6 py-3 rounded-full hover:bg-emerald-100 transition-all border border-emerald-100"
+            >
+              <Leaf className="w-3.5 h-3.5" /> Become a Seller
+            </Link>
+          </div>
         </div>
       </motion.div>
     </div>

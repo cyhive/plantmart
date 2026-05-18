@@ -10,7 +10,8 @@ import {
   LogOut, 
   Leaf,
   X,
-  Settings 
+  Settings,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'motion/react';
@@ -28,6 +29,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { id: 'overview', href: '/admin', icon: <BarChart3 className="w-5 h-5" />, label: 'Analytics' },
     { id: 'sellers', href: '/admin/sellers', icon: <Users className="w-5 h-5" />, label: 'Sellers' },
     { id: 'products', href: '/admin/products', icon: <ShoppingCart className="w-5 h-5" />, label: 'Products' },
+    { id: 'notifications', href: '/admin/notifications', icon: <Bell className="w-5 h-5" />, label: 'Notifications' },
     { id: 'settings', href: '/admin/settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
   ];
 

@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { name, email, password, role, shopName } = parsed.data;
+    const { name, email, password, role, shopName, phone } = parsed.data;
     const passwordHash = await hash(password, 12);
     const col = await getUsersCollection();
     const now = new Date();
@@ -27,6 +27,7 @@ export async function POST(req: Request) {
       passwordHash,
       name,
       role,
+      ...(phone?.trim() ? { phone: phone.trim() } : {}),
       ...(role === 'seller' && shopName?.trim() ? { shopName: shopName.trim() } : {}),
       createdAt: now,
       updatedAt: now,

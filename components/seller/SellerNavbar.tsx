@@ -1,8 +1,8 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { Bell, Search, User } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Bell, Search } from 'lucide-react';
+import Link from 'next/link'; // Import Link
 
 export function SellerNavbar() {
   const { user } = useAuth();
@@ -21,11 +21,18 @@ export function SellerNavbar() {
       </div>
 
       <div className="flex items-center gap-6">
-        <button className="relative p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
+        {/* Updated Notification Link */}
+        <Link 
+          href="/seller/notifications" 
+          className="relative p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all inline-flex items-center justify-center"
+        >
           <Bell className="w-5 h-5" />
+          {/* Notification Dot */}
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-        </button>
+        </Link>
+
         <div className="w-px h-8 bg-slate-100" />
+        
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold text-slate-900">{user?.name}</p>
