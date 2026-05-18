@@ -104,12 +104,12 @@ function CatalogPageContent() {
 
   const MOCK_PRODUCTS: Product[] = [
     { _id: '1', name: 'Monstera Deliciosa', price: 1299, sales: 120, category: 'Indoor', images: ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[0], ratings: { average: 4.8, count: 156 }, stock: 12 },
-    { _id: '2', name: 'Snake Plant (Sansevieria)', price: 899, sales: 250, category: 'Indoor', images: ['https://images.unsplash.com/photo-1593482892290-f54927ae1bbc?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[1], ratings: { average: 4.9, count: 230 }, stock: 45 },
-    { _id: '3', name: 'Fiddle Leaf Fig', price: 2499, sales: 80, category: 'Indoor', images: ['https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[2], ratings: { average: 4.7, count: 89 }, stock: 5 },
-    { _id: '4', name: 'Peace Lily', price: 699, sales: 95, category: 'Indoor', images: ['https://images.unsplash.com/photo-1593691509543-c55fb32e7355?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[0], ratings: { average: 4.6, count: 112 }, stock: 20 },
-    { _id: '5', name: 'Bonsai Pine Tree', price: 4500, sales: 30, category: 'Outdoor', images: ['https://images.unsplash.com/photo-1512428813824-f7139c82b346?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[3], ratings: { average: 5.0, count: 42 }, stock: 3 },
+    { _id: '2', name: 'Snake Plant (Sansevieria)', price: 899, sales: 250, category: 'Indoor', images: ['https://images.unsplash.com/photo-1506543731388-4978848643df?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[1], ratings: { average: 4.9, count: 230 }, stock: 45 },
+    { _id: '3', name: 'Fiddle Leaf Fig', price: 2499, sales: 80, category: 'Indoor', images: ['https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[2], ratings: { average: 4.7, count: 89 }, stock: 5 },
+    { _id: '4', name: 'Peace Lily', price: 699, sales: 95, category: 'Indoor', images: ['https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[0], ratings: { average: 4.6, count: 112 }, stock: 20 },
+    { _id: '5', name: 'Bonsai Pine Tree', price: 4500, sales: 30, category: 'Outdoor', images: ['https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[3], ratings: { average: 5.0, count: 42 }, stock: 3 },
     { _id: '6', name: 'Aloe Vera', price: 349, sales: 300, category: 'Medicinal', images: ['https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[1], ratings: { average: 4.8, count: 450 }, stock: 100 },
-    { _id: '7', name: 'Golden Pothos', price: 499, sales: 210, category: 'Indoor', images: ['https://images.unsplash.com/photo-1637967886160-fd78df3deb44?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[2], ratings: { average: 4.9, count: 320 }, stock: 15 },
+    { _id: '7', name: 'Golden Pothos', price: 499, sales: 210, category: 'Indoor', images: ['https://images.unsplash.com/photo-1591958911259-bee2173bdcdc?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[2], ratings: { average: 4.9, count: 320 }, stock: 15 },
     { _id: '8', name: 'Terracotta Hand-Painted Pot', price: 799, sales: 60, category: 'Pots', images: ['https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[0], ratings: { average: 4.7, count: 64 }, stock: 25 }
   ];
 
@@ -581,30 +581,52 @@ function CatalogPageContent() {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                        <div className="flex flex-col">
-                           <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none">Starting from</span>
-                           <div className="flex items-baseline gap-0.5 mt-0.5">
+                      <div className="pt-4 border-t border-slate-50 space-y-3">
+                        <div className="flex items-baseline justify-between">
+                           <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Starting from</span>
+                           <div className="flex items-baseline gap-0.5">
                              <span className="text-xs font-black text-emerald-600 italic">₹</span>
-                             <span className="text-xl sm:text-2xl font-display font-black text-slate-900">{product.price}</span>
+                             <span className="text-xl font-display font-black text-slate-900">{product.price}</span>
                            </div>
                         </div>
-                        <button 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            addItem({
-                              id: product._id,
-                              name: product.name,
-                              price: product.price,
-                              image: product.images[0] || '',
-                              quantity: 1,
-                              seller: { name: product.seller.name, shopName: product.seller.shopName }
-                            });
-                          }}
-                          className="bg-slate-900 text-white px-4 h-11 rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-all duration-500 shadow-md shadow-slate-900/10 hover:shadow-emerald-600/20 text-xs font-bold"
-                        >
-                           Add to Cart
-                        </button>
+                        <div className="flex items-center gap-2 w-full">
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              addItem({
+                                id: product._id,
+                                name: product.name,
+                                price: product.price,
+                                image: product.images[0] || '',
+                                quantity: 1,
+                                seller: { name: product.seller.name, shopName: product.seller.shopName }
+                              });
+                              alert(`${product.name} added to cart!`);
+                            }}
+                            className="flex-1 bg-emerald-50 text-emerald-700 h-10 rounded-xl flex items-center justify-center hover:bg-emerald-100 transition-colors border border-emerald-500/10 text-xs font-bold cursor-pointer"
+                          >
+                            <ShoppingBag className="w-3.5 h-3.5" /> <span className="ml-1 text-[10px]">Add</span>
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              addItem({
+                                id: product._id,
+                                name: product.name,
+                                price: product.price,
+                                image: product.images[0] || '',
+                                quantity: 1,
+                                seller: { name: product.seller.name, shopName: product.seller.shopName }
+                              });
+                              router.push('/cart');
+                            }}
+                            className="flex-1 bg-slate-900 text-white h-10 rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-all shadow-md text-[10px] font-black uppercase tracking-wider cursor-pointer"
+                          >
+                            Buy Now
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </motion.div>

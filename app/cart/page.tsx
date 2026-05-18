@@ -132,13 +132,18 @@ export default function CartPage() {
                       <div className="space-y-4">
                         <div className="flex items-start justify-between gap-6">
                           <div className="space-y-1">
-                            <Link href={`/plants/${item.id}`}>
+                            <Link href={`/plants/${item.id.split('-')[0]}`}>
                               <h3 className="text-3xl font-display font-black text-slate-900 hover:text-emerald-700 transition-colors tracking-tight italic">{item.name}</h3>
                             </Link>
                             <div className="flex items-center gap-3">
                                <div className="px-3 py-1 bg-slate-50 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-100">
                                   {item.seller.shopName}
                                </div>
+                               {item.size && (
+                                 <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">
+                                    Size: {item.size}
+                                 </span>
+                               )}
                                <span className="flex items-center gap-1 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
                                   <CheckCircle2 className="w-3 h-3" /> Verified
                                </span>

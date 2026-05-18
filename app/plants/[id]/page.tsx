@@ -34,6 +34,12 @@ export default function ProductDetailPage() {
   const [showCheckoutPreview, setShowCheckoutPreview] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
+  const [selectedSize, setSelectedSize] = useState<'Small' | 'Medium' | 'Large'>('Medium');
+  const sizeAdjustments = {
+    'Small': 0,
+    'Medium': 300,
+    'Large': 600
+  };
   const [reviews, setReviews] = useState([
     { id: 1, author: 'Priya S.', rating: 5, date: 'October 12, 2025', comment: 'Absolutely beautiful plant! Arrived in perfect condition and the packaging was very secure. Highly recommend this nursery.' },
     { id: 2, author: 'Rahul K.', rating: 4, date: 'September 28, 2025', comment: 'Healthy plant, but it took a bit longer to arrive than expected. Otherwise, very happy with the purchase.' },
@@ -71,12 +77,13 @@ export default function ProductDetailPage() {
   const handleAddToCart = () => {
     if (!product) return;
     addItem({
-      id: product._id,
+      id: `${product._id}-${selectedSize}`,
       name: product.name,
-      price: product.price,
+      price: product.price + sizeAdjustments[selectedSize],
       image: product.images[0],
       quantity: quantity,
-      seller: product.seller
+      seller: product.seller,
+      size: selectedSize
     });
     setShowCheckoutPreview(true);
   };
@@ -84,26 +91,19 @@ export default function ProductDetailPage() {
   const handleBuyNow = () => {
     if (!product) return;
     addItem({
-      id: product._id,
+      id: `${product._id}-${selectedSize}`,
       name: product.name,
-      price: product.price,
+      price: product.price + sizeAdjustments[selectedSize],
       image: product.images[0],
       quantity: quantity,
-      seller: product.seller
+      seller: product.seller,
+      size: selectedSize
     });
     router.push('/cart');
   };
 
   const handleProceedToCheckout = () => {
     if (!product) return;
-    addItem({
-      id: product._id,
-      name: product.name,
-      price: product.price,
-      image: product.images[0],
-      quantity: quantity,
-      seller: product.seller
-    });
     router.push('/cart');
   };
   
@@ -141,7 +141,8 @@ export default function ProductDetailPage() {
     { label: product.name }
   ];
 
-  const originalPrice = Math.round(product.price * 1.25);
+  const currentPrice = product.price + sizeAdjustments[selectedSize];
+  const currentOriginalPrice = Math.round(currentPrice * 1.25);
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-28 lg:pb-16">
@@ -150,11 +151,11 @@ export default function ProductDetailPage() {
         
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 mt-6">
           {/* Image Gallery - Sticky on large screens */}
-          <div className="lg:w-1/2 lg:sticky lg:top-28 h-fit space-y-6">
+          <div className="lg:w-[40%] lg:sticky lg:top-28 h-fit space-y-6">
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }} 
               animate={{ opacity: 1, scale: 1 }} 
-              className="aspect-square bg-white rounded-[36px] md:rounded-[48px] overflow-hidden border border-slate-100 shadow-2xl relative group"
+              className="aspect-square max-h-[480px] w-full mx-auto bg-white rounded-[36px] md:rounded-[48px] overflow-hidden border border-slate-100 shadow-2xl relative group"
             >
               <img 
                 src={product.images[activeImage] || 'https://via.placeholder.com/800x800?text=No+Image'} 
@@ -174,16 +175,22 @@ export default function ProductDetailPage() {
                 <button 
                   key={i} 
                   onClick={() => setActiveImage(i)} 
-                  className={`w-20 h-20 md:w-24 md:h-24 rounded-[20px] md:rounded-[24px] overflow-hidden border-4 flex-shrink-0 transition-all duration-300 ${activeImage === i ? 'border-emerald-500 scale-105 shadow-md shadow-emerald-500/10' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-102'}`}
+                  className={`w-20 h-20 md:w-24 md:h-24 rounded-[20px] md:rounded-[24px] p-1 flex-shrink-0 transition-all duration-300 cursor-pointer ${
+                    activeImage === i 
+                      ? 'bg-emerald-500 scale-105 shadow-lg shadow-emerald-500/20' 
+                      : 'bg-slate-200/50 opacity-60 hover:opacity-100 hover:scale-102'
+                  }`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <div className="w-full h-full rounded-[16px] md:rounded-[20px] overflow-hidden">
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </div>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Product Info */}
-          <div className="lg:w-1/2 space-y-8 md:space-y-10">
+          <div className="lg:w-[60%] space-y-8 md:space-y-10">
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <span className="px-4 py-1.5 bg-emerald-50 text-emerald-700 text-[10px] font-extrabold rounded-full uppercase tracking-widest border border-emerald-100">{product.category}</span>
@@ -215,12 +222,72 @@ export default function ProductDetailPage() {
               </div>
               
               <div className="flex items-baseline gap-4">
-                <span className="text-4xl md:text-5xl font-display font-black text-emerald-900">₹{product.price}</span>
-                <span className="text-lg text-slate-400 font-medium line-through">₹{originalPrice}</span>
+                <span className="text-4xl md:text-5xl font-display font-black text-emerald-900">₹{currentPrice}</span>
+                <span className="text-lg text-slate-400 font-medium line-through">₹{currentOriginalPrice}</span>
                 <span className="text-xs bg-emerald-500 text-white font-extrabold px-2.5 py-1 rounded-lg uppercase tracking-wider">Save 25%</span>
               </div>
             </div>
 
+            {/* Size Selector, Quantity Selector, and Aggregate Price */}
+            <div className="flex flex-wrap items-center justify-between gap-6 bg-white p-6 rounded-[32px] border border-slate-100 shadow-xs w-full">
+              {/* Pot Size Selector */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest ml-1">Pot Size</span>
+                <div className="flex items-center bg-slate-50 rounded-2xl p-1 border border-slate-200/50 gap-1">
+                  {(['Small', 'Medium', 'Large'] as const).map(sz => (
+                    <button
+                      key={sz}
+                      onClick={() => setSelectedSize(sz)}
+                      className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                        selectedSize === sz
+                          ? 'bg-emerald-600 text-white shadow-md'
+                          : 'bg-white text-slate-600 hover:bg-slate-100 border border-transparent hover:border-slate-200'
+                      }`}
+                    >
+                      {sz}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quantity Selector */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest ml-1">Quantity Selector</span>
+                <div className="flex items-center bg-slate-50 rounded-2xl p-1 border border-slate-200/50">
+                  <button 
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    disabled={quantity <= 1}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white hover:bg-slate-100 text-slate-600 disabled:opacity-20 disabled:cursor-not-allowed shadow-sm transition-all active:scale-95 cursor-pointer"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <div className="w-12 text-center font-display font-black text-xl text-slate-900 select-none">
+                    {quantity}
+                  </div>
+                  <button 
+                    onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}
+                    disabled={quantity >= product.stock}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white hover:bg-slate-100 text-slate-600 disabled:opacity-20 disabled:cursor-not-allowed shadow-sm transition-all active:scale-95 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Aggregate Price */}
+              <div className="flex flex-col gap-1 pr-4">
+                <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest ml-1">Aggregate Price</span>
+                <div className="text-3xl font-display font-black text-emerald-900 flex items-baseline gap-1">
+                  <span className="text-base font-bold">₹</span>
+                  {currentPrice * quantity}
+                </div>
+              </div>
+            </div>
+
+            {/* Subtle Trust Label */}
+            <div className="pt-4 pb-2 border-b border-slate-100 flex items-center gap-3 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" /> 7-Day Nursery Fresh Guarantee • Express Doorstep Delivery
+            </div>
             {/* Care Grid */}
             <div className="grid grid-cols-3 gap-4 md:gap-6">
               {[
@@ -248,83 +315,7 @@ export default function ProductDetailPage() {
               <p className="text-slate-600 leading-relaxed text-sm md:text-base italic font-medium">&quot;{product.description}&quot;</p>
             </div>
 
-            {/* Quantity Selector and Total Price */}
-            <div className="flex flex-wrap items-center gap-8 bg-white p-6 rounded-[32px] border border-slate-100 shadow-xs">
-              <div className="flex flex-col gap-2">
-                <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest ml-1">Quantity Selector</span>
-                <div className="flex items-center bg-slate-50 rounded-2xl p-1 border border-slate-200/50">
-                  <button 
-                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    disabled={quantity <= 1}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white hover:bg-slate-100 text-slate-600 disabled:opacity-20 disabled:cursor-not-allowed shadow-sm transition-all active:scale-95 cursor-pointer"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <div className="w-12 text-center font-display font-black text-xl text-slate-900 select-none">
-                    {quantity}
-                  </div>
-                  <button 
-                    onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}
-                    disabled={quantity >= product.stock}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white hover:bg-slate-100 text-slate-600 disabled:opacity-20 disabled:cursor-not-allowed shadow-sm transition-all active:scale-95 cursor-pointer"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest ml-1">Aggregate Price</span>
-                <div className="text-3xl font-display font-black text-emerald-900 flex items-baseline gap-1">
-                  <span className="text-base font-bold">₹</span>
-                  {product.price * quantity}
-                </div>
-              </div>
-            </div>
-
-            {/* Primary Action Buttons (Always displayed together when page is open) */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleAddToCart}
-                className="flex-1 bg-emerald-50 text-emerald-700 border-2 border-emerald-500/20 py-4.5 rounded-[24px] font-black text-sm uppercase tracking-wider hover:bg-emerald-100 hover:border-emerald-500/30 transition-all shadow-md flex items-center justify-center gap-3 cursor-pointer"
-              >
-                <ShoppingCart className="w-5 h-5" /> Add to Cart
-              </motion.button>
-              
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleBuyNow}
-                className="flex-1 bg-slate-900 text-white py-4.5 rounded-[24px] font-black text-sm uppercase tracking-wider hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 flex items-center justify-center gap-3 cursor-pointer"
-              >
-                <ArrowRight className="w-5 h-5 text-emerald-400" /> Buy Now
-              </motion.button>
-              
-              <div className="flex gap-4 sm:flex-shrink-0 justify-center sm:justify-start">
-                <motion.button 
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setWishlisted(!wishlisted)}
-                  className={`w-14 h-14 rounded-[24px] flex items-center justify-center transition-all border shadow-sm cursor-pointer ${wishlisted ? 'bg-red-50 text-red-500 border-red-200' : 'bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 border-slate-100'}`}
-                >
-                  <Heart className={`w-5 h-5 ${wishlisted ? 'fill-red-500 text-red-500' : ''}`} />
-                </motion.button>
-                
-                <motion.button 
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    alert("Botanical link copied to clipboard!");
-                  }}
-                  className="w-14 h-14 bg-white text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-[24px] flex items-center justify-center transition-all border border-slate-100 shadow-md cursor-pointer"
-                >
-                  <Share2 className="w-5 h-5" />
-                </motion.button>
-              </div>
-            </div>
+           
 
             {/* Trust and Logistics Info */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-slate-100">
@@ -496,7 +487,10 @@ export default function ProductDetailPage() {
                     <h3 className="font-bold text-slate-900 text-lg">{product.name}</h3>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500 font-medium">Qty: {quantity}</span>
-                      <span className="text-emerald-700 font-bold">₹{product.price} / unit</span>
+                      <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[9px] font-black uppercase tracking-wider rounded-lg border border-emerald-100">
+                        Size: {selectedSize}
+                      </span>
+                      <span className="text-emerald-700 font-bold">₹{currentPrice} / unit</span>
                     </div>
                   </div>
                 </div>
@@ -537,7 +531,7 @@ export default function ProductDetailPage() {
                 <div className="pt-4 space-y-6">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400 font-medium text-lg">Total Payable</span>
-                    <span className="text-4xl font-display font-black text-emerald-900">₹{product.price * quantity}</span>
+                    <span className="text-4xl font-display font-black text-emerald-900">₹{currentPrice * quantity}</span>
                   </div>
                   
                   <div className="flex gap-4">
@@ -588,34 +582,55 @@ export default function ProductDetailPage() {
           )}
        </AnimatePresence>
 
-      {/* Mobile Sticky Quick-Purchase Bar (Always displayed at bottom when page is open) */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/90 backdrop-blur-xl border-t border-slate-100 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] px-5 py-4 pb-6 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <img 
-            src={product.images[0]} 
-            alt={product.name} 
-            className="w-12 h-12 rounded-xl object-cover border border-slate-100 flex-shrink-0"
-          />
-          <div className="min-w-0 leading-tight">
-            <h4 className="font-bold text-slate-900 truncate text-sm">{product.name}</h4>
-            <p className="text-emerald-800 font-extrabold text-base">₹{product.price}</p>
-          </div>
-        </div>
-        <div className="flex gap-2 flex-shrink-0">
-          <button 
-            onClick={handleAddToCart}
-            className="bg-emerald-50 text-emerald-700 px-4 py-3 rounded-xl font-bold text-xs hover:bg-emerald-100 transition-all flex items-center justify-center border border-emerald-500/10 cursor-pointer"
-          >
-            <ShoppingCart className="w-4 h-4" />
-          </button>
-          <button 
-            onClick={handleBuyNow}
-            className="bg-slate-900 text-white px-5 py-3 rounded-xl font-black text-xs hover:bg-slate-800 transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
-          >
-            Buy Now <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
+      {/* Universal Floating Quick-Action Bar */}
+      <motion.div 
+        initial={{ y: 100, opacity: 0, x: '-50%' }}
+        animate={{ y: 0, opacity: 1, x: '-50%' }}
+        className="fixed bottom-0 left-1/2 z-40 w-fit bg-white/90 backdrop-blur-xl border border-slate-100/80 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.12)] rounded-[24px] p-3 flex items-center gap-6 border-slate-200/50"
+      >
+        <motion.button 
+          whileHover={{ scale: 1.02 }} 
+          whileTap={{ scale: 0.98 }} 
+          onClick={handleAddToCart}
+          className="bg-emerald-50 text-emerald-700 px-6 py-3 rounded-xl font-black uppercase tracking-wider hover:bg-emerald-100 hover:text-emerald-800 transition-colors flex items-center justify-center gap-2 border border-emerald-500/20 shadow-xs cursor-pointer text-xs"
+        >
+          <ShoppingCart className="w-4 h-4" /> Add to Cart
+        </motion.button>
+        
+        <motion.button 
+          whileHover={{ scale: 1.02 }} 
+          whileTap={{ scale: 0.98 }} 
+          onClick={handleBuyNow}
+          className="bg-slate-900 text-white px-8 py-3 rounded-xl font-black uppercase tracking-wider hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10 cursor-pointer text-xs"
+        >
+          Buy Now <ArrowRight className="w-4 h-4 text-emerald-400" />
+        </motion.button>
+
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setWishlisted(!wishlisted)}
+          className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all border flex-shrink-0 cursor-pointer ${
+            wishlisted 
+              ? 'bg-red-50 text-red-500 border-red-100 shadow-inner' 
+              : 'bg-white border-slate-100 hover:bg-slate-50 hover:border-slate-200 shadow-xs'
+          }`}
+        >
+          <Heart className={`w-4 h-4 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
+        </motion.button>
+
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Botanical link copied to clipboard!");
+          }}
+          className="w-11 h-11 rounded-xl bg-white border border-slate-100 hover:bg-slate-50 hover:border-slate-200 shadow-xs flex items-center justify-center flex-shrink-0 cursor-pointer transition-all active:scale-95"
+        >
+          <Share2 className="w-4 h-4 text-slate-400" />
+        </motion.button>
+      </motion.div>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export function Navbar() {
@@ -21,6 +21,11 @@ export function Navbar() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [showBanner, setShowBanner] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const isSellerPage = pathname?.startsWith('/seller');
   const isAdminPage = pathname?.startsWith('/admin');
@@ -171,7 +176,7 @@ export function Navbar() {
                   <ShoppingCart className="w-6 h-6" />
                 </div>
                 <AnimatePresence>
-                  {totalItems > 0 && (
+                  {mounted && totalItems > 0 && (
                     <motion.span 
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
