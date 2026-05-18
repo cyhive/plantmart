@@ -1,6 +1,8 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
+export const dynamic = 'force-dynamic';
+
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -40,6 +42,18 @@ interface Product {
   ratings: { average: number; count: number };
   stock: number;
   sales?: number;
+}
+
+export default function CatalogPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <CatalogPageContent />
+    </Suspense>
+  );
 }
 
 function CatalogPageContent() {
@@ -460,14 +474,14 @@ function CatalogPageContent() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <AnimatePresence mode="popLayout">
               {loading ? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="bg-white rounded-[48px] border border-slate-100 p-8 space-y-8 animate-pulse shadow-sm">
-                    <div className="aspect-square bg-slate-50 rounded-[40px]" />
-                    <div className="space-y-4">
-                      <div className="h-6 bg-slate-50 rounded-full w-2/3" />
+                Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-[24px] border border-slate-100 p-5 space-y-6 animate-pulse shadow-sm">
+                    <div className="aspect-square bg-slate-50 rounded-[18px]" />
+                    <div className="space-y-3">
+                      <div className="h-5 bg-slate-50 rounded-full w-2/3" />
                       <div className="h-4 bg-slate-50 rounded-full w-1/3" />
                     </div>
                   </div>
@@ -481,43 +495,43 @@ function CatalogPageContent() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ delay: i * 0.05 }}
-                    className="group relative bg-white rounded-[40px] border border-slate-100/80 shadow-sm hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-700 flex flex-col overflow-hidden"
+                    className="group relative bg-white rounded-[24px] border border-slate-100/80 shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-500 flex flex-col overflow-hidden h-full"
                   >
-                    <div className="relative aspect-[4/5] overflow-hidden m-2 rounded-[32px] bg-slate-50">
+                    <div className="relative aspect-square overflow-hidden m-2 rounded-[18px] bg-slate-50 flex-shrink-0">
                       <img
                         src={product.images[0] || 'https://via.placeholder.com/400x400?text=No+Image'}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
                       />
                       
-                      <div className="absolute top-4 left-4 flex flex-col gap-2">
-                        <div className="glass px-4 py-1.5 rounded-full text-[9px] font-black text-emerald-900 uppercase tracking-widest shadow-sm backdrop-blur-md border border-white/40">
+                      <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                        <div className="glass px-3 py-1 rounded-full text-[8px] font-black text-emerald-900 uppercase tracking-widest shadow-sm backdrop-blur-md border border-white/40">
                           {product.category}
                         </div>
                         {product.price > 2000 && (
-                          <div className="bg-slate-900 text-white px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5">
-                            <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" /> Rare Specimen
+                          <div className="bg-slate-900 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
+                            <Star className="w-2 h-2 fill-amber-400 text-amber-400" /> Rare Specimen
                           </div>
                         )}
                       </div>
 
                       <button 
                         onClick={(e) => toggleFavorite(product._id, e)}
-                        className="absolute top-4 right-4 z-20 w-10 h-10 glass rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-md border border-white/40 shadow-sm"
+                        className="absolute top-3 right-3 z-20 w-8.5 h-8.5 glass rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-md border border-white/40 shadow-sm"
                       >
-                        <Heart className={`w-5 h-5 transition-colors duration-300 ${favorites.includes(product._id) ? 'fill-rose-500 text-rose-500' : 'text-slate-600'}`} />
+                        <Heart className={`w-4 h-4 transition-colors duration-300 ${favorites.includes(product._id) ? 'fill-rose-500 text-rose-500' : 'text-slate-600'}`} />
                       </button>
 
-                      <div className="absolute inset-x-0 bottom-0 p-6 translate-y-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
-                         <div className="glass p-4 rounded-3xl backdrop-blur-xl border border-white/20 shadow-2xl flex items-center justify-between gap-4">
-                            <div className="flex -space-x-3">
-                               {[1,2,3].map(j => (
-                                 <div key={j} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-sm">
-                                   <img src={`https://i.pravatar.cc/100?img=${j+i}`} alt="" />
-                                 </div>
-                               ))}
+                      <div className="absolute inset-x-0 bottom-0 p-4 translate-y-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
+                         <div className="glass p-3 rounded-2xl backdrop-blur-xl border border-white/20 shadow-2xl flex items-center justify-between gap-3">
+                            <div className="flex -space-x-2.5">
+                                {[1,2,3].map(j => (
+                                  <div key={j} className="w-7 h-7 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-sm flex-shrink-0">
+                                    <img src={`https://i.pravatar.cc/100?img=${j+i}`} alt="" />
+                                  </div>
+                                ))}
                             </div>
-                            <span className="text-[10px] font-bold text-slate-700 italic flex-grow">+12 viewed</span>
+                            <span className="text-[9px] font-bold text-slate-700 italic flex-grow">+12 viewed</span>
                             <button 
                               onClick={(e) => {
                                 e.preventDefault();
@@ -530,53 +544,53 @@ function CatalogPageContent() {
                                   seller: { name: product.seller.name, shopName: product.seller.shopName }
                                 });
                               }}
-                              className="bg-emerald-600 text-white p-3 rounded-2xl shadow-xl hover:bg-emerald-700 transition-all active:scale-90"
+                              className="bg-emerald-600 text-white p-2 rounded-xl shadow-xl hover:bg-emerald-700 transition-all active:scale-90"
                             >
-                               <ShoppingBag className="w-4 h-4" />
+                               <ShoppingBag className="w-3.5 h-3.5" />
                             </button>
                          </div>
                       </div>
 
                       {product.stock <= 0 && (
                         <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[4px] flex items-center justify-center z-30">
-                           <div className="bg-white/10 backdrop-blur-xl text-white px-8 py-3 rounded-full font-black uppercase tracking-[0.2em] text-xs border border-white/20 shadow-2xl">Sold Out</div>
+                           <div className="bg-white/10 backdrop-blur-xl text-white px-6 py-2.5 rounded-full font-black uppercase tracking-[0.2em] text-[10px] border border-white/20 shadow-2xl">Sold Out</div>
                         </div>
                       )}
                     </div>
 
-                    <div className="px-8 pb-8 pt-4 space-y-6">
+                    <div className="px-5 pb-5 pt-3 space-y-4 flex flex-col justify-between flex-grow">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                            <button 
                              onClick={() => product.seller?._id && setFilters(f => ({...f, sellerId: product.seller._id}))}
-                             className="flex items-center gap-2 group/seller"
+                             className="flex items-center gap-1.5 group/seller"
                            >
-                             <div className="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-[8px] font-black text-emerald-700 border border-emerald-200 group-hover/seller:bg-emerald-600 group-hover/seller:text-white transition-colors">
+                             <div className="w-5 h-5 rounded bg-emerald-50 flex items-center justify-center text-[7px] font-black text-emerald-700 border border-emerald-100 group-hover/seller:bg-emerald-600 group-hover/seller:text-white transition-colors">
                                {product.seller?.shopName?.charAt(0)}
                              </div>
-                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover/seller:text-emerald-600 transition-colors">{product.seller?.shopName}</span>
+                             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 group-hover/seller:text-emerald-600 transition-colors truncate max-w-[100px]">{product.seller?.shopName}</span>
                            </button>
-                           <div className="flex items-center gap-1.5 text-amber-500">
+                           <div className="flex items-center gap-1 text-amber-500">
                              <Star className="w-3 h-3 fill-current" />
                              <span className="text-xs font-black text-slate-900">{product.ratings?.average || '4.5'}</span>
                            </div>
                         </div>
                         <Link href={`/plants/${product._id}`} className="block">
-                          <h3 className="font-display font-bold text-2xl text-slate-900 group-hover:text-emerald-700 transition-colors tracking-tight line-clamp-1 italic">{product.name}</h3>
+                          <h3 className="font-display font-bold text-lg sm:text-xl text-slate-900 group-hover:text-emerald-700 transition-colors tracking-tight line-clamp-1 italic">{product.name}</h3>
                         </Link>
-                        <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 italic">
-                           <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {product.seller?.address?.city}</span>
+                        <div className="flex items-center gap-3 text-[9px] font-bold text-slate-400 italic">
+                           <span className="flex items-center gap-1 truncate max-w-[80px]"><MapPin className="w-2.5 h-2.5" /> {product.seller?.address?.city}</span>
                            <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                           <span className="flex items-center gap-1"><Leaf className="w-3 h-3" /> Healthy Specimen</span>
+                           <span className="flex items-center gap-1"><Leaf className="w-2.5 h-2.5" /> Healthy Specimen</span>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+                      <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                         <div className="flex flex-col">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none">Starting from</span>
-                           <div className="flex items-baseline gap-1 mt-1">
-                             <span className="text-sm font-black text-emerald-600 italic">₹</span>
-                             <span className="text-3xl font-display font-black text-slate-900">{product.price}</span>
+                           <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none">Starting from</span>
+                           <div className="flex items-baseline gap-0.5 mt-0.5">
+                             <span className="text-xs font-black text-emerald-600 italic">₹</span>
+                             <span className="text-xl sm:text-2xl font-display font-black text-slate-900">{product.price}</span>
                            </div>
                         </div>
                         <button 
@@ -591,7 +605,7 @@ function CatalogPageContent() {
                               seller: { name: product.seller.name, shopName: product.seller.shopName }
                             });
                           }}
-                          className="bg-slate-900 text-white px-5 h-14 rounded-[20px] flex items-center justify-center hover:bg-emerald-600 transition-all duration-500 shadow-xl shadow-slate-900/10 hover:shadow-emerald-600/20 text-sm font-bold"
+                          className="bg-slate-900 text-white px-4 h-11 rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-all duration-500 shadow-md shadow-slate-900/10 hover:shadow-emerald-600/20 text-xs font-bold"
                         >
                            Add to Cart
                         </button>

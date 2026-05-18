@@ -34,7 +34,7 @@ export function AdminNotificationBar() {
             <div className="absolute -top-[100%] -right-[10%] w-[30%] h-[300%] bg-blue-500/5 blur-[100px] -rotate-12" />
           </div>
 
-          <div className="max-w-[1600px] mx-auto px-6 py-2.5 flex items-center justify-between gap-4">
+          {/* <div className="max-w-[1600px] mx-auto px-6 py-2.5 flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 flex-grow overflow-hidden">
               <div className="hidden sm:flex items-center justify-center w-8 h-8 bg-emerald-500/20 rounded-lg border border-emerald-500/20">
                 <ShieldAlert className="w-4 h-4 text-emerald-400" />
@@ -64,7 +64,7 @@ export function AdminNotificationBar() {
             >
               <X className="w-4 h-4" />
             </button>
-          </div>
+          </div> */}
         </motion.div>
       )}
     </AnimatePresence>

@@ -1,15 +1,14 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { Leaf, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 
-function RegisterForm() {
-  const searchParams = useSearchParams();
-  const [role, setRole] = useState<'buyer' | 'seller'>('buyer');
+export default function RegisterPage() {
+  const role = 'buyer';
   const [formData, setFormData] = useState({ name: '', email: '', password: '', shopName: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);

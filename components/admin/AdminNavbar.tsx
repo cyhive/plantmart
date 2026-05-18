@@ -1,16 +1,26 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { Bell, Search, ShieldCheck } from 'lucide-react';
+import { Bell, Search, ShieldCheck, Menu } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 
-export function AdminNavbar() {
+interface AdminNavbarProps {
+  onMenuClick: () => void;
+}
+
+export function AdminNavbar({ onMenuClick }: AdminNavbarProps) {
   const { user } = useAuth();
 
   return (
-    <header className="bg-white border-b border-slate-100 px-8 h-20 flex items-center justify-between sticky top-0 z-30 flex-shrink-0">
-      <div className="flex items-center gap-6 flex-grow max-w-xl">
+    <header className="bg-white border-b border-slate-100 px-4 md:px-8 h-20 flex items-center justify-between sticky top-0 z-30 flex-shrink-0">
+      <div className="flex items-center gap-4 md:gap-6 flex-grow max-w-xl">
+        <button 
+          onClick={onMenuClick}
+          className="lg:hidden p-2 text-slate-500 hover:bg-slate-50 rounded-xl transition-all"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
         <div className="relative w-full group hidden md:block">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-emerald-600 transition-colors" />
           <input 

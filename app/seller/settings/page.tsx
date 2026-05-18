@@ -6,8 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Store, 
   Mail, 
-  User as UserIcon, 
-  ShieldCheck, 
+  ShieldCheck,
   Save, 
   Globe, 
   Phone, 
@@ -15,23 +14,52 @@ import {
   ImageIcon, 
   FileText,
   Camera,
-  RefreshCw
+  RefreshCw,
+  Building2,
+  Briefcase,
+  Upload,
+  User,
+  CreditCard,
+  FileCheck
 } from 'lucide-react';
+
+const statesAndDistricts: Record<string, string[]> = {
+  'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Nashik', 'Thane'],
+  'Karnataka': ['Bangalore', 'Mysore', 'Hubli', 'Belgaum', 'Mangalore'],
+  'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Salem', 'Trichy'],
+  'Kerala': ['Kochi', 'Trivandrum', 'Kozhikode', 'Thrissur', 'Kollam'],
+  'Delhi': ['New Delhi', 'North Delhi', 'South Delhi', 'East Delhi', 'West Delhi'],
+  'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Agra', 'Varanasi', 'Meerut'],
+  'Gujarat': ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar'],
+  'West Bengal': ['Kolkata', 'Howrah', 'Durgapur', 'Siliguri', 'Asansol'],
+};
 
 export default function SellerSettingsPage() {
   const { user } = useAuth();
   
-  // Expanded state to include all fields from the Nursery Detail Page
+  // Expanded state to include all fields from registration
   const [formData, setFormData] = useState({
-    name: user?.name || 'Alexander Garden',
+    firstName: user?.name?.split(' ')[0] || 'Alexander',
+    lastName: user?.name?.split(' ')[1] || 'Garden',
     email: user?.email || 'alexander@green-garden.com',
-    shopName: user?.shopName || 'Green Garden Nursery',
     phone: '+91 98765 43210',
-    location: 'Pune, Maharashtra',
-    website: 'www.greengarden.com',
+    shopName: (user as any)?.shopName || 'Green Garden Nursery',
+    shopCategory: 'Nursery',
     description: 'Specializing in exotic indoor foliage and rare succulents. Our family-run nursery has been providing high-quality botanical specimens since 2012.',
-    image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=1200'
+    address: '123 Green Lane, Botanical District',
+    district: 'Pune',
+    state: 'Maharashtra',
+    pinCode: '411001',
+    businessType: 'Individual',
+    taxId: 'ABCDE1234F',
+    website: 'www.greengarden.com',
+    image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=1200',
+    idProof: null as string | null
   });
+
+  const [districts, setDistricts] = useState<string[]>(
+    statesAndDistricts[formData.state] || []
+  );
 
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -112,11 +140,77 @@ export default function SellerSettingsPage() {
             <div className="lg:col-span-2 space-y-8">
               <div className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm space-y-12">
                 
-                {/* Section: Identity */}
+                {/* Section: Identity & Contact */}
+                <div className="space-y-8">
+                  <div className="flex items-center gap-4 border-b border-slate-50 pb-4">
+                    <User className="w-6 h-6 text-emerald-600" />
+                    <h3 className="text-xl font-display font-bold text-slate-900 uppercase tracking-tight">Identity & Contact</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</label>
+                      <input 
+                        type="text" 
+                        value={formData.firstName}
+                        onChange={e => setFormData({...formData, firstName: e.target.value})}
+                        className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Last Name</label>
+                      <input 
+                        type="text" 
+                        value={formData.lastName}
+                        onChange={e => setFormData({...formData, lastName: e.target.value})}
+                        className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+                      <div className="relative">
+                        <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                        <input 
+                          type="email" 
+                          disabled
+                          value={formData.email}
+                          className="w-full pl-12 pr-6 py-4 bg-slate-100 border-none rounded-2xl cursor-not-allowed font-bold text-slate-500"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label>
+                      <div className="relative">
+                        <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                        <input 
+                          type="tel" 
+                          value={formData.phone}
+                          onChange={e => setFormData({...formData, phone: e.target.value})}
+                          className="w-full pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold"
+                        />
+                      </div>
+                    </div>
+                    <div className="md:col-span-2 space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Website (Optional)</label>
+                      <div className="relative">
+                        <Globe className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                        <input 
+                          type="text" 
+                          value={formData.website}
+                          onChange={e => setFormData({...formData, website: e.target.value})}
+                          className="w-full pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold"
+                          placeholder="www.yournursery.com"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section: Store Identity */}
                 <div className="space-y-8">
                   <div className="flex items-center gap-4 border-b border-slate-50 pb-4">
                     <Store className="w-6 h-6 text-emerald-600" />
-                    <h3 className="text-xl font-display font-bold text-slate-900 uppercase tracking-tight">Identity & Reach</h3>
+                    <h3 className="text-xl font-display font-bold text-slate-900 uppercase tracking-tight">Storefront Details</h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -130,34 +224,143 @@ export default function SellerSettingsPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Business Location</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Shop Category</label>
                       <div className="relative">
-                        <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
-                        <input 
-                          type="text" 
-                          value={formData.location}
-                          onChange={e => setFormData({...formData, location: e.target.value})}
-                          className="w-full pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold"
-                        />
+                        <Briefcase className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                        <select 
+                          value={formData.shopCategory}
+                          onChange={e => setFormData({...formData, shopCategory: e.target.value})}
+                          className="w-full pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold appearance-none"
+                        >
+                          <option>Nursery</option>
+                          <option>Seeds & Bulbs</option>
+                          <option>Tools & Equipment</option>
+                          <option>Pots & Planters</option>
+                          <option>Fertilizers</option>
+                        </select>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Section: The Story (Long Description) */}
-                <div className="space-y-8">
-                  <div className="flex items-center gap-4 border-b border-slate-50 pb-4">
-                    <FileText className="w-6 h-6 text-emerald-600" />
-                    <h3 className="text-xl font-display font-bold text-slate-900 uppercase tracking-tight">Botanical Story</h3>
-                  </div>
+                  
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">About the Nursery</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Botanical Story (Description)</label>
                     <textarea 
                       rows={4}
                       value={formData.description}
                       onChange={e => setFormData({...formData, description: e.target.value})}
                       className="w-full px-6 py-5 bg-slate-50 border-none rounded-3xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-medium text-slate-600 italic leading-relaxed resize-none"
                     />
+                  </div>
+                </div>
+
+                {/* Section: Business & Legal */}
+                <div className="space-y-8">
+                  <div className="flex items-center gap-4 border-b border-slate-50 pb-4">
+                    <Building2 className="w-6 h-6 text-emerald-600" />
+                    <h3 className="text-xl font-display font-bold text-slate-900 uppercase tracking-tight">Business & Legal</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Business Type</label>
+                      <select 
+                        value={formData.businessType}
+                        onChange={e => setFormData({...formData, businessType: e.target.value})}
+                        className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold appearance-none"
+                      >
+                        <option>Individual</option>
+                        <option>Proprietorship</option>
+                        <option>Partnership</option>
+                        <option>Private Limited</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Tax ID / PAN / GST</label>
+                      <div className="relative">
+                        <CreditCard className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                        <input 
+                          type="text" 
+                          value={formData.taxId}
+                          onChange={e => setFormData({...formData, taxId: e.target.value})}
+                          className="w-full pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold"
+                        />
+                      </div>
+                    </div>
+                    <div className="md:col-span-2 space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Identity Proof (PDF/Image)</label>
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1 relative">
+                          <FileCheck className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                          <div className="w-full pl-12 pr-6 py-4 bg-emerald-50/50 border-2 border-dashed border-emerald-100 rounded-2xl font-bold text-emerald-700 text-sm">
+                            {formData.idProof ? 'document_verified.pdf' : 'No document uploaded'}
+                          </div>
+                        </div>
+                        <button type="button" className="px-6 py-4 bg-white border border-slate-200 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-colors">
+                          Replace
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section: Warehouse Address */}
+                <div className="space-y-8">
+                  <div className="flex items-center gap-4 border-b border-slate-50 pb-4">
+                    <MapPin className="w-6 h-6 text-emerald-600" />
+                    <h3 className="text-xl font-display font-bold text-slate-900 uppercase tracking-tight">Warehouse Address</h3>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Street Address</label>
+                    <input 
+                      type="text" 
+                      value={formData.address}
+                      onChange={e => setFormData({...formData, address: e.target.value})}
+                      className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">State</label>
+                      <select 
+                        value={formData.state}
+                        onChange={e => {
+                          const newState = e.target.value;
+                          setFormData({...formData, state: newState, district: ''});
+                          setDistricts(statesAndDistricts[newState] || []);
+                        }}
+                        className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold appearance-none"
+                      >
+                        <option value="">Select State</option>
+                        {Object.keys(statesAndDistricts).map(state => (
+                          <option key={state} value={state}>{state}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">District</label>
+                      <select 
+                        disabled={!formData.state}
+                        value={formData.district}
+                        onChange={e => setFormData({...formData, district: e.target.value})}
+                        className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold appearance-none disabled:opacity-50"
+                      >
+                        <option value="">Select District</option>
+                        {districts.map(district => (
+                          <option key={district} value={district}>{district}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Pin Code</label>
+                      <input 
+                        type="text" 
+                        value={formData.pinCode}
+                        onChange={e => setFormData({...formData, pinCode: e.target.value})}
+                        className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold"
+                      />
+                    </div>
                   </div>
                 </div>
 

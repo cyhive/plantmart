@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
+import SellerReviewForm from '@/components/seller/SellerReviewForm';
 
 interface Nursery {
   id: string;
@@ -39,8 +40,13 @@ export default function NurseryDetailPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'plants' | 'reviews' | 'about'>('plants');
-
-  // Mock Nursery Data
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [openAboutAccordion, setOpenAboutAccordion] = useState<number | null>(0);
+  const [reviews, setReviews] = useState([
+    { id: 1, author: 'Priya S.', rating: 5, date: 'October 12, 2025', comment: 'Absolutely beautiful plant! Arrived in perfect condition and the packaging was very secure. Highly recommend this nursery.' },
+    { id: 2, author: 'Rahul K.', rating: 4, date: 'September 28, 2025', comment: 'Healthy plant, but it took a bit longer to arrive than expected. Otherwise, very happy with the purchase.' },
+    { id: 3, author: 'Anita M.', rating: 5, date: 'September 15, 2025', comment: 'Thriving beautifully in my living room. The care instructions provided were very helpful for a beginner like me.' },
+  ]);
   const mockNurseries: Record<string, Nursery> = {
     '1': { 
       id: '1', 
@@ -88,11 +94,10 @@ export default function NurseryDetailPage() {
     { id: '4', name: 'Peace Lily', price: 699, image: 'https://images.unsplash.com/photo-1593691509543-c55fb32e7355?auto=format&fit=crop&q=80&w=800', category: 'Indoor' }
   ];
 
-  const mockReviews = [
-    { id: 1, author: 'Priya S.', rating: 5, date: 'October 12, 2025', comment: 'Absolutely beautiful plant! Arrived in perfect condition and the packaging was very secure. Highly recommend this nursery.' },
-    { id: 2, author: 'Rahul K.', rating: 4, date: 'September 28, 2025', comment: 'Healthy plant, but it took a bit longer to arrive than expected. Otherwise, very happy with the purchase.' },
-    { id: 3, author: 'Anita M.', rating: 5, date: 'September 15, 2025', comment: 'Thriving beautifully in my living room. The care instructions provided were very helpful for a beginner like me.' },
-  ];
+  const handleReviewSubmit = (newReview: any) => {
+    setReviews([newReview, ...reviews]);
+    // Close form after a short delay (handled in component or here)
+  };
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 800);
@@ -198,25 +203,25 @@ export default function NurseryDetailPage() {
                   <Link href="/plants" className="text-emerald-600 font-bold hover:underline flex items-center gap-2">Explore All <ChevronRight className="w-4 h-4" /></Link>
                </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                   {mockPlants.map((plant) => (
                     <Link key={plant.id} href={`/plants/${plant.id}`}>
                       <motion.div 
-                        whileHover={{ y: -10 }}
-                        className="group bg-white rounded-[48px] border border-slate-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500"
+                        whileHover={{ y: -6 }}
+                        className="group bg-white rounded-[24px] border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 p-3 flex flex-col h-full"
                       >
-                         <div className="relative h-80 overflow-hidden">
+                         <div className="relative aspect-square overflow-hidden rounded-[18px] bg-slate-50 mb-3 flex-shrink-0">
                             <img src={plant.image} alt={plant.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
-                            <div className="absolute top-6 left-6 px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-emerald-900 border border-white">
+                            <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-widest text-emerald-900 border border-white">
                                {plant.category}
                             </div>
                          </div>
-                         <div className="p-8 space-y-4">
-                            <div className="flex justify-between items-start">
-                               <h3 className="text-2xl font-display font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">{plant.name}</h3>
-                               <div className="text-2xl font-display font-black text-emerald-900">₹{plant.price}</div>
+                         <div className="px-1.5 pb-2 space-y-2 flex flex-col justify-between flex-grow">
+                            <div className="flex justify-between items-center gap-2">
+                               <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors line-clamp-1">{plant.name}</h3>
+                               <div className="text-lg font-display font-black text-emerald-900 flex-shrink-0">₹{plant.price}</div>
                             </div>
-                            <div className="flex items-center gap-1 text-amber-400">
+                            <div className="flex items-center gap-0.5 text-amber-400">
                                {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}
                             </div>
                          </div>
@@ -236,7 +241,7 @@ export default function NurseryDetailPage() {
               className="grid grid-cols-1 lg:grid-cols-3 gap-12"
             >
                <div className="lg:col-span-2 space-y-8">
-                  {mockReviews.map((review) => (
+                  {reviews.map((review) => (
                     <div key={review.id} className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm space-y-6">
                        <div className="flex items-start justify-between">
                           <div className="flex items-center gap-4">
@@ -270,7 +275,12 @@ export default function NurseryDetailPage() {
                         <h3 className="text-3xl font-display font-bold">Trusted Expert</h3>
                         <p className="text-slate-400 text-sm font-medium leading-relaxed italic">This nursery has maintained a 4.5+ rating for over 12 consecutive months.</p>
                      </div>
-                     <button className="w-full bg-white text-slate-900 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Write a Review</button>
+                     <button 
+                        onClick={() => setShowReviewForm(true)}
+                        className="w-full bg-white text-slate-900 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all shadow-lg hover:shadow-emerald-500/30"
+                     >
+                        Write a Review
+                     </button>
                   </div>
                   
                   <div className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm space-y-6">
@@ -309,19 +319,71 @@ export default function NurseryDetailPage() {
                      <p className="text-slate-600 text-xl font-medium leading-relaxed italic">"{nursery.description}"</p>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                     <div className="p-8 rounded-[32px] bg-white border border-slate-100 shadow-sm space-y-4">
-                        <Award className="w-10 h-10 text-emerald-600" />
-                        <h4 className="text-xl font-bold text-slate-900">Certified Nursery</h4>
-                        <p className="text-sm text-slate-500 font-medium">Holds all national botanical cultivation certifications.</p>
-                     </div>
-                     <div className="p-8 rounded-[32px] bg-white border border-slate-100 shadow-sm space-y-4">
-                        <MapPin className="w-10 h-10 text-emerald-600" />
-                        <h4 className="text-xl font-bold text-slate-900">Strategic Hub</h4>
-                        <p className="text-sm text-slate-500 font-medium">Located in a prime climate zone for tropical cultivation.</p>
-                     </div>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        title: "Our Botanical Heritage",
+                        content: "Founded over a decade ago, our nursery has been a pioneer in sustainable tropical cultivation. We specialize in rare indoor species and high-health foliage, ensuring every plant that leaves our care is ready to thrive in your home.",
+                        icon: <Award className="w-5 h-5" />
+                      },
+                      {
+                        title: "Eco-Conscious Practices",
+                        content: "We use 100% organic fertilizers and integrated pest management systems. Our watering protocols utilize recycled rainwater, reducing our environmental footprint while producing stronger, more resilient plants.",
+                        icon: <Leaf className="w-5 h-5" />
+                      },
+                      {
+                        title: "Delivery & Guarantee",
+                        content: "Every plant is secured in our custom eco-packaging and includes a 7-day health guarantee. We provide direct consultation for the first 30 days to ensure your new botanical companion settles in perfectly.",
+                        icon: <ShieldCheck className="w-5 h-5" />
+                      }
+                    ].map((item, i) => (
+                      <div 
+                        key={i}
+                        className={`group rounded-[32px] border transition-all duration-500 overflow-hidden ${
+                          openAboutAccordion === i 
+                            ? 'bg-white border-emerald-200 shadow-xl shadow-emerald-500/5' 
+                            : 'bg-white/50 border-slate-100 hover:border-emerald-200'
+                        }`}
+                      >
+                        <button
+                          onClick={() => setOpenAboutAccordion(openAboutAccordion === i ? null : i)}
+                          className="w-full px-8 py-6 flex items-center justify-between text-left"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-500 ${
+                              openAboutAccordion === i ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-600'
+                            }`}>
+                              {item.icon}
+                            </div>
+                            <span className={`text-lg font-bold transition-colors duration-300 ${openAboutAccordion === i ? 'text-emerald-700' : 'text-slate-900'}`}>
+                              {item.title}
+                            </span>
+                          </div>
+                          <ChevronRight className={`w-5 h-5 transition-all duration-500 ${
+                            openAboutAccordion === i ? 'rotate-90 text-emerald-500' : 'text-slate-300 group-hover:text-emerald-400'
+                          }`} />
+                        </button>
+                        
+                        <AnimatePresence>
+                          {openAboutAccordion === i && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            >
+                              <div className="px-8 pb-8 pl-22">
+                                <p className="text-slate-500 text-lg leading-relaxed italic">
+                                  {item.content}
+                                </p>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ))}
                   </div>
-               </div>
+                </div>
                
                <div className="relative">
                   <div className="aspect-square rounded-[80px] overflow-hidden border-8 border-white shadow-2xl relative z-10 group">
@@ -335,6 +397,33 @@ export default function NurseryDetailPage() {
           )}
         </AnimatePresence>
       </div>
+
+       {/* Review Modal */}
+       <AnimatePresence>
+          {showReviewForm && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowReviewForm(false)}
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              />
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="relative w-full max-w-2xl z-10"
+              >
+                <SellerReviewForm 
+                  sellerName={nursery.shopName} 
+                  onClose={() => setShowReviewForm(false)}
+                  onSubmitSuccess={handleReviewSubmit}
+                />
+              </motion.div>
+            </div>
+          )}
+       </AnimatePresence>
     </div>
   );
 }

@@ -42,17 +42,18 @@ export function Footer() {
     {
       title: 'Support',
       links: [
-        { name: 'Help Center', href: '/help' },
+        { name: 'Help Center', href: '/support' },
         { name: 'Shipping Info', href: '/shipping' },
         { name: 'Return Policy', href: '/returns' },
         { name: 'Track Order', href: '/track' },
+        { name: 'Care Journal', href: '/care-journal' },
         { name: 'Contact Us', href: '/contact' },
       ],
     },
     {
       title: 'Company',
       links: [
-        { name: 'Our Story', href: '/about' },
+        // { name: 'Our Story', href: '/about' },
         { name: 'Verified Nurseries', href: '/sellers' },
         { name: 'Sustainability', href: '/sustainability' },
         { name: 'Careers', href: '/careers' },

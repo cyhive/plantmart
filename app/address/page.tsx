@@ -285,7 +285,16 @@ export default function AddressPage() {
                 <div className="h-[400px] rounded-3xl overflow-hidden border border-slate-100 shadow-inner">
                    <AddressMap 
                      address={{ coordinates: formData.coordinates }}
-                     setAddress={(updater) => setFormData((prev) => updater(prev))}
+                     setAddress={(update: any) => {
+                       if (typeof update === 'function') {
+                         setFormData(prev => {
+                           const res = update(prev);
+                           return { ...prev, coordinates: res.coordinates };
+                         });
+                       } else {
+                         setFormData(prev => ({ ...prev, coordinates: update.coordinates }));
+                       }
+                     }}
                      setActiveTab={setActiveTab}
                      handleGetLiveLocation={() => {}}
                    />
