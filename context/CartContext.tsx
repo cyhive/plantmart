@@ -9,6 +9,7 @@ interface CartItem {
   image: string;
   quantity: number;
   seller: { name: string; shopName: string };
+  size?: string;
 }
 
 interface CartContextType {
@@ -25,6 +26,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -36,12 +38,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Failed to parse cart', e);
       }
     }
+    setHasLoaded(true);
   }, []);
 
   // Save cart to localStorage on change
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(items));
-  }, [items]);
+    if (hasLoaded) {
+      localStorage.setItem('cart', JSON.stringify(items));
+    }
+  }, [items, hasLoaded]);
 
   const addItem = (item: CartItem) => {
     setItems(prev => {

@@ -585,30 +585,52 @@ function CatalogPageContent() {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                        <div className="flex flex-col">
-                           <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none">Starting from</span>
-                           <div className="flex items-baseline gap-0.5 mt-0.5">
+                      <div className="pt-4 border-t border-slate-50 space-y-3">
+                        <div className="flex items-baseline justify-between">
+                           <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Starting from</span>
+                           <div className="flex items-baseline gap-0.5">
                              <span className="text-xs font-black text-emerald-600 italic">₹</span>
-                             <span className="text-xl sm:text-2xl font-display font-black text-slate-900">{product.price}</span>
+                             <span className="text-xl font-display font-black text-slate-900">{product.price}</span>
                            </div>
                         </div>
-                        <button 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            addItem({
-                              id: product._id,
-                              name: product.name,
-                              price: product.price,
-                              image: product.images[0] || '',
-                              quantity: 1,
-                              seller: { name: product.seller.name, shopName: product.seller.shopName }
-                            });
-                          }}
-                          className="bg-slate-900 text-white px-4 h-11 rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-all duration-500 shadow-md shadow-slate-900/10 hover:shadow-emerald-600/20 text-xs font-bold"
-                        >
-                           Add to Cart
-                        </button>
+                        <div className="flex items-center gap-2 w-full">
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              addItem({
+                                id: product._id,
+                                name: product.name,
+                                price: product.price,
+                                image: product.images[0] || '',
+                                quantity: 1,
+                                seller: { name: product.seller.name, shopName: product.seller.shopName }
+                              });
+                              alert(`${product.name} added to cart!`);
+                            }}
+                            className="flex-1 bg-emerald-50 text-emerald-700 h-10 rounded-xl flex items-center justify-center hover:bg-emerald-100 transition-colors border border-emerald-500/10 text-xs font-bold cursor-pointer"
+                          >
+                            <ShoppingBag className="w-3.5 h-3.5" /> <span className="ml-1 text-[10px]">Add</span>
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              addItem({
+                                id: product._id,
+                                name: product.name,
+                                price: product.price,
+                                image: product.images[0] || '',
+                                quantity: 1,
+                                seller: { name: product.seller.name, shopName: product.seller.shopName }
+                              });
+                              router.push('/cart');
+                            }}
+                            className="flex-1 bg-slate-900 text-white h-10 rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-all shadow-md text-[10px] font-black uppercase tracking-wider cursor-pointer"
+                          >
+                            Buy Now
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
