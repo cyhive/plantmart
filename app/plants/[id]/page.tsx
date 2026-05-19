@@ -23,6 +23,8 @@ interface Product {
   category: string;
   images: string[];
   stock: number;
+  originalPrice?: number;
+  discountText?: string;
   seller: { 
     name: string; 
     shopName: string; 
@@ -233,7 +235,28 @@ export default function ProductDetailPage() {
   useEffect(() => {
     // Simulate API Fetch with Mock Data
     setTimeout(() => {
-      const foundProduct = MOCK_PRODUCTS[id as string] || MOCK_PRODUCTS['1'];
+      let foundProduct = MOCK_PRODUCTS[id as string] || MOCK_PRODUCTS['1'];
+      
+      let activeDiscounts: any[] = [];
+      try {
+        const stored = localStorage.getItem('plantmart_seller_discounts');
+        if (stored) {
+          activeDiscounts = JSON.parse(stored).filter((d: any) => d.status === 'Active');
+        }
+      } catch (e) {
+        console.error('Error loading discounts:', e);
+      }
+
+      const disc = activeDiscounts.find((d: any) => d.productId === foundProduct._id);
+      if (disc) {
+        foundProduct = {
+          ...foundProduct,
+          originalPrice: foundProduct.price,
+          price: disc.discountedPrice,
+          discountText: disc.discountType === 'percentage' ? `${disc.discountValue}% OFF` : `₹${disc.discountValue} OFF`
+        };
+      }
+
       setProduct(foundProduct);
       setLoading(false);
 
@@ -353,7 +376,9 @@ export default function ProductDetailPage() {
   ];
 
   const currentPrice = product.price + sizeAdjustments[selectedSize];
-  const currentOriginalPrice = Math.round(currentPrice * 1.25);
+  const currentOriginalPrice = product.originalPrice 
+    ? (product.originalPrice + sizeAdjustments[selectedSize]) 
+    : Math.round(currentPrice * 1.25);
 
   return (
     <div className="min-h-screen bg-linear-to-b from-[#fbfdfb] via-[#f7faf7] to-[#f4f7f4] pb-28 relative overflow-hidden">
@@ -478,7 +503,7 @@ export default function ProductDetailPage() {
               </div>
               <div className="flex flex-col items-end gap-1.5">
                 <span className="text-xs bg-emerald-600 text-white font-extrabold px-3 py-1.5 rounded-xl uppercase tracking-wider shadow-sm">
-                  Save 25% Today
+                  {product.discountText ? `Sale: ${product.discountText}` : 'Save 25% Today'}
                 </span>
                 <span className="text-[9px] text-slate-400 font-medium italic">Inc. of all nursery packing taxes</span>
               </div>

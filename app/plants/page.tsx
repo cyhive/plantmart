@@ -41,6 +41,8 @@ interface Product {
   ratings: { average: number; count: number };
   stock: number;
   sales?: number;
+  originalPrice?: number;
+  discountText?: string;
 }
 
 export default function CatalogPage() {
@@ -130,7 +132,28 @@ function CatalogPageContent() {
   useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => {
-      let filtered = MOCK_PRODUCTS.filter(product => {
+      let activeDiscounts: any[] = [];
+      try {
+        const stored = localStorage.getItem('plantmart_seller_discounts');
+        if (stored) {
+          activeDiscounts = JSON.parse(stored).filter((d: any) => d.status === 'Active');
+        }
+      } catch (e) {
+        console.error('Error loading discounts:', e);
+      }
+
+      let filtered = MOCK_PRODUCTS.map(product => {
+        const disc = activeDiscounts.find((d: any) => d.productId === product._id);
+        if (disc) {
+          return {
+            ...product,
+            originalPrice: product.price,
+            price: disc.discountedPrice,
+            discountText: disc.discountType === 'percentage' ? `${disc.discountValue}% OFF` : `₹${disc.discountValue} OFF`
+          };
+        }
+        return product;
+      }).filter(product => {
         const matchesCategory = !filters.category || product.category.toLowerCase() === filters.category.toLowerCase();
         const matchesSearch = !filters.search || product.name.toLowerCase().includes(filters.search.toLowerCase());
         const matchesSeller = !filters.sellerId || product.seller._id === filters.sellerId;
@@ -487,106 +510,88 @@ function CatalogPageContent() {
                   <motion.div
                     key={product._id}
                     layout
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.92 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="group relative bg-white rounded-[24px] border border-slate-100/80 shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-500 flex flex-col overflow-hidden h-full"
+                    exit={{ opacity: 0, scale: 0.92 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="group relative bg-white rounded-2xl border border-slate-100 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden h-full"
                   >
-                    <div className="relative aspect-square overflow-hidden m-2 rounded-[18px] bg-slate-50 flex-shrink-0">
+                    <div className="relative aspect-square overflow-hidden m-1.5 rounded-xl bg-slate-50 flex-shrink-0">
                       <img
                         src={product.images[0] || 'https://via.placeholder.com/400x400?text=No+Image'}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                       />
                       
-                      <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                        <div className="glass px-3 py-1 rounded-full text-[8px] font-black text-emerald-900 uppercase tracking-widest shadow-sm backdrop-blur-md border border-white/40">
+                      <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
+                        <div className="glass px-2.5 py-0.5 rounded-full text-[7.5px] font-black text-emerald-900 uppercase tracking-widest shadow-xs backdrop-blur-md border border-white/40">
                           {product.category}
                         </div>
                         {product.price > 2000 && (
-                          <div className="bg-slate-900 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
-                            <Star className="w-2 h-2 fill-amber-400 text-amber-400" /> Rare Specimen
+                          <div className="bg-slate-900 text-white px-2.5 py-0.5 rounded-full text-[7.5px] font-black uppercase tracking-widest shadow-xs flex items-center gap-1">
+                            <Star className="w-1.5 h-1.5 fill-amber-400 text-amber-400" /> Rare Specimen
                           </div>
                         )}
                       </div>
 
                       <button 
                         onClick={(e) => toggleFavorite(product._id, e)}
-                        className="absolute top-3 right-3 z-20 w-8.5 h-8.5 glass rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-md border border-white/40 shadow-sm"
+                        className="absolute top-2.5 right-2.5 z-20 w-7.5 h-7.5 glass rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 backdrop-blur-md border border-white/40 shadow-xs"
                       >
-                        <Heart className={`w-4 h-4 transition-colors duration-300 ${favorites.includes(product._id) ? 'fill-rose-500 text-rose-500' : 'text-slate-600'}`} />
+                        <Heart className={`w-3.5 h-3.5 transition-colors duration-300 ${favorites.includes(product._id) ? 'fill-rose-500 text-rose-500' : 'text-slate-500'}`} />
                       </button>
 
-                      <div className="absolute inset-x-0 bottom-0 p-4 translate-y-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
-                         <div className="glass p-3 rounded-2xl backdrop-blur-xl border border-white/20 shadow-2xl flex items-center justify-between gap-3">
-                            <div className="flex -space-x-2.5">
-                                {[1,2,3].map(j => (
-                                  <div key={j} className="w-7 h-7 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-sm flex-shrink-0">
-                                    <img src={`https://i.pravatar.cc/100?img=${j+i}`} alt="" />
-                                  </div>
-                                ))}
-                            </div>
-                            <span className="text-[9px] font-bold text-slate-700 italic flex-grow">+12 viewed</span>
-                            <button 
-                              onClick={(e) => {
-                                e.preventDefault();
-                                addItem({
-                                  id: product._id,
-                                  name: product.name,
-                                  price: product.price,
-                                  image: product.images[0] || '',
-                                  quantity: 1,
-                                  seller: { name: product.seller.name, shopName: product.seller.shopName }
-                                });
-                              }}
-                              className="bg-emerald-600 text-white p-2 rounded-xl shadow-xl hover:bg-emerald-700 transition-all active:scale-90"
-                            >
-                               <ShoppingBag className="w-3.5 h-3.5" />
-                            </button>
-                         </div>
-                      </div>
-
                       {product.stock <= 0 && (
-                        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[4px] flex items-center justify-center z-30">
-                           <div className="bg-white/10 backdrop-blur-xl text-white px-6 py-2.5 rounded-full font-black uppercase tracking-[0.2em] text-[10px] border border-white/20 shadow-2xl">Sold Out</div>
+                        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[3px] flex items-center justify-center z-30">
+                           <div className="bg-white/10 backdrop-blur-xl text-white px-5 py-2 rounded-full font-black uppercase tracking-[0.2em] text-[9px] border border-white/20 shadow-2xl">Sold Out</div>
                         </div>
                       )}
                     </div>
 
-                    <div className="px-5 pb-5 pt-3 space-y-4 flex flex-col justify-between flex-grow">
-                      <div className="space-y-2">
+                    <div className="px-4 pb-4 pt-2.5 space-y-3 flex flex-col justify-between flex-grow">
+                      <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
                            <button 
                              onClick={() => product.seller?._id && setFilters(f => ({...f, sellerId: product.seller._id}))}
-                             className="flex items-center gap-1.5 group/seller"
+                             className="flex items-center gap-1 group/seller"
                            >
-                             <div className="w-5 h-5 rounded bg-emerald-50 flex items-center justify-center text-[7px] font-black text-emerald-700 border border-emerald-100 group-hover/seller:bg-emerald-600 group-hover/seller:text-white transition-colors">
+                             <div className="w-4.5 h-4.5 rounded bg-emerald-50 flex items-center justify-center text-[6px] font-black text-emerald-700 border border-emerald-100 group-hover/seller:bg-emerald-600 group-hover/seller:text-white transition-colors">
                                {product.seller?.shopName?.charAt(0)}
                              </div>
-                             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 group-hover/seller:text-emerald-600 transition-colors truncate max-w-[100px]">{product.seller?.shopName}</span>
+                             <span className="text-[8.5px] font-black uppercase tracking-widest text-slate-400 group-hover/seller:text-emerald-600 transition-colors truncate max-w-[90px]">{product.seller?.shopName}</span>
                            </button>
                            <div className="flex items-center gap-1 text-amber-500">
                              <Star className="w-3 h-3 fill-current" />
-                             <span className="text-xs font-black text-slate-900">{product.ratings?.average || '4.5'}</span>
+                             <span className="text-[11px] font-black text-slate-900">{product.ratings?.average || '4.5'}</span>
                            </div>
                         </div>
                         <Link href={`/plants/${product._id}`} className="block">
-                          <h3 className="font-display font-bold text-lg sm:text-xl text-slate-900 group-hover:text-emerald-700 transition-colors tracking-tight line-clamp-1 italic">{product.name}</h3>
+                          <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 group-hover:text-emerald-700 transition-colors tracking-tight line-clamp-1 italic">{product.name}</h3>
                         </Link>
-                        <div className="flex items-center gap-3 text-[9px] font-bold text-slate-400 italic">
+                        <div className="flex items-center gap-2 text-[8.5px] font-bold text-slate-400 italic">
                            <span className="flex items-center gap-1 truncate max-w-[80px]"><MapPin className="w-2.5 h-2.5" /> {product.seller?.address?.city}</span>
-                           <span className="w-1 h-1 bg-slate-200 rounded-full" />
+                           <span className="w-0.5 h-0.5 bg-slate-200 rounded-full" />
                            <span className="flex items-center gap-1"><Leaf className="w-2.5 h-2.5" /> Healthy Specimen</span>
                         </div>
                       </div>
 
-                      <div className="pt-4 border-t border-slate-50 space-y-3">
+                      <div className="pt-3 border-t border-slate-100/60 space-y-2.5">
                         <div className="flex items-baseline justify-between">
-                           <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Starting from</span>
-                           <div className="flex items-baseline gap-0.5">
-                             <span className="text-xs font-black text-emerald-600 italic">₹</span>
-                             <span className="text-xl font-display font-black text-slate-900">{product.price}</span>
+                           <span className="text-[8.5px] font-black uppercase tracking-widest text-slate-400">
+                             {product.originalPrice ? (
+                               <span className="text-[8px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100/80">
+                                 {product.discountText}
+                               </span>
+                             ) : 'Starting from'}
+                           </span>
+                           <div className="flex items-baseline gap-1.5 flex-wrap justify-end">
+                             {product.originalPrice && (
+                               <span className="text-[10px] text-slate-450 font-medium line-through">₹{product.originalPrice}</span>
+                             )}
+                             <div className="flex items-baseline gap-0.5">
+                               <span className="text-xs font-black text-emerald-600 italic">₹</span>
+                               <span className="text-lg font-display font-black text-slate-900">{product.price}</span>
+                             </div>
                            </div>
                         </div>
                         <div className="flex items-center gap-2 w-full">
@@ -604,9 +609,9 @@ function CatalogPageContent() {
                               });
                               alert(`${product.name} added to cart!`);
                             }}
-                            className="flex-1 bg-emerald-50 text-emerald-700 h-10 rounded-xl flex items-center justify-center hover:bg-emerald-100 transition-colors border border-emerald-500/10 text-xs font-bold cursor-pointer"
+                            className="flex-1 bg-emerald-50 text-emerald-700 h-9 rounded-lg flex items-center justify-center hover:bg-emerald-100 transition-colors border border-emerald-500/10 text-[9px] font-bold cursor-pointer"
                           >
-                            <ShoppingBag className="w-3.5 h-3.5" /> <span className="ml-1 text-[10px]">Add</span>
+                            <ShoppingBag className="w-3.5 h-3.5" /> <span className="ml-1 text-[9px] hidden sm:inline">Add to Cart</span><span className="ml-1 text-[9px] sm:hidden">Add</span>
                           </button>
                           <button 
                             onClick={(e) => {
@@ -622,7 +627,7 @@ function CatalogPageContent() {
                               });
                               router.push('/cart');
                             }}
-                            className="flex-1 bg-slate-900 text-white h-10 rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-all shadow-md text-[10px] font-black uppercase tracking-wider cursor-pointer"
+                            className="flex-1 bg-slate-900 text-white h-9 rounded-lg flex items-center justify-center hover:bg-emerald-600 transition-all shadow-xs text-[9px] font-black uppercase tracking-wider cursor-pointer"
                           >
                             Buy Now
                           </button>

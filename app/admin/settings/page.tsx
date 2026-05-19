@@ -27,7 +27,6 @@ export default function AdminSettingsPage() {
     maintenanceMode: false,
     contactEmail: 'support@plantmart.com',
     currency: 'INR',
-    minWithdrawal: 1000,
     enable2FA: false,
     emailNotifications: true,
     browserNotifications: true,
@@ -45,7 +44,6 @@ export default function AdminSettingsPage() {
       maintenanceMode: false,
       contactEmail: 'support@plantmart.com',
       currency: 'INR',
-      minWithdrawal: 1000,
       enable2FA: false,
       emailNotifications: true,
       browserNotifications: true,
@@ -257,15 +255,6 @@ export default function AdminSettingsPage() {
                           <option value="USD">US Dollar ($)</option>
                           <option value="EUR">Euro (€)</option>
                         </select>
-                      </div>
-                      <div className="space-y-2 md:col-span-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Minimum Withdrawal Limit (₹)</label>
-                        <input 
-                          type="number" 
-                          value={settings.minWithdrawal}
-                          onChange={e => setSettings({...settings, minWithdrawal: Number(e.target.value)})}
-                          className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold outline-none"
-                        />
                       </div>
                     </div>
                   </section>

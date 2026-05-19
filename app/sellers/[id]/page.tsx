@@ -16,11 +16,14 @@ import {
   Package,
   Award,
   Clock,
-  ThumbsUp
+  ThumbsUp,
+  Heart,
+  ShoppingBag
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
 import SellerReviewForm from '@/components/seller/SellerReviewForm';
+import { useCart } from '@/context/CartContext';
 
 interface Nursery {
   id: string;
@@ -38,6 +41,8 @@ interface Nursery {
 export default function NurseryDetailPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { addItem } = useCart();
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'plants' | 'reviews' | 'about'>('plants');
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -93,6 +98,13 @@ export default function NurseryDetailPage() {
     { id: '2', name: 'Snake Plant', price: 899, image: 'https://images.unsplash.com/photo-1593482892290-f54927ae1bbc?auto=format&fit=crop&q=80&w=800', category: 'Indoor' },
     { id: '4', name: 'Peace Lily', price: 699, image: 'https://images.unsplash.com/photo-1593691509543-c55fb32e7355?auto=format&fit=crop&q=80&w=800', category: 'Indoor' }
   ];
+
+  const toggleFavorite = (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    setFavorites(prev => 
+      prev.includes(id) ? prev.filter(fId => fId !== id) : [...prev, id]
+    );
+  };
 
   const handleReviewSubmit = (newReview: any) => {
     setReviews([newReview, ...reviews]);
@@ -215,6 +227,20 @@ export default function NurseryDetailPage() {
                             <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-widest text-emerald-900 border border-white">
                                {plant.category}
                             </div>
+                            <button 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                toggleFavorite(plant.id, e);
+                              }}
+                              className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all backdrop-blur-md shadow-md cursor-pointer border ${
+                                favorites?.includes(plant.id) 
+                                  ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' 
+                                  : 'bg-white/80 border-white/40 text-slate-400 hover:text-rose-500 hover:bg-white'
+                              }`}
+                            >
+                              <Heart className={`w-3.5 h-3.5 ${favorites?.includes(plant.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
+                            </button>
                          </div>
                          <div className="px-1.5 pb-2 space-y-2 flex flex-col justify-between flex-grow">
                             <div className="flex justify-between items-center gap-2">
@@ -224,6 +250,44 @@ export default function NurseryDetailPage() {
                             <div className="flex items-center gap-0.5 text-amber-400">
                                {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}
                             </div>
+                         </div>
+                         <div className="px-1.5 pt-3 mt-auto border-t border-slate-100 flex items-center gap-2">
+                           <button 
+                             onClick={(e) => {
+                               e.preventDefault();
+                               e.stopPropagation();
+                               addItem({
+                                 id: plant.id,
+                                 name: plant.name,
+                                 price: plant.price,
+                                 image: plant.image,
+                                 quantity: 1,
+                                 seller: { name: nursery.name, shopName: nursery.shopName }
+                               });
+                               alert(`${plant.name} added to cart!`);
+                             }}
+                             className="flex-1 bg-emerald-50 text-emerald-700 py-2 rounded-xl text-[10px] sm:text-xs font-bold hover:bg-emerald-100 hover:text-emerald-800 transition-colors flex items-center justify-center gap-1 border border-emerald-500/10 cursor-pointer"
+                           >
+                             <ShoppingBag className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Add to Cart</span><span className="sm:hidden">Add</span>
+                           </button>
+                           <button 
+                             onClick={(e) => {
+                               e.preventDefault();
+                               e.stopPropagation();
+                               addItem({
+                                 id: plant.id,
+                                 name: plant.name,
+                                 price: plant.price,
+                                 image: plant.image,
+                                 quantity: 1,
+                                 seller: { name: nursery.name, shopName: nursery.shopName }
+                               });
+                               router.push('/cart');
+                             }}
+                             className="flex-1 bg-slate-900 text-white py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider hover:bg-emerald-600 transition-colors flex items-center justify-center gap-1 shadow-md cursor-pointer"
+                           >
+                             Buy <span className="hidden sm:inline">Now</span>
+                           </button>
                          </div>
                       </motion.div>
                     </Link>

@@ -40,15 +40,58 @@ export default function CartPage() {
   const finalTotal = totalAmount - discount + shipping + tax;
 
   const applyCoupon = () => {
-    if (couponCode.toUpperCase() === 'MONSOON20') {
-      setDiscount(totalAmount * 0.2);
-      setIsCouponApplied(true);
-    } else if (couponCode.toUpperCase() === 'WELCOME100') {
-      setDiscount(100);
-      setIsCouponApplied(true);
-    } else {
-      alert('Invalid Coupon Code');
+    let localPromotions = [];
+    try {
+      const stored = localStorage.getItem('plantmart_promotions');
+      if (stored) {
+        localPromotions = JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error('Error loading promotions:', e);
     }
+
+    const defaultPromotions = [
+      { code: 'MONSOON20', type: 'percentage', value: 20, minPurchase: 0, status: 'Active' },
+      { code: 'WELCOME100', type: 'fixed', value: 100, minPurchase: 499, status: 'Active' }
+    ];
+
+    const allPromotions = [...localPromotions];
+    defaultPromotions.forEach(def => {
+      if (!allPromotions.some(p => p.code.toUpperCase() === def.code.toUpperCase())) {
+        allPromotions.push(def);
+      }
+    });
+
+    const promo = allPromotions.find(
+      p => p.code.toUpperCase() === couponCode.trim().toUpperCase()
+    );
+
+    if (!promo) {
+      alert('Invalid Coupon Code');
+      return;
+    }
+
+    if (promo.status === 'Inactive') {
+      alert('This coupon code is currently inactive.');
+      return;
+    }
+
+    const minSpend = Number(promo.minPurchase || 0);
+    if (totalAmount < minSpend) {
+      alert(`This coupon requires a minimum purchase of ₹${minSpend}. Your current order value is ₹${totalAmount}.`);
+      return;
+    }
+
+    let calcDiscount = 0;
+    if (promo.type === 'percentage') {
+      calcDiscount = totalAmount * (Number(promo.value) / 100);
+    } else {
+      calcDiscount = Number(promo.value);
+    }
+
+    setDiscount(calcDiscount);
+    setIsCouponApplied(true);
+    alert(`Coupon code "${promo.code}" applied! You saved ₹${calcDiscount.toFixed(0)}.`);
   };
 
   const breadcrumbs = [
