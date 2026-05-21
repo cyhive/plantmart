@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { loginAsAdmin } from '@/lib/auth/login-client';
+import { useRedirectIfRole } from '@/lib/auth/use-auth-guard';
 import { ShieldCheck, ArrowRight, Mail, Key, Fingerprint, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -15,28 +17,24 @@ export default function AdminLoginPage() {
   const { login } = useAuth();
   const router = useRouter();
 
+  useRedirectIfRole('admin', '/admin');
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
-    // Mock Login Logic for Admin
-    setTimeout(() => {
-      if (email && password) {
-        // In a real app, you'd verify if the user has an admin role
-        const mockUser = {
-          id: 'a1',
-          name: 'Administrator',
-          email: email,
-          role: 'admin'
-        };
-        login(mockUser as any);
-        router.push('/admin');
-      } else {
-        setError('Invalid administrator credentials');
-      }
+
+    const result = await loginAsAdmin(email, password);
+
+    if (!result.ok) {
+      setError(result.error);
       setLoading(false);
-    }, 1200);
+      return;
+    }
+
+    login(result.user);
+    router.push('/admin');
+    setLoading(false);
   };
 
   return (

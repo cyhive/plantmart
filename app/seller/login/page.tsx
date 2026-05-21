@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { loginWithRole } from '@/lib/auth/login-client';
+import { useRedirectIfRole } from '@/lib/auth/use-auth-guard';
 import { Store, ArrowRight, Mail, Lock, ShieldCheck, Briefcase } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -15,28 +17,29 @@ export default function SellerLoginPage() {
   const { login } = useAuth();
   const router = useRouter();
 
+  useRedirectIfRole('seller', '/seller');
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
-    // Mock Login Logic for Seller
-    setTimeout(() => {
-      if (email && password) {
-        // In a real app, you'd verify if the user has a seller role
-        const mockUser = {
-          id: 's1',
-          name: email.split('@')[0],
-          email: email,
-          role: 'seller'
-        };
-        login(mockUser as any);
-        router.push('/seller');
-      } else {
-        setError('Please enter both email and password');
-      }
+
+    const result = await loginWithRole(
+      email,
+      password,
+      'seller',
+      'This account is not registered as a seller. Apply at Become a Seller or use buyer login.',
+    );
+
+    if (!result.ok) {
+      setError(result.error);
       setLoading(false);
-    }, 1000);
+      return;
+    }
+
+    login(result.user);
+    router.push('/seller');
+    setLoading(false);
   };
 
   return (

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   PieChart, 
   Package, 
@@ -24,7 +24,13 @@ interface SellerSidebarProps {
 
 export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/seller/login');
+  };
 
   const menuItems = [
     { href: '/seller', icon: <PieChart className="w-5 h-5" />, label: 'Overview' },
@@ -99,7 +105,7 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
           </div>
 
           <button 
-            onClick={logout}
+            onClick={handleLogout}
             className="w-full flex items-center gap-4 px-4 py-3 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"
           >
             <LogOut className="w-5 h-5" /> Sign Out

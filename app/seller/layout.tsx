@@ -1,22 +1,7 @@
 'use client';
 
-import { useAuth } from '@/context/AuthContext';
-import { useRouter, usePathname } from 'next/navigation';
-import { useEffect } from 'react';
-import Link from 'next/link';
-import { 
-  PieChart, 
-  Package, 
-  ShoppingBag, 
-  Settings, 
-  Store, 
-  LogOut, 
-  Bell, 
-  Search,
-  Menu,
-  X,
-  Leaf
-} from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useRequireRole } from '@/lib/auth/use-auth-guard';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -28,19 +13,21 @@ export default function SellerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
   const isLoginPage = pathname === '/seller/login';
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-    </div>
-  );
+  const { loading, authorized } = useRequireRole('seller', '/seller/login');
 
   if (isLoginPage) {
     return <>{children}</>;
+  }
+
+  if (loading || !authorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (

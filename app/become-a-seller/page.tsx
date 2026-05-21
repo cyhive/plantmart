@@ -19,6 +19,9 @@ import {
   Leaf
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { registerAccount } from '@/lib/auth/register-client';
 
 const steps = [
   { id: 1, title: 'Identity', icon: User },
@@ -28,12 +31,16 @@ const steps = [
 ];
 
 export default function BecomeSellerPage() {
+  const router = useRouter();
+  const { login } = useAuth();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
+    password: '',
+    confirmPassword: '',
     shopName: '',
     shopDescription: '',
     shopCategory: 'Nursery',
@@ -64,6 +71,7 @@ export default function BecomeSellerPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -93,16 +101,38 @@ export default function BecomeSellerPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError('');
+
     if (step < 4) {
       nextStep();
       return;
     }
-    
+
+    if (formData.password.length < 8) {
+      setSubmitError('Password must be at least 8 characters.');
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setSubmitError('Passwords do not match.');
+      return;
+    }
+
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    const result = await registerAccount({
+      name: `${formData.firstName} ${formData.lastName}`.trim(),
+      email: formData.email,
+      password: formData.password,
+      role: 'seller',
+      shopName: formData.shopName,
+      phone: formData.phone,
+    });
+    if (!result.ok) {
+      setSubmitError(result.error);
+    } else {
+      login(result.user);
+      setIsCompleted(true);
+    }
     setIsSubmitting(false);
-    setIsCompleted(true);
   };
 
   if (isCompleted) {
@@ -116,17 +146,24 @@ export default function BecomeSellerPage() {
           <div className="mx-auto w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center">
             <CheckCircle2 className="w-10 h-10 text-emerald-600" />
           </div>
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-slate-900">Application Sent!</h2>
+          <motion.div className="space-y-2">
+            <h2 className="text-3xl font-bold text-slate-900">Seller account created</h2>
             <p className="text-slate-500 font-medium">
-              Thank you for applying to join PlantMart. Our team will review your application and get back to you within 2-3 business days.
+              Your seller account is ready. Open the seller dashboard to add products and manage orders.
             </p>
-          </div>
-          <Link 
-            href="/seller/login"
+          </motion.div>
+          <button
+            type="button"
+            onClick={() => router.push('/seller')}
             className="inline-block w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20"
           >
-            Go to Seller Login
+            Go to Seller Dashboard
+          </button>
+          <Link
+            href="/seller/login"
+            className="inline-block w-full text-slate-500 font-bold hover:text-slate-700 text-sm"
+          >
+            Or sign in later
           </Link>
         </motion.div>
       </div>
@@ -293,6 +330,35 @@ export default function BecomeSellerPage() {
                         onChange={handleChange}
                         className="w-full pl-14 pr-6 py-4 bg-slate-100/50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-emerald-500/30 focus:ring-8 focus:ring-emerald-500/5 outline-none transition-all duration-300 font-medium"
                         placeholder="+91 98765 43210" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Password</label>
+                      <input
+                        type="password"
+                        name="password"
+                        required
+                        minLength={8}
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="w-full px-6 py-4 bg-slate-100/50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-emerald-500/30 focus:ring-8 focus:ring-emerald-500/5 outline-none transition-all duration-300 font-medium"
+                        placeholder="At least 8 characters"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Confirm Password</label>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        required
+                        minLength={8}
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        className="w-full px-6 py-4 bg-slate-100/50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-emerald-500/30 focus:ring-8 focus:ring-emerald-500/5 outline-none transition-all duration-300 font-medium"
+                        placeholder="Repeat password"
                       />
                     </div>
                   </div>
@@ -566,6 +632,12 @@ export default function BecomeSellerPage() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {submitError && (
+              <motion.div className="mt-8 bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-bold border border-red-100">
+                {submitError}
+              </motion.div>
+            )}
 
             <div className="mt-12 flex justify-between items-center pt-8 border-t border-slate-100">
               {step > 1 ? (

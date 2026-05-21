@@ -53,135 +53,10 @@ interface Product {
   };
 }
 
-const MOCK_PRODUCTS: Record<string, Product> = {
-  '1': { 
-    _id: '1', 
-    name: 'Monstera Deliciosa', 
-    description: 'The Swiss Cheese plant is a classic favorite for its large, iconic leaves and tropical charm. Known for its distinct fenestrated leaves that split as the plant matures, it brings a dramatic and organic sculptural presence to any room.', 
-    price: 1299, 
-    category: 'Indoor', 
-    images: [
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1584589167171-541ce45f1eea?auto=format&fit=crop&q=80&w=800'
-    ], 
-    stock: 10, 
-    seller: { name: 'Green Garden', shopName: 'Green Garden Nursery', _id: '1', rating: 4.8, location: 'Pune, Maharashtra', joinedDate: 'Jan 2024' }, 
-    careTips: { 
-      sunlight: 'Partial Shade', 
-      watering: 'Weekly', 
-      difficulty: 'Beginner',
-      soil: 'Rich, peaty potting mix with good aeration (incorporate perlite/pumice).',
-      propagation: 'Stem cuttings rooted in clean water or peat moss.',
-      humidity: 'Thrives in moderate to high humidity (above 50% humidity).',
-      fertilizer: 'Apply balanced organic nitrogen liquid food monthly during spring/summer.'
-    }, 
-    ratings: { average: 4.9, count: 128 },
-    specifications: {
-      scientificName: 'Monstera deliciosa',
-      family: 'Araceae',
-      origin: 'Tropical rainforests of Southern Mexico & Panama',
-      petFriendly: false,
-      airPurifying: true,
-      matureSize: '6 to 10 feet tall (indoors)'
-    }
-  },
-  '2': { 
-    _id: '2', 
-    name: 'Snake Plant', 
-    description: 'Perfect for beginners, this exceptionally hardy plant features erect sword-like leaves patterned with horizontal bands. It can survive in low light, handles irregular watering, and is widely celebrated for its robust air-purifying capabilities.', 
-    price: 899, 
-    category: 'Indoor', 
-    images: [
-      'https://images.unsplash.com/photo-1593482892290-f54927ae1bbc?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1506543731388-2950c309018f?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1572605421943-7fba4902a40d?auto=format&fit=crop&q=80&w=800'
-    ], 
-    stock: 15, 
-    seller: { name: 'Air Purifiers', shopName: 'Pure Air Nursery', _id: '2', rating: 4.9, location: 'Noida, Uttar Pradesh', joinedDate: 'March 2023' }, 
-    careTips: { 
-      sunlight: 'Low Light', 
-      watering: 'Bi-weekly', 
-      difficulty: 'Beginner',
-      soil: 'Gritty cactus/succulent mixture with excellent drainage properties.',
-      propagation: 'Division of rhizomes or standard leaf cutting insertion.',
-      humidity: 'Extremely tolerant of dry indoor room air.',
-      fertilizer: 'Feed half-strength succulent fertilizer twice a year in active months.'
-    }, 
-    ratings: { average: 4.8, count: 95 },
-    specifications: {
-      scientificName: 'Sansevieria trifasciata',
-      family: 'Asparagaceae',
-      origin: 'Tropical West Africa (Nigeria and eastwards to Congo)',
-      petFriendly: false,
-      airPurifying: true,
-      matureSize: '2 to 4 feet tall'
-    }
-  },
-  '3': { 
-    _id: '3', 
-    name: 'Fiddle Leaf Fig', 
-    description: 'An elegant interior statement piece with large, waxy, fiddle-shaped leaves that grow upright. It demands bright, indirect sunlight and consistent waterings, rewarding patient caretakers with a beautiful, tree-like structure.', 
-    price: 2499, 
-    category: 'Outdoor', 
-    images: [
-      'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1584589167171-541ce45f1eea?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800'
-    ], 
-    stock: 5, 
-    seller: { name: 'Tree Experts', shopName: 'Expert Tree Farm', _id: '3', rating: 4.6, location: 'Kolkata, West Bengal', joinedDate: 'Sept 2023' }, 
-    careTips: { 
-      sunlight: 'Bright Indirect', 
-      watering: 'Weekly', 
-      difficulty: 'Intermediate',
-      soil: 'Fast-draining, soil-based mix containing coco coir, orchid bark, and perlite.',
-      propagation: 'Stem-tip cuttings in warm temperature or soil layering.',
-      humidity: 'Requires higher humidity (50-60%) to prevent leaf browning.',
-      fertilizer: 'Apply rich high-nitrogen foliage plant food diluted monthly in summer.'
-    }, 
-    ratings: { average: 4.7, count: 64 },
-    specifications: {
-      scientificName: 'Ficus lyrata',
-      family: 'Moraceae',
-      origin: 'West African Lowland Rainforests',
-      petFriendly: false,
-      airPurifying: true,
-      matureSize: '6 to 10 feet tall'
-    }
-  },
-  '4': { 
-    _id: '4', 
-    name: 'Peace Lily', 
-    description: 'Known for its beautiful white floral spates and glossy dark green foliage. In addition to its breathtaking, minimalist blooms, it ranks as one of the best air-purifying house plants according to NASA research.', 
-    price: 699, 
-    category: 'Indoor', 
-    images: [
-      'https://images.unsplash.com/photo-1593691509543-c55fb32e7355?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1506543731388-2950c309018f?auto=format&fit=crop&q=80&w=800'
-    ], 
-    stock: 20, 
-    seller: { name: 'Bloom Valley', shopName: 'Bloom Valley Florals', _id: '4', rating: 4.9, location: 'Ooty, Tamil Nadu', joinedDate: 'June 2024' }, 
-    careTips: { 
-      sunlight: 'Partial Shade', 
-      watering: 'Twice Weekly', 
-      difficulty: 'Beginner',
-      soil: 'Peat-rich, water-retentive potting mix with clean perlite to support aeration.',
-      propagation: 'Easy crown division when repotting in spring seasons.',
-      humidity: 'Enjoys regular misting or placement near a small humidifier.',
-      fertilizer: 'Feed balanced houseplant food diluted quarterly for optimal blooms.'
-    }, 
-    ratings: { average: 4.9, count: 82 },
-    specifications: {
-      scientificName: 'Spathiphyllum wallisii',
-      family: 'Araceae',
-      origin: 'Tropical environments of Central & South America',
-      petFriendly: false,
-      airPurifying: true,
-      matureSize: '1 to 3 feet tall'
-    }
-  }
+const DEFAULT_CARE_TIPS = {
+  sunlight: 'Indirect light',
+  watering: 'Weekly',
+  difficulty: 'Beginner',
 };
 
 export default function ProductDetailPage() {
@@ -265,7 +140,7 @@ export default function ProductDetailPage() {
           street: '88 Green Avenue',
           city: 'Bangalore',
           state: 'Karnataka',
-          zipCode: '560001'
+          zipCode: '560001',
         });
       } else {
         // Mock address for checkout simulator

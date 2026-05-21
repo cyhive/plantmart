@@ -37,15 +37,46 @@ export default function AdminSellersPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const MOCK_SELLERS: Seller[] = [
-    { _id: 's1', name: 'Nandan K.', email: 'nandan@greengarden.com', phone: '+91 9876543210', shopName: 'Green Garden Nursery', isVerified: true, createdAt: '2023-10-15T10:00:00Z' },
-    { _id: 's2', name: 'Arjun S.', email: 'arjun@pureair.in', phone: '+91 9822334455', shopName: 'Pure Air Botanicals', isVerified: false, createdAt: '2024-01-20T14:30:00Z' },
-    { _id: 's3', name: 'Maya R.', email: 'maya@tropicalhaven.com', phone: '+91 9122334455', shopName: 'Tropical Haven', isVerified: true, createdAt: '2023-05-12T09:15:00Z' },
-  ];
-
   useEffect(() => {
-    setSellers(MOCK_SELLERS);
-    setLoading(false);
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/users?role=seller', { credentials: 'include' });
+        if (!res.ok || cancelled) {
+          if (!cancelled) setSellers([]);
+          return;
+        }
+        const data = (await res.json()) as {
+          users: Array<{
+            id: string;
+            name: string;
+            email: string;
+            phone?: string;
+            shopName?: string;
+            createdAt: string;
+          }>;
+        };
+        if (cancelled) return;
+        const mapped: Seller[] = data.users.map((u) => ({
+          _id: u.id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone,
+          shopName: u.shopName ?? '—',
+          isVerified: false,
+          createdAt: u.createdAt,
+        }));
+        setSellers(mapped);
+      } catch {
+        if (!cancelled) setSellers([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const toggleVerification = (id: string, currentStatus: boolean) => {

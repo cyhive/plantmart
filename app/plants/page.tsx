@@ -34,6 +34,7 @@ interface Seller {
 interface Product {
   _id: string;
   name: string;
+  description?: string;
   price: number;
   category: string;
   images: string[];
@@ -64,6 +65,7 @@ function CatalogPageContent() {
   const [products, setProducts] = useState<Product[]>([]);
   const [sellers, setSellers] = useState<Seller[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [favorites, setFavorites] = useState<string[]>([]);
 
   // Price Slider Constants
@@ -96,29 +98,6 @@ function CatalogPageContent() {
     location: true
   });
 
-  // Mock Data
-  const MOCK_SELLERS: Seller[] = [
-    { _id: 's1', name: 'Nandan', shopName: 'Green Garden Nursery', address: { city: 'Bangalore' } },
-    { _id: 's2', name: 'Arjun', shopName: 'Pure Air Botanicals', address: { city: 'Pune' } },
-    { _id: 's3', name: 'Maya', shopName: 'Tropical Haven', address: { city: 'Kochi' } },
-    { _id: 's4', name: 'Rahul', shopName: 'Himalayan Greens', address: { city: 'Dehradun' } },
-  ];
-
-  const MOCK_PRODUCTS: Product[] = [
-    { _id: '1', name: 'Monstera Deliciosa', price: 1299, sales: 120, category: 'Indoor', images: ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[0], ratings: { average: 4.8, count: 156 }, stock: 12 },
-    { _id: '2', name: 'Snake Plant (Sansevieria)', price: 899, sales: 250, category: 'Indoor', images: ['https://images.unsplash.com/photo-1506543731388-4978848643df?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[1], ratings: { average: 4.9, count: 230 }, stock: 45 },
-    { _id: '3', name: 'Fiddle Leaf Fig', price: 2499, sales: 80, category: 'Indoor', images: ['https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[2], ratings: { average: 4.7, count: 89 }, stock: 5 },
-    { _id: '4', name: 'Peace Lily', price: 699, sales: 95, category: 'Indoor', images: ['https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[0], ratings: { average: 4.6, count: 112 }, stock: 20 },
-    { _id: '5', name: 'Bonsai Pine Tree', price: 4500, sales: 30, category: 'Outdoor', images: ['https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[3], ratings: { average: 5.0, count: 42 }, stock: 3 },
-    { _id: '6', name: 'Aloe Vera', price: 349, sales: 300, category: 'Medicinal', images: ['https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[1], ratings: { average: 4.8, count: 450 }, stock: 100 },
-    { _id: '7', name: 'Golden Pothos', price: 499, sales: 210, category: 'Indoor', images: ['https://images.unsplash.com/photo-1591958911259-bee2173bdcdc?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[2], ratings: { average: 4.9, count: 320 }, stock: 15 },
-    { _id: '8', name: 'Terracotta Hand-Painted Pot', price: 799, sales: 60, category: 'Pots', images: ['https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=600'], seller: MOCK_SELLERS[0], ratings: { average: 4.7, count: 64 }, stock: 25 }
-  ];
-
-  useEffect(() => {
-    setSellers(MOCK_SELLERS);
-  }, []);
-
   useEffect(() => {
     setFilters(prev => ({
       ...prev,
@@ -130,55 +109,53 @@ function CatalogPageContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      let activeDiscounts: any[] = [];
+    let cancelled = false;
+
+    const loadCatalog = async () => {
+      setLoading(true);
+      setLoadError('');
+
+      const params = new URLSearchParams();
+      if (filters.category) params.set('category', filters.category);
+      if (filters.search) params.set('search', filters.search);
+      if (filters.sellerId) params.set('sellerId', filters.sellerId);
+      if (filters.tag) params.set('tag', filters.tag);
+      if (filters.city) params.set('city', filters.city);
+      if (filters.sort) params.set('sort', filters.sort);
+      if (filters.inStock) params.set('inStock', 'true');
+      params.set('minPrice', String(filters.minPrice));
+      params.set('maxPrice', String(filters.maxPrice));
+
       try {
-        const stored = localStorage.getItem('plantmart_seller_discounts');
-        if (stored) {
-          activeDiscounts = JSON.parse(stored).filter((d: any) => d.status === 'Active');
+        const res = await fetch(`/api/catalog/products?${params.toString()}`);
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (!res.ok) {
+          setLoadError(typeof data.error === 'string' ? data.error : 'Failed to load catalog');
+          setProducts([]);
+          setSellers([]);
+          return;
         }
-      } catch (e) {
-        console.error('Error loading discounts:', e);
+        setProducts(data.products ?? []);
+        setSellers(data.sellers ?? []);
+      } catch {
+        if (!cancelled) {
+          setLoadError('Network error while loading catalog');
+          setProducts([]);
+          setSellers([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
+    };
 
-      let filtered = MOCK_PRODUCTS.map(product => {
-        const disc = activeDiscounts.find((d: any) => d.productId === product._id);
-        if (disc) {
-          return {
-            ...product,
-            originalPrice: product.price,
-            price: disc.discountedPrice,
-            discountText: disc.discountType === 'percentage' ? `${disc.discountValue}% OFF` : `₹${disc.discountValue} OFF`
-          };
-        }
-        return product;
-      }).filter(product => {
-        const matchesCategory = !filters.category || product.category.toLowerCase() === filters.category.toLowerCase();
-        const matchesSearch = !filters.search || product.name.toLowerCase().includes(filters.search.toLowerCase());
-        const matchesSeller = !filters.sellerId || product.seller._id === filters.sellerId;
-        const matchesMinPrice = product.price >= filters.minPrice;
-        const matchesMaxPrice = product.price <= filters.maxPrice;
-        const matchesStock = !filters.inStock || product.stock > 0;
-        const matchesCity = !filters.city || product.seller.address?.city === filters.city;
-
-        return matchesCategory && matchesSearch && matchesSeller && matchesMinPrice && matchesMaxPrice && matchesStock && matchesCity;
-      });
-
-      if (filters.sort === 'price-low') filtered.sort((a, b) => a.price - b.price);
-      if (filters.sort === 'price-high') filtered.sort((a, b) => b.price - a.price);
-      if (filters.sort === 'newest') filtered.reverse();
-      if (filters.sort === 'top-sold') filtered.sort((a, b) => (b.sales ?? 0) - (a.sales ?? 0));
-      if (filters.sort === 'top-rated') filtered.sort((a, b) => (b.ratings?.average ?? 0) - (a.ratings?.average ?? 0));
-
-      setProducts(filtered);
-      setLoading(false);
-    }, 400);
-
-    return () => clearTimeout(timer);
+    loadCatalog();
+    return () => {
+      cancelled = true;
+    };
   }, [filters]);
 
-  const categories = ['Indoor', 'Outdoor', 'Succulents', 'Medicinal', 'Pots'];
+  const categories = ['Indoor', 'Outdoor', 'Succulents', 'Medicinal', 'Pots', 'Other'];
   const cities = Array.from(new Set(sellers.map(s => s.address?.city).filter(Boolean)));
 
   const breadcrumbs = [
@@ -442,6 +419,12 @@ function CatalogPageContent() {
 
         {/* Main Content */}
         <main className="flex-grow space-y-10">
+          {loadError && (
+            <motion.div className="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-bold border border-red-100">
+              {loadError}
+            </motion.div>
+          )}
+
           {/* Header & Sort */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="space-y-1">
@@ -663,4 +646,4 @@ function CatalogPageContent() {
       </div>
     </div>
   );
-} 
+}

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './globals.css'; // Simplified import
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
@@ -10,8 +11,6 @@ export const metadata: Metadata = {
   description: 'Discover 1000+ varieties of hand-picked plants from verified nurseries across the country.',
   keywords: 'plants, indoor plants, outdoor plants, succulents, nursery, buy plants online',
 };
-
-import { Suspense } from 'react';
 
 export default function RootLayout({
   children,
