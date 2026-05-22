@@ -31,10 +31,6 @@ interface Product {
   isApproved: boolean;
 }
 
-/** Valid HTTPS URL used when the seller has not set an image yet (API requires ≥1 image). */
-const DEFAULT_SPECIMEN_IMAGE =
-  'https://images.unsplash.com/photo-1416879595882-3373a0480a5f?auto=format&fit=crop&q=80&w=800';
-
 function emptySpecimenForm() {
   return {
     name: '',
@@ -42,7 +38,7 @@ function emptySpecimenForm() {
     price: '',
     category: 'Indoor',
     stock: '',
-    images: [DEFAULT_SPECIMEN_IMAGE],
+    images: [''],
   };
 }
 
@@ -59,23 +55,48 @@ export default function SellerProductsPage() {
   // Form State
   const [formData, setFormData] = useState(emptySpecimenForm);
 
+  const [uploading, setUploading] = useState(false);
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image must be 5MB or smaller.');
+      e.target.value = '';
+      return;
+    }
+
     setUploading(true);
-    // Mock Upload Logic
-    setTimeout(() => {
-      setFormData(prev => ({ ...prev, images: ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800'] }));
+    setError('');
+    try {
+      const body = new FormData();
+      body.append('file', file);
+      const res = await fetch('/api/products/upload', {
+        method: 'POST',
+        credentials: 'include',
+        body,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(typeof data.error === 'string' ? data.error : 'Failed to upload image');
+        return;
+      }
+      if (typeof data.url !== 'string' || !data.url) {
+        setError('Upload succeeded but no image URL was returned');
+        return;
+      }
+      setFormData((prev) => ({ ...prev, images: [data.url] }));
+    } catch {
+      setError('Failed to upload image. Try again or paste an image URL.');
+    } finally {
       setUploading(false);
-    }, 1500);
+      e.target.value = '';
+    }
   };
 
-  const [uploading, setUploading] = useState(false);
-
   const buildPayload = () => {
-    const trimmed = formData.images.map((url) => url.trim()).filter(Boolean);
-    const images = trimmed.length > 0 ? trimmed : [DEFAULT_SPECIMEN_IMAGE];
+    const images = formData.images.map((url) => url.trim()).filter(Boolean);
     const price = Number(formData.price);
     const stock = Math.max(0, Math.floor(Number(formData.stock)));
     return {
@@ -181,7 +202,7 @@ export default function SellerProductsPage() {
       price: product.price.toString(),
       category: product.category,
       stock: product.stock.toString(),
-      images: product.images.length > 0 ? product.images : [DEFAULT_SPECIMEN_IMAGE],
+      images: product.images.length > 0 ? product.images : [''],
     });
     setIsModalOpen(true);
   };
@@ -480,28 +501,7 @@ export default function SellerProductsPage() {
                       </select>
                     </div>
                     <div className="space-y-2 col-span-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
-                        Image URL (https)
-                      </label>
-                      <input
-                        type="url"
-                        value={formData.images[0] ?? ''}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            images: [e.target.value],
-                          }))
-                        }
-                        className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold focus:ring-4 focus:ring-emerald-500/5 transition-all"
-                        placeholder="https://images.unsplash.com/..."
-                      />
-                      <p className="text-[10px] text-slate-400 font-medium">
-                        Paste a direct link to your plant photo, or use the default. You can also pick a file below to
-                        replace it with a sample image.
-                      </p>
-                    </div>
-                    <div className="space-y-2 col-span-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Plant Image</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Plant photo <span className="text-slate-300 font-semibold normal-case">(optional)</span></label>
                       <div className="relative group/upload">
                         <div className={`w-full h-40 border-2 border-dashed rounded-[32px] flex flex-col items-center justify-center transition-all ${formData.images[0] ? 'border-emerald-500/50 bg-emerald-50/30' : 'border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-emerald-300'}`}>
                           {formData.images[0] ? (
@@ -535,6 +535,26 @@ export default function SellerProductsPage() {
                           />
                         </div>
                       </div>
+                      <p className="text-[10px] text-slate-400 font-medium">
+                        Upload a photo or skip. A default image is used if you add none.
+                      </p>
+                      <details className="rounded-2xl bg-slate-50/80 px-4 py-3">
+                        <summary className="text-[10px] font-bold text-slate-500 cursor-pointer list-none">
+                          Optional: paste an image link instead
+                        </summary>
+                        <input
+                          type="text"
+                          value={formData.images[0] ?? ''}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              images: [e.target.value],
+                            }))
+                          }
+                          className="mt-3 w-full bg-white border border-slate-100 rounded-xl py-3 px-4 text-sm font-medium focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                          placeholder="Image link (not required)"
+                        />
+                      </details>
                     </div>
                     <div className="space-y-2 col-span-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Description</label>

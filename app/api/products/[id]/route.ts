@@ -3,6 +3,7 @@ import { requireSellerSession, parseObjectId, canManageProduct } from '@/lib/aut
 import { getProductsCollection } from '@/lib/products/collection';
 import { updateProductSchema } from '@/lib/validators/product';
 import { toSellerProduct } from '@/lib/models/product';
+import { resolveProductImages } from '@/lib/products/defaults';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -67,8 +68,10 @@ export async function PATCH(req: Request, context: RouteContext) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    const { images, ...rest } = parsed.data;
     const updates = {
-      ...parsed.data,
+      ...rest,
+      ...(images !== undefined ? { images: resolveProductImages(images) } : {}),
       updatedAt: new Date(),
     };
 

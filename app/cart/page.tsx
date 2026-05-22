@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 
 import { useCart } from '@/context/CartContext';
+import { normalizeCartProductId } from '@/lib/cart/product-id';
+import { DEFAULT_PRODUCT_IMAGE } from '@/lib/products/defaults';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { 
@@ -29,7 +31,15 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, totalAmount, totalItems } = useCart();
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    totalAmount,
+    totalItems,
+    syncItemsWithCatalog,
+    cartLoading,
+  } = useCart();
   const { user } = useAuth();
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -51,8 +61,12 @@ export default function CartPage() {
       .catch(console.error);
   }, []);
 
+  useEffect(() => {
+    void syncItemsWithCatalog();
+  }, [syncItemsWithCatalog]);
+
   const shipping = totalAmount > 2000 ? 0 : 150;
-  const tax = (totalAmount - discount) * 0.18; // 18% GST after discount
+  const tax = Math.round((totalAmount - discount) * 0.18);
   const finalTotal = totalAmount - discount + shipping + tax;
 
   const applyCoupon = () => {
@@ -113,6 +127,18 @@ export default function CartPage() {
   const breadcrumbs = [
     { label: 'Botanical Bag' }
   ];
+
+  if (cartLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-[60vh] flex items-center justify-center"
+      >
+        <p className="text-slate-500 font-medium">Loading your botanical bag…</p>
+      </motion.div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -242,14 +268,21 @@ export default function CartPage() {
                     <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-50 rounded-bl-[120px] -z-10 opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-y-10 translate-x-10 group-hover:translate-y-0 group-hover:translate-x-0" />
                     
                     <div className="w-full md:w-56 h-56 rounded-[40px] overflow-hidden bg-slate-50 flex-shrink-0 shadow-2xl group-hover:rotate-2 transition-transform duration-700">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                      <img
+                        src={item.image || DEFAULT_PRODUCT_IMAGE}
+                        alt={item.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_PRODUCT_IMAGE;
+                        }}
+                      />
                     </div>
 
                     <div className="flex-grow flex flex-col justify-between py-2 space-y-6">
                       <div className="space-y-4">
                         <div className="flex items-start justify-between gap-6">
                           <div className="space-y-1">
-                            <Link href={`/plants/${item.id.split('-')[0]}`}>
+                            <Link href={`/plants/${normalizeCartProductId(item.id)}`}>
                               <h3 className="text-3xl font-display font-black text-slate-900 hover:text-emerald-700 transition-colors tracking-tight italic">{item.name}</h3>
                             </Link>
                             <div className="flex items-center gap-3">

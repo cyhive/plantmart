@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -6,6 +6,7 @@ import { Leaf, ArrowRight, Truck, ShieldCheck, Zap, Star, Quote, Mail, ShoppingB
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
+import { CatalogProductsSection } from '@/components/home/CatalogProductsSection';
 
 // Hero Slides data
 const heroSlides = [
@@ -37,7 +38,7 @@ const heroSlides = [
     tag: 'Free Shipping',
     title: 'Garden',
     highlight: 'To Door',
-    desc: 'Get free express shipping on all orders over ₹2000. Fresh plants, delivered straight to your doorstep.',
+    desc: 'Get free express shipping on all orders over â‚¹2000. Fresh plants, delivered straight to your doorstep.',
     image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=800',
     color: 'green'
   }
@@ -63,13 +64,6 @@ const categories = [
   { name: 'Pots & Tools', slug: 'Pots', icon: <Box className="w-14 h-14" />, count: 60, color: 'bg-amber-500/10 text-amber-600' },
 ];
 
-const bestSellers = [
-  { id: '1', name: 'Monstera Deliciosa', price: 1299, image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=400', category: 'Indoor' },
-  { id: '2', name: 'Snake Plant', price: 899, image: 'https://images.unsplash.com/photo-1593482892290-f54927ae1bbc?auto=format&fit=crop&q=80&w=400', category: 'Indoor' },
-  { id: '3', name: 'Fiddle Leaf Fig', price: 2499, image: 'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=400', category: 'Outdoor' },
-  { id: '4', name: 'Peace Lily', price: 699, image: 'https://images.unsplash.com/photo-1593691509543-c55fb32e7355?auto=format&fit=crop&q=80&w=400', category: 'Indoor' },
-];
-
 const testimonials = [
   { name: 'Sarah J.', role: 'Plant Enthusiast', text: 'The quality of the plants I received was exceptional. They were packaged so carefully!', stars: 5 },
   { name: 'Michael R.', role: 'Interior Designer', text: 'PlantMart has become my go-to for all my client projects. The variety is unmatched.', stars: 5 },
@@ -90,7 +84,7 @@ const offers = [
   {
     id: 'welcome',
     title: 'Welcome Bonus',
-    discount: '₹150 OFF',
+    discount: 'â‚¹150 OFF',
     desc: 'New to the plant parent community? Start your journey with an exclusive discount.',
     code: 'PLANTLOVE',
     color: 'blue',
@@ -343,104 +337,7 @@ export default function HomePage() {
     ))}
   </div>
 </section>
-      {/* Best Sellers */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        <div className="text-center space-y-4">
-          <h2 className="text-5xl font-display font-bold text-slate-900 tracking-tight">Best Sellers</h2>
-          <p className="text-slate-500 text-lg font-medium">Most loved plants by our community</p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {bestSellers.map((product, i) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="group bg-white rounded-[24px] border border-slate-100 hover:shadow-xl transition-all duration-500 p-3 flex flex-col h-full"
-            >
-              <Link href={`/plants/${product.id}`} className="flex flex-col h-full justify-between">
-                <div>
-                  <div className="relative aspect-square overflow-hidden rounded-[18px] bg-slate-50 mb-4">
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-100 transition-transform duration-700" />
-                    <div className="absolute top-3 left-3 glass py-1 px-2.5 rounded-lg text-[9px] font-bold text-emerald-900 uppercase tracking-widest">
-                      {product.category}
-                    </div>
-                    <button 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleFavorite(product.id, e);
-                      }}
-                      className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all backdrop-blur-md shadow-md cursor-pointer border ${
-                        favorites?.includes(product.id) 
-                          ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' 
-                          : 'bg-white/80 border-white/40 text-slate-400 hover:text-rose-500 hover:bg-white'
-                      }`}
-                    >
-                      <Heart className={`w-3.5 h-3.5 ${favorites?.includes(product.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
-                    </button>
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-                  </div>
-                  <div className="px-1.5 space-y-2">
-                    <h3 className="font-bold text-sm sm:text-base text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-1">{product.name}</h3>
-                    <div className="flex items-center justify-between">
-                      <p className="text-emerald-700 font-bold text-sm sm:text-base">₹{product.price}</p>
-                      <div className="flex items-center gap-0.5 sm:gap-1 text-amber-400">
-                        <Star className="w-3.5 h-3.5 fill-amber-400" />
-                        <span className="text-slate-400 text-xs font-bold">4.9</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="px-1.5 pt-3 mt-3 border-t border-slate-100 flex items-center gap-2">
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (typeof addItem !== 'undefined') {
-                        addItem({
-                          id: product.id,
-                          name: product.name,
-                          price: product.price,
-                          image: product.image,
-                          quantity: 1,
-                          seller: { name: 'Verified Seller', shopName: 'PlantMart Direct' }
-                        });
-                        alert(`${product.name} added to cart!`);
-                      }
-                    }}
-                    className="flex-1 bg-emerald-50 text-emerald-700 py-2 rounded-xl text-[10px] sm:text-xs font-bold hover:bg-emerald-100 hover:text-emerald-800 transition-colors flex items-center justify-center gap-1 border border-emerald-500/10 cursor-pointer"
-                  >
-                    <ShoppingBag className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Add to Cart</span><span className="sm:hidden">Add</span>
-                  </button>
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (typeof addItem !== 'undefined') {
-                        addItem({
-                          id: product.id,
-                          name: product.name,
-                          price: product.price,
-                          image: product.image,
-                          quantity: 1,
-                          seller: { name: 'Verified Seller', shopName: 'PlantMart Direct' }
-                        });
-                        router.push('/cart');
-                      }
-                    }}
-                    className="flex-1 bg-slate-900 text-white py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider hover:bg-emerald-600 transition-colors flex items-center justify-center gap-1 shadow-md cursor-pointer"
-                  >
-                    Buy <span className="hidden sm:inline">Now</span>
-                  </button>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+      <CatalogProductsSection />
 
       {/* Features */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -604,7 +501,7 @@ export default function HomePage() {
               <div className="absolute bottom-12 left-12 right-12">
                 <div className="glass p-8 rounded-[32px] border-white/20">
                   <p className="text-white text-lg font-bold italic">"Plants don't just grow, they flourish when they feel loved."</p>
-                  <p className="text-emerald-400 text-xs font-black uppercase tracking-widest mt-4">— Dr. Greenleaf</p>
+                  <p className="text-emerald-400 text-xs font-black uppercase tracking-widest mt-4">â€” Dr. Greenleaf</p>
                 </div>
               </div>
             </div>
