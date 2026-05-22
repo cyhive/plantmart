@@ -22,10 +22,38 @@ export function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showBanner, setShowBanner] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [defaultAddress, setDefaultAddress] = useState<any>(null);
   
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    const fetchAddress = () => {
+      if (user) {
+        fetch('/api/addresses')
+          .then(res => res.json())
+          .then(data => {
+            if (data.addresses && data.addresses.length > 0) {
+              const def = data.addresses.find((a: any) => a.isDefault);
+              setDefaultAddress(def || data.addresses[0]);
+            } else {
+              setDefaultAddress(null);
+            }
+          })
+          .catch(console.error);
+      } else {
+        setDefaultAddress(null);
+      }
+    };
+
+    fetchAddress();
+
+    const handleAddressUpdate = () => {
+      fetchAddress();
+    };
+
+    window.addEventListener('addressUpdated', handleAddressUpdate);
+    return () => window.removeEventListener('addressUpdated', handleAddressUpdate);
+  }, [user]);
   
   const isSellerPage = pathname?.startsWith('/seller');
   const isAdminPage = pathname?.startsWith('/admin');
@@ -76,7 +104,7 @@ export function Navbar() {
                   <div className="flex flex-col">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Deliver to</span>
                     <span className="text-xs font-bold text-slate-700 truncate max-w-[120px]">
-                      {user.address?.city ? `${user.address.city}, ${user.address.state}` : 'Set Address'}
+                      {defaultAddress ? `${defaultAddress.city}, ${defaultAddress.state}` : user.address?.city ? `${user.address.city}, ${user.address.state}` : 'Set Address'}
                     </span>
                   </div>
                 </Link>

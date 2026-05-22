@@ -11,7 +11,7 @@ import { motion } from 'motion/react';
 function RegisterForm() {
   const searchParams = useSearchParams();
   const [role, setRole] = useState<'buyer' | 'seller'>('buyer');
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', shopName: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', shopName: '', street: '', city: '', state: '', zipCode: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -34,6 +34,14 @@ function RegisterForm() {
       password: formData.password,
       role,
       ...(role === 'seller' ? { shopName: formData.shopName } : {}),
+      ...(role === 'buyer' && (formData.street || formData.city || formData.state || formData.zipCode) ? { 
+        address: { 
+          street: formData.street, 
+          city: formData.city, 
+          state: formData.state, 
+          zipCode: formData.zipCode 
+        } 
+      } : {}),
     });
 
     if (!result.ok) {
@@ -143,6 +151,51 @@ function RegisterForm() {
                 placeholder="Green Garden Nursery"
               />
             </div>
+          )}
+
+          {role === 'buyer' && (
+            <>
+              <div className="md:col-span-1 space-y-2">
+                <label className="block text-sm font-bold text-slate-700 ml-1">Street / Apartment (Optional)</label>
+                <input
+                  type="text"
+                  value={formData.street}
+                  onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                  className="w-full px-6 py-4 bg-white/50 border-2 border-transparent rounded-[24px] focus:bg-white focus:border-emerald-500/30 focus:ring-8 focus:ring-emerald-500/5 outline-none transition-all duration-300 font-medium"
+                  placeholder="123 Main St"
+                />
+              </div>
+              <div className="md:col-span-1 space-y-2">
+                <label className="block text-sm font-bold text-slate-700 ml-1">City (Optional)</label>
+                <input
+                  type="text"
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  className="w-full px-6 py-4 bg-white/50 border-2 border-transparent rounded-[24px] focus:bg-white focus:border-emerald-500/30 focus:ring-8 focus:ring-emerald-500/5 outline-none transition-all duration-300 font-medium"
+                  placeholder="New York"
+                />
+              </div>
+              <div className="md:col-span-1 space-y-2">
+                <label className="block text-sm font-bold text-slate-700 ml-1">State (Optional)</label>
+                <input
+                  type="text"
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  className="w-full px-6 py-4 bg-white/50 border-2 border-transparent rounded-[24px] focus:bg-white focus:border-emerald-500/30 focus:ring-8 focus:ring-emerald-500/5 outline-none transition-all duration-300 font-medium"
+                  placeholder="NY"
+                />
+              </div>
+              <div className="md:col-span-1 space-y-2">
+                <label className="block text-sm font-bold text-slate-700 ml-1">Postal Code (Optional)</label>
+                <input
+                  type="text"
+                  value={formData.zipCode}
+                  onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                  className="w-full px-6 py-4 bg-white/50 border-2 border-transparent rounded-[24px] focus:bg-white focus:border-emerald-500/30 focus:ring-8 focus:ring-emerald-500/5 outline-none transition-all duration-300 font-medium"
+                  placeholder="10001"
+                />
+              </div>
+            </>
           )}
 
           <div className="col-span-full pt-4">

@@ -7,6 +7,12 @@ export type RegisterInput = {
   role: 'buyer' | 'seller';
   shopName?: string;
   phone?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  };
 };
 
 type RegisterSuccess = { ok: true; user: AuthUser };
@@ -41,6 +47,7 @@ export async function registerAccount(input: RegisterInput): Promise<RegisterSuc
         role: input.role,
         ...(input.role === 'seller' && input.shopName?.trim() ? { shopName: input.shopName.trim() } : {}),
         ...(input.phone?.trim() ? { phone: input.phone.trim() } : {}),
+        ...(input.address ? { address: input.address } : {}),
       }),
     });
     const data = await res.json().catch(() => ({}));

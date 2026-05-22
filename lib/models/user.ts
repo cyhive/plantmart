@@ -10,6 +10,16 @@ export type UserDocument = {
   role: UserRole;
   phone?: string;
   shopName?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
   createdAt: Date;
   updatedAt: Date;
 };
@@ -24,6 +34,7 @@ export function toPublicUser(doc: UserDocument) {
     role: doc.role,
     phone: doc.phone,
     shopName: doc.shopName,
+    address: doc.address,
     createdAt: doc.createdAt.toISOString(),
   };
 }

@@ -13,9 +13,11 @@ import {
   ChevronRight,
   Box,
   IndianRupee,
-  Store
+  Store,
+  Loader2
 } from 'lucide-react';
 import Link from 'next/link';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 
 export default function SellerDashboardPage() {
   const { user } = useAuth();
@@ -24,23 +26,39 @@ export default function SellerDashboardPage() {
     totalOrders: 0,
     totalRevenue: 0
   });
+  const [salesData, setSalesData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = () => {
-      // Mock Stats Logic
-      setTimeout(() => {
-        setStats({
-          totalProducts: 42,
-          totalOrders: 156,
-          totalRevenue: 84500
-        });
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/seller/dashboard');
+        if (res.ok) {
+          const data = await res.json();
+          setStats({
+            totalProducts: data.totalProducts || 0,
+            totalOrders: data.totalOrders || 0,
+            totalRevenue: data.totalRevenue || 0
+          });
+          setSalesData(data.salesData || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch stats', err);
+      } finally {
         setLoading(false);
-      }, 600);
+      }
     };
 
     if (user) fetchStats();
   }, [user]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-emerald-600 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-12">
@@ -92,13 +110,13 @@ export default function SellerDashboardPage() {
         ))}
       </div>
 
-      {/* Action Hub */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Action Hub & Graph */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-[48px] border border-slate-100 shadow-sm overflow-hidden flex flex-col"
+          className="bg-white rounded-[48px] border border-slate-100 shadow-sm overflow-hidden flex flex-col lg:col-span-1"
         >
           <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
             <h3 className="font-display font-bold text-xl text-slate-900 flex items-center gap-3 italic">
@@ -112,8 +130,8 @@ export default function SellerDashboardPage() {
                     <Box className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">Inventory Management</p>
-                    <p className="text-xs text-slate-500">Update stock levels and rates.</p>
+                    <p className="font-bold text-slate-900">Inventory</p>
+                    <p className="text-xs text-slate-500">Update stock.</p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-emerald-500 transition-all" />
@@ -125,8 +143,8 @@ export default function SellerDashboardPage() {
                     <ShoppingBag className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">Order Fulfillment</p>
-                    <p className="text-xs text-slate-500">Track sales and update statuses.</p>
+                    <p className="font-bold text-slate-900">Orders</p>
+                    <p className="text-xs text-slate-500">Track sales.</p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-emerald-500 transition-all" />
@@ -138,20 +156,36 @@ export default function SellerDashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-emerald-900 rounded-[48px] shadow-2xl relative overflow-hidden group p-12 flex flex-col justify-between"
+          className="bg-white border border-slate-100 rounded-[48px] shadow-sm relative overflow-hidden group p-8 flex flex-col lg:col-span-2"
         >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-32 -mt-32 blur-3xl" />
-          <div className="space-y-6 relative z-10">
-            <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-emerald-400">
-               <PieChart className="w-8 h-8" />
-            </div>
-            <h3 className="text-3xl font-display font-bold text-white">Performance Insights</h3>
-            <p className="text-emerald-100/60 text-sm font-medium leading-relaxed max-w-sm">We're aggregating your sales data to provide detailed growth analytics and customer heatmaps.</p>
+          <div className="space-y-2 mb-8 relative z-10">
+            <h3 className="text-2xl font-display font-bold text-slate-900 flex items-center gap-3">
+               <PieChart className="w-6 h-6 text-emerald-500" />
+               Performance Insights
+            </h3>
+            <p className="text-slate-500 text-sm font-medium">Revenue trends over the last 7 days.</p>
           </div>
           
-          <button className="w-full bg-emerald-500 text-white py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-3 mt-8 hover:bg-emerald-400 shadow-xl shadow-emerald-500/20">
-             Coming Soon: Market Reports <ChevronRight className="w-5 h-5" />
-          </button>
+          <div className="w-full h-72 flex-grow">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={salesData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} tickFormatter={(value) => `₹${value}`} dx={-10} />
+                <CartesianGrid vertical={false} stroke="#f1f5f9" />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}
+                  formatter={(value: number) => [`₹${value}`, 'Revenue']}
+                />
+                <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
       </div>
     </div>

@@ -39,6 +39,7 @@ interface Address {
   city: string;
   state: string;
   zipCode: string;
+  phone?: string;
   isDefault: boolean;
   coordinates: {
     lat: number;
@@ -62,58 +63,90 @@ export default function AddressPage() {
     city: '',
     state: '',
     zipCode: '',
+    phone: '',
     isDefault: false,
     coordinates: { lat: 20.5937, lng: 78.9629 }
   });
 
   useEffect(() => {
-    // Mock Data Initialization
-    const mockAddresses: Address[] = [
-      {
-        id: '1',
-        type: 'home',
-        street: '88 Green Avenue',
-        building: 'Emerald Heights, Flat 402',
-        landmark: 'Near Botanical Garden',
-        city: 'Bangalore',
-        state: 'Karnataka',
-        zipCode: '560001',
-        isDefault: true,
-        coordinates: { lat: 12.9716, lng: 77.5946 }
-      },
-      {
-        id: '2',
-        type: 'work',
-        street: 'Tech Park East',
-        building: 'Innovation Tower, Floor 12',
-        city: 'Pune',
-        state: 'Maharashtra',
-        zipCode: '411001',
-        isDefault: false,
-        coordinates: { lat: 18.5204, lng: 73.8567 }
+    const fetchAddresses = async () => {
+      try {
+        const res = await fetch('/api/addresses');
+        if (!res.ok) throw new Error('Failed to fetch addresses');
+        const data = await res.json();
+        if (data.addresses) {
+          // Map backend format to frontend format if necessary
+          setAddresses(data.addresses.map((addr: any) => ({
+            ...addr,
+            type: addr.type || 'other'
+          })));
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-    ];
-
-    setTimeout(() => {
-      setAddresses(mockAddresses);
-      setLoading(false);
-    }, 800);
+    };
+    fetchAddresses();
   }, []);
 
-  const handleSave = () => {
-    if (editingId) {
-      setAddresses(prev => prev.map(a => a.id === editingId ? { ...formData, id: editingId } : a));
-    } else {
-      const newAddress: Address = { ...formData, id: Math.random().toString(36).substr(2, 9) };
-      if (newAddress.isDefault) {
-        setAddresses(prev => prev.map(a => ({ ...a, isDefault: false })).concat(newAddress));
+  const handleSave = async () => {
+    try {
+      const payload = {
+        ...formData,
+        type: formData.type
+      };
+
+      if (editingId) {
+        const res = await fetch(`/api/addresses/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const errData = await res.json().catch(()=>({}));
+          throw new Error(errData.error || 'Failed to update');
+        }
+        
+        // Optimistic update
+        setAddresses(prev => prev.map(a => {
+          if (a.id === editingId) {
+            return { ...formData, id: editingId, type: formData.type } as any;
+          }
+          if (payload.isDefault) {
+            return { ...a, isDefault: false };
+          }
+          return a;
+        }));
       } else {
-        setAddresses(prev => [...prev, newAddress]);
+        const res = await fetch('/api/addresses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const errData = await res.json().catch(()=>({}));
+          throw new Error(errData.error || 'Failed to add');
+        }
+        const data = await res.json();
+        
+        if (data.address) {
+          const newAddress = { ...data.address, type: data.address.type };
+          if (newAddress.isDefault) {
+            setAddresses(prev => prev.map(a => ({ ...a, isDefault: false })).concat(newAddress));
+          } else {
+            setAddresses(prev => [...prev, newAddress]);
+          }
+        }
       }
+      setIsAdding(false);
+      setEditingId(null);
+      resetForm();
+      window.dispatchEvent(new Event('addressUpdated'));
+    } catch (err: any) {
+      console.error('Save error:', err.message);
+      alert(`Error saving address: ${err.message}`);
     }
-    setIsAdding(false);
-    setEditingId(null);
-    resetForm();
   };
 
   const resetForm = () => {
@@ -125,17 +158,48 @@ export default function AddressPage() {
       city: '',
       state: '',
       zipCode: '',
+      phone: '',
       isDefault: false,
       coordinates: { lat: 20.5937, lng: 78.9629 }
     });
   };
 
-  const deleteAddress = (id: string) => {
-    setAddresses(prev => prev.filter(a => a.id !== id));
+  const deleteAddress = async (id: string) => {
+    try {
+      const res = await fetch(`/api/addresses/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setAddresses(prev => {
+          const newAddresses = prev.filter(a => a.id !== id);
+          // Just a local refresh, ideally refetching would be safer for default logic
+          return newAddresses;
+        });
+        // Refetch to get updated default if needed
+        const fetchRes = await fetch('/api/addresses');
+        if (fetchRes.ok) {
+          const data = await fetchRes.json();
+          setAddresses(data.addresses.map((addr: any) => ({ ...addr, type: addr.type || 'other' })));
+        }
+        window.dispatchEvent(new Event('addressUpdated'));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const setAsDefault = (id: string) => {
-    setAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })));
+  const setAsDefault = async (id: string) => {
+    try {
+      const res = await fetch(`/api/addresses/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isDefault: true })
+      });
+      if (res.ok) {
+        setAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })));
+        window.dispatchEvent(new Event('addressUpdated'));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   if (loading) return (
@@ -216,7 +280,7 @@ export default function AddressPage() {
                     </div>
                   </div>
 
-                  <div className="md:col-span-2 space-y-2">
+                  <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Street / Road Name</label>
                     <input 
                       type="text" 
@@ -228,10 +292,21 @@ export default function AddressPage() {
                   </div>
 
                   <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Contact Phone Number</label>
+                    <input 
+                      type="tel" 
+                      value={formData.phone || ''}
+                      onChange={e => setFormData({...formData, phone: e.target.value})}
+                      placeholder="e.g. +91 98765 43210"
+                      className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/5 transition-all shadow-inner"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Building / Apt Name</label>
                     <input 
                       type="text" 
-                      value={formData.building}
+                      value={formData.building || ''}
                       onChange={e => setFormData({...formData, building: e.target.value})}
                       placeholder="e.g. Flora Residences, Flat 10A"
                       className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/5 transition-all shadow-inner"
@@ -242,20 +317,29 @@ export default function AddressPage() {
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Landmark (Optional)</label>
                     <input 
                       type="text" 
-                      value={formData.landmark}
+                      value={formData.landmark || ''}
                       onChange={e => setFormData({...formData, landmark: e.target.value})}
                       placeholder="e.g. Opposite City Park"
                       className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/5 transition-all shadow-inner"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 md:col-span-2">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:col-span-2">
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">City</label>
                       <input 
                         type="text" 
                         value={formData.city}
                         onChange={e => setFormData({...formData, city: e.target.value})}
+                        className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/5 transition-all shadow-inner"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">State</label>
+                      <input 
+                        type="text" 
+                        value={formData.state}
+                        onChange={e => setFormData({...formData, state: e.target.value})}
                         className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/5 transition-all shadow-inner"
                       />
                     </div>
@@ -362,6 +446,7 @@ export default function AddressPage() {
                        <p className="text-xl font-display font-black text-slate-900 tracking-tight leading-tight italic">{addr.street}</p>
                        {addr.building && <p className="text-sm font-bold text-slate-600 italic leading-tight">{addr.building}</p>}
                        <p className="text-xs font-medium text-slate-400">{addr.city}, {addr.state} • {addr.zipCode}</p>
+                       {addr.phone && <p className="text-xs font-bold text-emerald-600 mt-1">📞 {addr.phone}</p>}
                     </div>
 
                     {addr.landmark && (

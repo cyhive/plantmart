@@ -8,6 +8,12 @@ export const registerBodySchema = z
     role: z.enum(['buyer', 'seller']),
     shopName: z.string().trim().max(200).optional(),
     phone: z.string().trim().max(30).optional(),
+    address: z.object({
+      street: z.string().trim().optional(),
+      city: z.string().trim().optional(),
+      state: z.string().trim().optional(),
+      zipCode: z.string().trim().optional(),
+    }).optional(),
   })
   .superRefine((data, ctx) => {
     if (data.role === 'seller' && !data.shopName?.trim()) {

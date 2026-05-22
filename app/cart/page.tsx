@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -34,6 +34,22 @@ export default function CartPage() {
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [isCouponApplied, setIsCouponApplied] = useState(false);
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<any | null>(null);
+
+  // Fetch addresses on mount
+  useEffect(() => {
+    fetch('/api/addresses')
+      .then(res => res.json())
+      .then(data => {
+        if (data.addresses && data.addresses.length > 0) {
+          setAddresses(data.addresses);
+          const defaultAddr = data.addresses.find((a: any) => a.isDefault);
+          setSelectedAddress(defaultAddr || data.addresses[0]);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const shipping = totalAmount > 2000 ? 0 : 150;
   const tax = (totalAmount - discount) * 0.18; // 18% GST after discount
@@ -389,11 +405,44 @@ export default function CartPage() {
                      <MapPin className="w-4 h-4 text-emerald-600" />
                      <span>Destination</span>
                    </div>
-                   <Link href="/address" className="text-[10px] font-black text-emerald-600 uppercase hover:underline">Change</Link>
+                   <Link href="/address" className="text-[10px] font-black text-emerald-600 uppercase hover:underline">Manage Hubs</Link>
                 </div>
                 
-                {user?.address?.street ? (
-                  <div className="space-y-1">
+                {addresses.length > 0 ? (
+                  <div className="space-y-4">
+                    <select 
+                      value={selectedAddress?.id || ''} 
+                      onChange={(e) => {
+                        const addr = addresses.find(a => a.id === e.target.value);
+                        if(addr) setSelectedAddress(addr);
+                      }}
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-emerald-500 transition-colors cursor-pointer appearance-none"
+                    >
+                      {addresses.map(a => (
+                        <option key={a.id} value={a.id}>
+                          {(a.type || 'other').toUpperCase()} - {a.street}, {a.city}
+                        </option>
+                      ))}
+                    </select>
+                    
+                    {selectedAddress && (
+                      <div className="space-y-1 p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
+                        <p className="text-lg font-display font-bold text-slate-900 leading-tight italic">
+                          {selectedAddress.street}
+                        </p>
+                        <p className="text-xs text-slate-500 font-medium">
+                          {selectedAddress.city}, {selectedAddress.state} {selectedAddress.zipCode}
+                        </p>
+                        {selectedAddress.phone && (
+                          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700 pt-2">
+                            Contact: {selectedAddress.phone}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : user?.address?.street ? (
+                  <div className="space-y-1 p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
                     <p className="text-lg font-display font-bold text-slate-900 leading-tight italic">
                       {user.address.street}
                     </p>
@@ -411,8 +460,8 @@ export default function CartPage() {
 
               <div className="space-y-4">
                 <button 
-                  className="w-full bg-slate-900 text-white py-6 rounded-[32px] font-black text-xl hover:bg-emerald-600 transition-all shadow-2xl shadow-slate-900/10 active:scale-[0.98] flex items-center justify-center gap-4 group"
-                  disabled={!user?.address?.street}
+                  className="w-full bg-slate-900 text-white py-6 rounded-[32px] font-black text-xl hover:bg-emerald-600 transition-all shadow-2xl shadow-slate-900/10 active:scale-[0.98] flex items-center justify-center gap-4 group disabled:opacity-50 disabled:bg-slate-300 disabled:cursor-not-allowed"
+                  disabled={!selectedAddress && !user?.address?.street}
                 >
                   Confirm & Pay <ChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
                 </button>

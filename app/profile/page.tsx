@@ -65,23 +65,35 @@ export default function ProfilePage() {
     );
   }
 
-  const handleSave = () => {
-    // In a real app, this would be an API call
-    const updatedUser = {
-      ...user,
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      address: {
-        ...user.address,
-        street: formData.street,
-        city: formData.city,
-        state: formData.state,
-        zipCode: formData.zipCode
+  const handleSave = async () => {
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: {
+            street: formData.street,
+            city: formData.city,
+            state: formData.state,
+            zipCode: formData.zipCode
+          }
+        })
+      });
+      
+      if (!res.ok) throw new Error('Failed to update profile');
+      const data = await res.json();
+      
+      if (data.user) {
+        login(data.user);
       }
-    };
-    login(updatedUser);
-    setIsEditing(false);
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      // On failure, we could show a toast here, but simply reverting edit mode or keeping it open works.
+    }
   };
 
   const mockOrders = [
