@@ -3,6 +3,7 @@ import { requireSellerSession, parseObjectId } from '@/lib/auth/require-seller';
 import { getProductsCollection } from '@/lib/products/collection';
 import { createProductSchema } from '@/lib/validators/product';
 import { toSellerProduct } from '@/lib/models/product';
+import { resolveProductImages } from '@/lib/products/defaults';
 
 export async function GET() {
   const { session, response } = await requireSellerSession();
@@ -61,7 +62,7 @@ export async function POST(req: Request) {
       price: parsed.data.price,
       category: parsed.data.category,
       stock: parsed.data.stock,
-      images: parsed.data.images,
+      images: resolveProductImages(parsed.data.images),
       isApproved: true,
       ratings: { average: 0, count: 0 },
       sales: 0,

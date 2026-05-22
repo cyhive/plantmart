@@ -7,4 +7,6 @@ coverage/
 .env*
 !.env.example
 .next/
+public/uploads/products/*
+!public/uploads/products/.gitkeep
 .next
