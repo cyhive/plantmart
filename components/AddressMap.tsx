@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
 interface AddressMapProps {
   address: { coordinates: { lat: number, lng: number } };
   setAddress: (fn: (prev: any) => any) => void;
-  setActiveTab: (tab: 'form' | 'map') => void;
+  setActiveTab?: (tab: 'form' | 'map') => void;
   handleGetLiveLocation: () => void;
 }
 
@@ -31,7 +31,7 @@ export default function AddressMap({ address, setAddress, setActiveTab, handleGe
 
   const fetchAddressDetails = async (lat: number, lng: number) => {
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=en`);
       const data = await res.json();
       if (data && data.address) {
         const addr = data.address;
@@ -128,12 +128,14 @@ export default function AddressMap({ address, setAddress, setActiveTab, handleGe
               </p>
             </div>
           </div>
-          <button 
-            onClick={() => setActiveTab('form')}
-            className="bg-white text-slate-600 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition-all border border-slate-200"
-          >
-            Review Details
-          </button>
+          {setActiveTab && (
+            <button 
+              onClick={() => setActiveTab('form')}
+              className="bg-white text-slate-600 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition-all border border-slate-200"
+            >
+              Review Details
+            </button>
+          )}
         </div>
       </div>
     </div>

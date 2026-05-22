@@ -30,7 +30,10 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { useRouter } from 'next/navigation';
+
 export default function CartPage() {
+  const router = useRouter();
   const {
     items,
     removeItem,
@@ -311,8 +314,9 @@ export default function CartPage() {
                       <div className="flex flex-wrap items-center justify-between gap-8">
                         <div className="flex items-center bg-slate-50 rounded-[24px] border border-slate-100 p-2 shadow-inner">
                           <button 
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="w-12 h-12 flex items-center justify-center rounded-2xl hover:bg-white hover:shadow-lg text-slate-600 transition-all active:scale-90"
+                            onClick={() => item.quantity > 1 && updateQuantity(item.id, item.quantity - 1)}
+                            disabled={item.quantity <= 1}
+                            className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${item.quantity <= 1 ? 'opacity-50 cursor-not-allowed text-slate-400' : 'hover:bg-white hover:shadow-lg text-slate-600 active:scale-90'}`}
                           >
                             <Minus className="w-5 h-5" />
                           </button>
@@ -438,7 +442,7 @@ export default function CartPage() {
                      <MapPin className="w-4 h-4 text-emerald-600" />
                      <span>Destination</span>
                    </div>
-                   <Link href="/address" className="text-[10px] font-black text-emerald-600 uppercase hover:underline">Manage Hubs</Link>
+                   <Link href="/address" className="text-[10px] font-black text-emerald-600 uppercase hover:underline">Manage Address</Link>
                 </div>
                 
                 {addresses.length > 0 ? (
@@ -495,6 +499,14 @@ export default function CartPage() {
                 <button 
                   className="w-full bg-slate-900 text-white py-6 rounded-[32px] font-black text-xl hover:bg-emerald-600 transition-all shadow-2xl shadow-slate-900/10 active:scale-[0.98] flex items-center justify-center gap-4 group disabled:opacity-50 disabled:bg-slate-300 disabled:cursor-not-allowed"
                   disabled={!selectedAddress && !user?.address?.street}
+                  onClick={() => {
+                    const addrId = selectedAddress?.id || user?.address?.id;
+                    if(addrId) {
+                       router.push(`/checkout?addressId=${addrId}`);
+                    } else {
+                       router.push(`/checkout`);
+                    }
+                  }}
                 >
                   Confirm & Pay <ChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
                 </button>

@@ -53,7 +53,6 @@ export default function AddressPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'form' | 'map'>('form');
 
   const [formData, setFormData] = useState<Omit<Address, 'id'>>({
     type: 'home',
@@ -242,25 +241,27 @@ export default function AddressPage() {
                   </button>
                   <h2 className="text-2xl font-display font-bold text-slate-900">{editingId ? 'Refine Hub' : 'Establish New Hub'}</h2>
                </div>
-               <div className="flex gap-2 p-1 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                  {[
-                    { id: 'form', icon: <Navigation className="w-4 h-4" />, label: 'Manual' },
-                    { id: 'map', icon: <MapIcon className="w-4 h-4" />, label: 'Map' }
-                  ].map(tab => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
-                      className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400'}`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-               </div>
             </div>
 
             <div className="p-10">
-              {activeTab === 'form' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="flex flex-col lg:flex-row gap-10">
+                {/* Map Section */}
+                <div className="w-full lg:w-1/2 xl:w-2/5 h-[400px] lg:h-auto min-h-[400px] rounded-3xl overflow-hidden border border-slate-100 shadow-inner shrink-0 sticky top-10">
+                   <AddressMap 
+                     address={{ coordinates: formData.coordinates }}
+                     setAddress={(update: any) => {
+                       if (typeof update === 'function') {
+                         setFormData(prev => update(prev));
+                       } else {
+                         setFormData(prev => ({ ...prev, ...update }));
+                       }
+                     }}
+                     handleGetLiveLocation={() => {}}
+                   />
+                </div>
+
+                {/* Form Section */}
+                <div className="w-full lg:w-1/2 xl:w-3/5 grid grid-cols-1 md:grid-cols-2 gap-8 h-fit">
                   <div className="md:col-span-2 space-y-4">
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Address Label</label>
                     <div className="flex gap-4">
@@ -365,25 +366,7 @@ export default function AddressPage() {
                      <label htmlFor="default-check" className="text-sm font-bold text-emerald-800 italic">Set as Primary Delivery Destination</label>
                   </div>
                 </div>
-              ) : (
-                <div className="h-[400px] rounded-3xl overflow-hidden border border-slate-100 shadow-inner">
-                   <AddressMap 
-                     address={{ coordinates: formData.coordinates }}
-                     setAddress={(update: any) => {
-                       if (typeof update === 'function') {
-                         setFormData(prev => {
-                           const res = update(prev);
-                           return { ...prev, coordinates: res.coordinates };
-                         });
-                       } else {
-                         setFormData(prev => ({ ...prev, coordinates: update.coordinates }));
-                       }
-                     }}
-                     setActiveTab={setActiveTab}
-                     handleGetLiveLocation={() => {}}
-                   />
-                </div>
-              )}
+              </div>
 
               <div className="mt-12 flex justify-end gap-4">
                  <button 

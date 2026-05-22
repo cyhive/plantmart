@@ -16,7 +16,8 @@ import {
   Clock, 
   ChevronRight,
   ShieldCheck,
-  Package
+  Package,
+  Plus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
@@ -28,26 +29,50 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
-    street: '',
-    city: '',
-    state: '',
-    zipCode: ''
+    phone: ''
   });
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<any[]>([]);
 
   useEffect(() => {
     if (user) {
       setFormData({
         name: user.name || '',
         email: user.email || '',
-        phone: user.phone || '',
-        street: user.address?.street || '',
-        city: user.address?.city || '',
-        state: user.address?.state || '',
-        zipCode: user.address?.zipCode || ''
+        phone: user.phone || ''
       });
+      fetch('/api/addresses')
+        .then(res => res.json())
+        .then(data => {
+          if (data.addresses) setAddresses(data.addresses);
+        })
+        .catch(console.error);
+
+      fetch('/api/favorites')
+        .then(res => res.json())
+        .then(data => {
+          if (data.favorites) setFavorites(data.favorites);
+        })
+        .catch(console.error);
     }
   }, [user]);
+
+  const handleSetDefaultAddress = async (id: string) => {
+    try {
+      const res = await fetch(`/api/addresses/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isDefault: true })
+      });
+      if (res.ok) {
+        setAddresses(prev => prev.map(addr => ({ ...addr, isDefault: addr.id === id })));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
 
   if (!user) {
     return (
@@ -73,13 +98,7 @@ export default function ProfilePage() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          phone: formData.phone,
-          address: {
-            street: formData.street,
-            city: formData.city,
-            state: formData.state,
-            zipCode: formData.zipCode
-          }
+          phone: formData.phone
         })
       });
       
@@ -158,7 +177,7 @@ export default function ProfilePage() {
                  </div>
                  <div className="bg-slate-50 px-6 py-2 rounded-2xl border border-slate-100 text-center">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Wishlist</p>
-                    <p className="text-xl font-display font-black text-slate-900">45</p>
+                    <p className="text-xl font-display font-black text-slate-900">{favorites.length}</p>
                  </div>
                  <div className="bg-slate-50 px-6 py-2 rounded-2xl border border-slate-100 text-center">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Points</p>
@@ -245,40 +264,47 @@ export default function ProfilePage() {
                       </div>
                    </div>
 
-                   <div className="space-y-8 relative z-10 pt-4">
-                      <h3 className="text-2xl font-display font-bold text-slate-900">Default Delivery Hub</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="md:col-span-2 space-y-2">
-                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Street / Apartment</label>
-                           <input 
-                             type="text" 
-                             disabled={!isEditing}
-                             value={formData.street}
-                             onChange={(e) => setFormData({...formData, street: e.target.value})}
-                             className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/5 disabled:opacity-70 transition-all shadow-inner"
-                           />
-                        </div>
-                        <div className="space-y-2">
-                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">City</label>
-                           <input 
-                             type="text" 
-                             disabled={!isEditing}
-                             value={formData.city}
-                             onChange={(e) => setFormData({...formData, city: e.target.value})}
-                             className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/5 disabled:opacity-70 transition-all shadow-inner"
-                           />
-                        </div>
-                        <div className="space-y-2">
-                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Postal Code</label>
-                           <input 
-                             type="text" 
-                             disabled={!isEditing}
-                             value={formData.zipCode}
-                             onChange={(e) => setFormData({...formData, zipCode: e.target.value})}
-                             className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/5 disabled:opacity-70 transition-all shadow-inner"
-                           />
-                        </div>
+                   <div className="space-y-6 relative z-10 pt-4 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-2xl font-display font-bold text-slate-900">Saved Addresses</h3>
+                        <Link
+                          href="/address"
+                          className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                        >
+                          <Plus className="w-3.5 h-3.5" /> Add New Address
+                        </Link>
                       </div>
+
+                      {addresses.length === 0 ? (
+                        <p className="text-slate-500 italic text-sm">No saved addresses found.</p>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {addresses.map((addr) => (
+                            <div key={addr.id} className={`p-5 rounded-2xl border ${addr.isDefault ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-100 bg-slate-50'} flex flex-col justify-between space-y-4`}>
+                              <div className="space-y-1 text-sm font-medium text-slate-700">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-100 px-2 py-1 rounded-md">{addr.type || 'Home'}</span>
+                                  {addr.isDefault && (
+                                    <span className="text-[10px] font-black text-white bg-emerald-500 uppercase tracking-widest px-2 py-1 rounded-md flex items-center gap-1"><MapPin className="w-3 h-3"/> Default</span>
+                                  )}
+                                </div>
+                                <p className="font-bold text-slate-900 line-clamp-1">{addr.street}</p>
+                                <p>{addr.city}, {addr.state} {addr.zipCode}</p>
+                                <p className="text-slate-500 text-xs mt-1">{addr.country}</p>
+                              </div>
+                              {!addr.isDefault && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetDefaultAddress(addr.id)}
+                                  className="w-full py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-100 hover:text-emerald-700 transition-colors"
+                                >
+                                  Set as Default
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                    </div>
 
                    {isEditing && (
@@ -382,18 +408,59 @@ export default function ProfilePage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-white p-12 rounded-[48px] border border-slate-100 text-center space-y-6"
+              className="space-y-6"
             >
-              <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto text-pink-500">
-                 <Heart className="w-10 h-10 fill-current" />
-              </div>
-              <div className="space-y-2">
-                 <h3 className="text-2xl font-display font-bold text-slate-900">Your Botanical Wishlist</h3>
-                 <p className="text-slate-400 font-medium max-w-sm mx-auto italic">Start curating your dream garden by liking your favorite specimens in the catalog.</p>
-              </div>
-              <Link href="/plants" className="inline-block bg-slate-900 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl">
-                 Explore Catalog
-              </Link>
+              {favorites.length === 0 ? (
+                <div className="bg-white p-12 rounded-[48px] border border-slate-100 text-center space-y-6">
+                  <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto text-pink-500">
+                     <Heart className="w-10 h-10 fill-current" />
+                  </div>
+                  <div className="space-y-2">
+                     <h3 className="text-2xl font-display font-bold text-slate-900">Your Botanical Wishlist</h3>
+                     <p className="text-slate-400 font-medium max-w-sm mx-auto italic">Start curating your dream garden by liking your favorite specimens in the catalog.</p>
+                  </div>
+                  <Link href="/plants" className="inline-block bg-slate-900 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl">
+                     Explore Catalog
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {favorites.map((fav) => {
+                    const product = fav.product;
+                    if (!product) return null;
+                    return (
+                      <div key={fav.id} className="bg-white rounded-[32px] border border-slate-100 overflow-hidden group hover:shadow-xl transition-all">
+                        <div className="h-48 overflow-hidden bg-slate-50 relative">
+                          <img 
+                            src={product.images?.[0] || '/images/default-plant.png'} 
+                            alt={product.name} 
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1416879598056-0c8227656910?w=800&auto=format&fit=crop&q=80'; }}
+                          />
+                          <button 
+                            onClick={async () => {
+                              await fetch(`/api/favorites/${product._id}`, { method: 'DELETE' });
+                              setFavorites(prev => prev.filter(f => f.id !== fav.id));
+                            }}
+                            className="absolute top-4 right-4 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-rose-500 hover:bg-rose-50 transition-colors shadow-sm z-10"
+                          >
+                            <Heart className="w-5 h-5 fill-current" />
+                          </button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                          <div>
+                            <h4 className="font-display font-black text-xl text-slate-900 truncate">{product.name}</h4>
+                            <p className="text-sm font-bold text-emerald-600">₹{product.price}</p>
+                          </div>
+                          <Link href={`/plants/${product._id}`} className="block w-full py-3 bg-slate-900 text-white text-center rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-colors">
+                            View Plant
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

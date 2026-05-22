@@ -87,18 +87,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (cancelled) return;
 
-          const withInFlight = mergeCartLines(itemsRef.current, refreshed);
-          setItems(withInFlight);
+          setItems(refreshed);
           clearGuestCart();
 
           try {
-            const saved = await saveUserCart(withInFlight);
-            if (!cancelled) {
-              setItems((current) => {
-                const mergedSaved = mergeCartLines(current, saved);
-                return cartLinesEqual(current, mergedSaved) ? current : mergedSaved;
-              });
-            }
+            await saveUserCart(refreshed);
           } catch (err) {
             console.error('Failed to save merged cart', err);
           }

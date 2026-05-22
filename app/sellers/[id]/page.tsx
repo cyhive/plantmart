@@ -264,7 +264,6 @@ export default function NurseryDetailPage() {
                                  quantity: 1,
                                  seller: { name: nursery.name, shopName: nursery.shopName }
                                });
-                               alert(`${plant.name} added to cart!`);
                              }}
                              className="flex-1 bg-emerald-50 text-emerald-700 py-2 rounded-xl text-[10px] sm:text-xs font-bold hover:bg-emerald-100 hover:text-emerald-800 transition-colors flex items-center justify-center gap-1 border border-emerald-500/10 cursor-pointer"
                            >

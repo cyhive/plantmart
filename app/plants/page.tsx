@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface Seller {
   _id: string;
@@ -62,6 +63,7 @@ function CatalogPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { addItem } = useCart();
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [sellers, setSellers] = useState<Seller[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,11 +74,51 @@ function CatalogPageContent() {
   const MIN_LIMIT = 0;
   const MAX_LIMIT = 5000;
 
-  const toggleFavorite = (id: string, e: React.MouseEvent) => {
+  useEffect(() => {
+    if (user) {
+      fetch('/api/favorites')
+        .then(res => res.json())
+        .then(data => {
+          if (data.favorites) {
+            setFavorites(data.favorites.map((f: any) => f.productId));
+          }
+        })
+        .catch(console.error);
+    } else {
+      setFavorites([]);
+    }
+  }, [user]);
+
+  const toggleFavorite = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    const isFavorite = favorites.includes(id);
+    // Optimistic update
     setFavorites(prev => 
-      prev.includes(id) ? prev.filter(fId => fId !== id) : [...prev, id]
+      isFavorite ? prev.filter(fId => fId !== id) : [...prev, id]
     );
+
+    try {
+      if (isFavorite) {
+        await fetch(`/api/favorites/${id}`, { method: 'DELETE' });
+      } else {
+        await fetch('/api/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId: id })
+        });
+      }
+    } catch (err) {
+      console.error('Failed to toggle favorite', err);
+      // Revert on error
+      setFavorites(prev => 
+        isFavorite ? [...prev, id] : prev.filter(fId => fId !== id)
+      );
+    }
   };
   
   const [filters, setFilters] = useState({
@@ -590,7 +632,6 @@ function CatalogPageContent() {
                                 quantity: 1,
                                 seller: { name: product.seller.name, shopName: product.seller.shopName }
                               });
-                              alert(`${product.name} added to cart!`);
                             }}
                             className="flex-1 bg-emerald-50 text-emerald-700 h-9 rounded-lg flex items-center justify-center hover:bg-emerald-100 transition-colors border border-emerald-500/10 text-[9px] font-bold cursor-pointer"
                           >

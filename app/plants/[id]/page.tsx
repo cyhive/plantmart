@@ -288,8 +288,8 @@ export default function ProductDetailPage() {
         {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mt-8">
           
-          {/* Column 1: Image Gallery (5 cols, sticky) */}
-          <div className="lg:col-span-5 lg:sticky lg:top-28 h-fit space-y-6">
+          {/* Column 1: Image Gallery (4 cols, sticky) */}
+          <div className="lg:col-span-4 lg:sticky lg:top-28 h-fit space-y-6">
             
             {/* Main Interactive Zoomable Container */}
             <div 
@@ -330,8 +330,8 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          {/* Column 2: Product Information & Custom Configurations (7 cols) */}
-          <div className="lg:col-span-7 space-y-8 lg:pl-4">
+          {/* Column 2: Product Information & Custom Configurations (8 cols) */}
+          <div className="lg:col-span-8 space-y-8 lg:pl-4">
             
             {/* Badges & Tags */}
             <div className="space-y-4">
@@ -385,16 +385,6 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Plant Story Card */}
-            <div className="bg-emerald-50/30 p-6 md:p-8 rounded-[32px] border border-emerald-500/5 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl -mr-8 -mt-8 group-hover:bg-emerald-500/10 transition-colors" />
-              <h3 className="font-display font-black text-lg text-slate-900 flex items-center gap-2 mb-4">
-                <Leaf className="w-4 h-4 text-emerald-600" />
-                Botanical Narrative
-              </h3>
-              <p className="text-slate-600 leading-relaxed text-sm md:text-base italic font-medium">&quot;{product.description}&quot;</p>
-            </div>
-
             {/* Quantity Selector and Total Price */}
             <div className="flex flex-wrap items-center gap-8 bg-white p-6 rounded-[32px] border border-slate-100 shadow-xs">
               <div className="flex flex-col gap-2">
@@ -428,6 +418,20 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
             </div>
+
+
+
+            {/* Plant Story Card */}
+            <div className="bg-emerald-50/30 p-6 md:p-8 rounded-[32px] border border-emerald-500/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl -mr-8 -mt-8 group-hover:bg-emerald-500/10 transition-colors" />
+              <h3 className="font-display font-black text-lg text-slate-900 flex items-center gap-2 mb-4">
+                <Leaf className="w-4 h-4 text-emerald-600" />
+                Botanical Narrative
+              </h3>
+              <p className="text-slate-600 leading-relaxed text-sm md:text-base italic font-medium">&quot;{product.description}&quot;</p>
+            </div>
+
+            
 
             {/* Quick Micro Care Information Cards */}
             <div className="grid grid-cols-3 gap-4">
@@ -882,6 +886,63 @@ export default function ProductDetailPage() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Desktop Floating Action Bar (Right Side) */}
+      <div className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 flex-col gap-4">
+        <motion.button 
+          whileHover={{ scale: 1.05, x: -5 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleAddToCart}
+          className="w-14 h-14 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 rounded-2xl shadow-lg flex items-center justify-center group cursor-pointer relative"
+        >
+          <ShoppingCart className="w-6 h-6 text-emerald-700" />
+          <div className="absolute right-full mr-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+            Add to Cart
+          </div>
+        </motion.button>
+        
+        <motion.button 
+          whileHover={{ scale: 1.05, x: -5 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleBuyNow}
+          className="w-14 h-14 bg-emerald-700 text-white hover:bg-emerald-800 rounded-2xl shadow-lg shadow-emerald-700/20 flex items-center justify-center group cursor-pointer relative"
+        >
+          <ArrowRight className="w-6 h-6 text-emerald-300" />
+          <div className="absolute right-full mr-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+            Buy Now
+          </div>
+        </motion.button>
+
+        <motion.button 
+          whileHover={{ scale: 1.05, x: -5 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setWishlisted(!wishlisted)}
+          className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all border shadow-lg group cursor-pointer relative ${
+            wishlisted 
+              ? 'bg-red-50 text-red-500 border-red-100' 
+              : 'bg-white border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          <Heart className={`w-6 h-6 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
+          <div className="absolute right-full mr-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+            {wishlisted ? 'Remove Favorite' : 'Add Favorite'}
+          </div>
+        </motion.button>
+
+        <motion.button 
+          whileHover={{ scale: 1.05, x: -5 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            navigator.clipboard.writeText(window.location.href);
+          }}
+          className="w-14 h-14 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 shadow-lg flex items-center justify-center group cursor-pointer relative"
+        >
+          <Share2 className="w-6 h-6 text-slate-400" />
+          <div className="absolute right-full mr-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+            Share Plant
+          </div>
+        </motion.button>
+      </div>
 
       {/* Mobile Sticky Quick-Purchase Bar (Always displayed at bottom when page is open) */}
       <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/90 backdrop-blur-xl border-t border-slate-100 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] px-5 py-4 pb-6 flex items-center justify-between gap-4">
