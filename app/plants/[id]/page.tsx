@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  ShoppingCart, Heart, Share2, Info, Droplets, Sun, Activity, 
-  ShieldCheck, ArrowRight, Star, Minus, Plus, X, MapPin, Leaf, 
-  Store, Calendar, MessageSquare, ThumbsUp, Sparkles, Wind, 
+import {
+  ShoppingCart, Heart, Share2, Info, Droplets, Sun, Activity,
+  ShieldCheck, ArrowRight, Star, Minus, Plus, X, MapPin, Leaf,
+  Store, Calendar, MessageSquare, ThumbsUp, Sparkles, Wind,
   FileText, Award, Truck, Check, Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -26,17 +26,17 @@ interface Product {
   stock: number;
   originalPrice?: number;
   discountText?: string;
-  seller: { 
-    name: string; 
-    shopName: string; 
+  seller: {
+    name: string;
+    shopName: string;
     _id?: string;
     rating?: number;
     location?: string;
     joinedDate?: string;
   };
-  careTips: { 
-    sunlight: string; 
-    watering: string; 
+  careTips: {
+    sunlight: string;
+    watering: string;
     difficulty: string;
     soil?: string;
     propagation?: string;
@@ -109,6 +109,8 @@ function catalogToDetailProduct(p: CatalogApiProduct): Product {
 export default function ProductDetailPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { user } = useAuth();
+  const { addItem } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
@@ -117,7 +119,68 @@ export default function ProductDetailPage() {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'care' | 'seller' | 'reviews'>('overview');
-  
+  const [copied, setCopied] = useState(false);
+  const [isNearBottom, setIsNearBottom] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight;
+      const threshold = document.documentElement.scrollHeight - 300;
+      setIsNearBottom(scrollPosition > threshold);
+    };
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  useEffect(() => {
+    if (user && product) {
+      fetch('/api/favorites')
+        .then(res => res.json())
+        .then(data => {
+          if (data.favorites) {
+            const isFav = data.favorites.some((f: any) => f.productId === product._id);
+            setWishlisted(isFav);
+          }
+        })
+        .catch(console.error);
+    } else {
+      setWishlisted(false);
+    }
+  }, [user, product]);
+
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    if (!product) return;
+
+    const previousWishlisted = wishlisted;
+    setWishlisted(!previousWishlisted);
+
+    try {
+      if (previousWishlisted) {
+        await fetch(`/api/favorites/${product._id}`, { method: 'DELETE' });
+      } else {
+        await fetch('/api/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId: product._id })
+        });
+      }
+    } catch (err) {
+      console.error('Failed to toggle favorite', err);
+      setWishlisted(previousWishlisted);
+    }
+  };
+
   // Hover zoom coordinates for primary gallery photo
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
   const [isZoomed, setIsZoomed] = useState(false);
@@ -129,8 +192,6 @@ export default function ProductDetailPage() {
   ]);
 
   const [userAddress, setUserAddress] = useState<any>(null);
-  const { user } = useAuth();
-  const { addItem } = useCart();
 
   useEffect(() => {
     if (!user) {
@@ -187,7 +248,7 @@ export default function ProductDetailPage() {
   };
 
   const handleHelpfulClick = (reviewId: number) => {
-    setReviews(prevReviews => 
+    setReviews(prevReviews =>
       prevReviews.map(r => {
         if (r.id === reviewId) {
           if (r.userClickedHelpful) {
@@ -231,10 +292,10 @@ export default function ProductDetailPage() {
     if (!product) return;
     router.push('/cart');
   };
-  
+
   const handleReviewSubmit = (newReview: any) => {
     setReviews([
-      { ...newReview, helpfulCount: 0, userClickedHelpful: false }, 
+      { ...newReview, helpfulCount: 0, userClickedHelpful: false },
       ...reviews
     ]);
   };
@@ -277,51 +338,51 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-[#fbfdfb] via-[#f7faf7] to-[#f4f7f4] pb-28 relative overflow-hidden">
-      
+
       {/* Background Soft Blobs for Glassmorphism visual depth */}
       <div className="absolute top-20 left-[-10%] w-[35rem] h-[35rem] bg-emerald-100/30 rounded-full filter blur-3xl pointer-events-none -z-10 animate-float" />
       <div className="absolute top-[40%] right-[-10%] w-[40rem] h-[40rem] bg-amber-50/40 rounded-full filter blur-3xl pointer-events-none -z-10" />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <Breadcrumbs items={breadcrumbs} />
-        
+
         {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mt-8">
-          
+
           {/* Column 1: Image Gallery (4 cols, sticky) */}
           <div className="lg:col-span-4 lg:sticky lg:top-28 h-fit space-y-6">
-            
+
             {/* Main Interactive Zoomable Container */}
-            <div 
+            <div
               className="relative overflow-hidden aspect-square rounded-[36px] md:rounded-[48px] bg-white border border-slate-100/80 shadow-[0_20px_50px_rgba(0,0,0,0.06)] cursor-zoom-in group"
               onMouseEnter={() => setIsZoomed(true)}
               onMouseLeave={() => setIsZoomed(false)}
               onMouseMove={handleMouseMove}
             >
-              <img 
-                src={product.images[activeImage] || 'https://via.placeholder.com/800x800?text=No+Image'} 
-                alt={product.name} 
+              <img
+                src={product.images[activeImage] || 'https://via.placeholder.com/800x800?text=No+Image'}
+                alt={product.name}
                 style={{
                   transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
                   transform: isZoomed ? 'scale(1.8)' : 'scale(1)'
                 }}
-                className="w-full h-full object-cover transition-transform duration-200 ease-out" 
+                className="w-full h-full object-cover transition-transform duration-200 ease-out"
               />
-              
+
               {/* Premium Gradient Overlay */}
               <div className="absolute inset-0 bg-linear-to-t from-slate-950/20 via-transparent to-transparent pointer-events-none" />
-              
+
               {/* Floating Magnify Tip */}
               <div className="absolute bottom-6 right-6 px-4 py-2 bg-slate-900/80 backdrop-blur-md rounded-xl text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Leaf className="w-3.5 h-3.5 text-emerald-400" /> Premium Specimen
               </div>
             </div>
-            
+
             <div className="flex gap-4 overflow-x-auto pb-4 px-2 no-scrollbar scroll-smooth">
               {product.images.map((img, i) => (
-                <button 
-                  key={i} 
-                  onClick={() => setActiveImage(i)} 
+                <button
+                  key={i}
+                  onClick={() => setActiveImage(i)}
                   className={`w-20 h-20 md:w-24 md:h-24 rounded-[20px] md:rounded-[24px] overflow-hidden border-4 flex-shrink-0 transition-all duration-300 ${activeImage === i ? 'border-emerald-500 scale-105 shadow-md shadow-emerald-500/10' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-102'}`}
                 >
                   <img src={img} alt="" className="w-full h-full object-cover" />
@@ -332,14 +393,14 @@ export default function ProductDetailPage() {
 
           {/* Column 2: Product Information & Custom Configurations (8 cols) */}
           <div className="lg:col-span-8 space-y-8 lg:pl-4">
-            
+
             {/* Badges & Tags */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <span className="px-4 py-1.5 bg-emerald-50 text-emerald-800 text-[10px] font-extrabold rounded-full uppercase tracking-widest border border-emerald-100/50 flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-emerald-600 animate-pulse" /> {product.category}
                 </span>
-                
+
                 {product.stock > 0 ? (
                   <span className="bg-emerald-500/10 text-emerald-800 text-[10px] font-extrabold px-3 py-1.5 rounded-full flex items-center gap-1.5 uppercase tracking-widest border border-emerald-500/10">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
@@ -351,12 +412,12 @@ export default function ProductDetailPage() {
                   </span>
                 )}
               </div>
-              
+
               {/* Product Header Title & Meta */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-black text-slate-900 leading-tight tracking-tight">
                 {product.name}
               </h1>
-              
+
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
                 <div className="flex items-center gap-2">
                   <div className="flex text-amber-400">
@@ -390,7 +451,7 @@ export default function ProductDetailPage() {
               <div className="flex flex-col gap-2">
                 <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest ml-1">Quantity Selector</span>
                 <div className="flex items-center bg-slate-50 rounded-2xl p-1 border border-slate-200/50">
-                  <button 
+                  <button
                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
                     disabled={quantity <= 1}
                     className="w-10 h-10 flex items-center justify-center rounded-xl bg-white hover:bg-slate-100 text-slate-600 disabled:opacity-20 disabled:cursor-not-allowed shadow-sm transition-all active:scale-95 cursor-pointer"
@@ -400,7 +461,7 @@ export default function ProductDetailPage() {
                   <div className="w-12 text-center font-display font-black text-xl text-slate-900 select-none">
                     {quantity}
                   </div>
-                  <button 
+                  <button
                     onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}
                     disabled={quantity >= product.stock}
                     className="w-10 h-10 flex items-center justify-center rounded-xl bg-white hover:bg-slate-100 text-slate-600 disabled:opacity-20 disabled:cursor-not-allowed shadow-sm transition-all active:scale-95 cursor-pointer"
@@ -410,16 +471,14 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-                <div className="flex flex-col gap-1 items-end pr-2">
-                  <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest block text-right leading-none">Subtotal</span>
-                  <div className="text-3xl font-display font-black text-emerald-955 flex items-baseline gap-0.5">
-                    <span className="text-sm font-bold">₹</span>
-                    {currentPrice * quantity}
-                  </div>
+              <div className="flex flex-col gap-1 items-end pr-2">
+                <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest block text-right leading-none">Subtotal</span>
+                <div className="text-3xl font-display font-black text-emerald-955 flex items-baseline gap-0.5">
+                  <span className="text-sm font-bold">₹</span>
+                  {currentPrice * quantity}
                 </div>
+              </div>
             </div>
-
-
 
             {/* Plant Story Card */}
             <div className="bg-emerald-50/30 p-6 md:p-8 rounded-[32px] border border-emerald-500/5 relative overflow-hidden group">
@@ -431,7 +490,7 @@ export default function ProductDetailPage() {
               <p className="text-slate-600 leading-relaxed text-sm md:text-base italic font-medium">&quot;{product.description}&quot;</p>
             </div>
 
-            
+
 
             {/* Quick Micro Care Information Cards */}
             <div className="grid grid-cols-3 gap-4">
@@ -470,7 +529,7 @@ export default function ProductDetailPage() {
 
         {/* Dynamic Editorial Tab System Sections */}
         <div className="mt-20 pt-12 border-t border-slate-200 space-y-10">
-          
+
           {/* Glass Tab Selector */}
           <div className="flex border-b border-slate-200 overflow-x-auto no-scrollbar gap-8">
             {([
@@ -484,14 +543,13 @@ export default function ProductDetailPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 pb-4 font-display font-black text-sm uppercase tracking-wider relative cursor-pointer whitespace-nowrap transition-colors duration-200 ${
-                    isActive ? 'text-emerald-805 font-extrabold' : 'text-slate-400 hover:text-slate-600'
-                  }`}
+                  className={`flex items-center gap-2 pb-4 font-display font-black text-sm uppercase tracking-wider relative cursor-pointer whitespace-nowrap transition-colors duration-200 ${isActive ? 'text-emerald-805 font-extrabold' : 'text-slate-400 hover:text-slate-600'
+                    }`}
                 >
                   {tab.icon}
                   {tab.label}
                   {isActive && (
-                    <motion.div 
+                    <motion.div
                       layoutId="activeTabUnderline"
                       className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-700 rounded-full"
                     />
@@ -511,7 +569,7 @@ export default function ProductDetailPage() {
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.25 }}
               >
-                
+
                 {/* 1. Botanical Overview Tab */}
                 {activeTab === 'overview' && (
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -527,7 +585,7 @@ export default function ProductDetailPage() {
                         This premium nursery specimen has been carefully acclimated and grown under monitored conditions. We prune and filter water supplies to ensure root structure longevity and visual appeal upon arrival.
                       </p>
                     </div>
-                    
+
                     <div className="lg:col-span-5 bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm space-y-4">
                       <h4 className="font-display font-bold text-sm text-slate-800 uppercase tracking-widest pb-2 border-b border-slate-100 flex items-center gap-2">
                         <FileText className="w-4 h-4 text-emerald-700" /> Specimen Specifications
@@ -558,7 +616,7 @@ export default function ProductDetailPage() {
                       <Award className="w-5 h-5" />
                       <h3 className="font-display font-black text-lg uppercase tracking-wider">Acclimation & Care Directives</h3>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       <div className="p-6 bg-white rounded-[24px] border border-slate-100 shadow-xs space-y-3">
                         <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600"><Sun className="w-5 h-5" /></div>
@@ -639,7 +697,7 @@ export default function ProductDetailPage() {
                         <Link href={`/plants?sellerId=${product.seller._id || '1'}`} className="flex-1 text-center bg-slate-950 text-white py-3.5 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-700/10 transition-all">
                           Browse Nursery catalog
                         </Link>
-                        <button 
+                        <button
                           onClick={() => alert("Connecting with nursery concierge...")}
                           className="flex-1 text-center bg-emerald-50 text-emerald-805 border border-emerald-100 py-3.5 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-100 transition-all cursor-pointer"
                         >
@@ -653,11 +711,11 @@ export default function ProductDetailPage() {
                 {/* 4. Customer Reviews Tab */}
                 {activeTab === 'reviews' && (
                   <div className="space-y-10">
-                    
+
                     {/* Header Summary Stats */}
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-slate-100">
                       <div className="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto">
-                        
+
                         <div className="text-center space-y-1 pr-0 sm:pr-8 border-r-0 sm:border-r border-slate-200 w-full sm:w-auto">
                           <div className="text-6xl font-display font-black text-slate-900">{product.ratings.average}</div>
                           <div className="flex text-amber-400 justify-center">
@@ -671,9 +729,9 @@ export default function ProductDetailPage() {
                             <div key={rating} className="flex items-center gap-4 text-xs font-semibold">
                               <span className="text-slate-500 w-6 flex items-center gap-0.5">{rating} <Star className="w-3 h-3 text-amber-400 fill-amber-400" /></span>
                               <div className="flex-grow h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-amber-400 rounded-full" 
-                                  style={{ width: `${rating === 5 ? 85 : rating === 4 ? 10 : rating === 3 ? 3 : 2}%` }} 
+                                <div
+                                  className="h-full bg-amber-400 rounded-full"
+                                  style={{ width: `${rating === 5 ? 85 : rating === 4 ? 10 : rating === 3 ? 3 : 2}%` }}
                                 />
                               </div>
                               <span className="text-slate-400 w-8 text-right">{rating === 5 ? '85%' : rating === 4 ? '10%' : rating === 3 ? '3%' : '2%'}</span>
@@ -684,33 +742,33 @@ export default function ProductDetailPage() {
                     </div>
 
                     <div className="space-y-6">
-              {reviews.map(review => (
-                <div key={review.id} className="p-8 bg-white rounded-[32px] border border-slate-100 shadow-xs space-y-4">
-                  <div className="flex items-start justify-between flex-wrap gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-700 font-bold text-lg">
-                        {review.author.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-bold text-slate-900">{review.author}</p>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{review.date}</p>
-                      </div>
-                    </div>
-                    <div className="flex text-amber-400">
-                      {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />)}
+                      {reviews.map(review => (
+                        <div key={review.id} className="p-8 bg-white rounded-[32px] border border-slate-100 shadow-xs space-y-4">
+                          <div className="flex items-start justify-between flex-wrap gap-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-700 font-bold text-lg">
+                                {review.author.charAt(0)}
+                              </div>
+                              <div>
+                                <p className="font-bold text-slate-900">{review.author}</p>
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{review.date}</p>
+                              </div>
+                            </div>
+                            <div className="flex text-amber-400">
+                              {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />)}
+                            </div>
+                          </div>
+                          <p className="text-slate-600 font-medium leading-relaxed italic">&quot;{review.comment}&quot;</p>
+                          <div className="flex items-center gap-4 pt-4 text-xs font-bold text-slate-400">
+                            <button className="hover:text-emerald-600 flex items-center gap-1 transition-colors cursor-pointer"><ThumbsUp className="w-3.5 h-3.5" /> Helpful (12)</button>
+                          </div>
+                        </div>
+                      ))}
+                      <button className="w-full py-4 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors border-2 border-slate-100 rounded-2xl hover:border-slate-200 border-dashed cursor-pointer">
+                        Load More Reviews
+                      </button>
                     </div>
                   </div>
-                  <p className="text-slate-600 font-medium leading-relaxed italic">&quot;{review.comment}&quot;</p>
-                  <div className="flex items-center gap-4 pt-4 text-xs font-bold text-slate-400">
-                    <button className="hover:text-emerald-600 flex items-center gap-1 transition-colors cursor-pointer"><ThumbsUp className="w-3.5 h-3.5" /> Helpful (12)</button>
-                  </div>
-                </div>
-              ))}
-              <button className="w-full py-4 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors border-2 border-slate-100 rounded-2xl hover:border-slate-200 border-dashed cursor-pointer">
-                Load More Reviews
-              </button>
-            </div>
-          </div>
 
                 )}
 
@@ -724,29 +782,29 @@ export default function ProductDetailPage() {
       <AnimatePresence>
         {showCheckoutPreview && (
           <div className="fixed inset-0 z-50 flex items-center justify-end">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowCheckoutPreview(false)}
               className="absolute inset-0 bg-slate-955/40 backdrop-blur-sm"
             />
-            
-            <motion.div 
+
+            <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="relative w-full max-w-md h-full bg-white shadow-2xl z-10 flex flex-col justify-between border-l border-slate-100"
             >
-              
+
               {/* Drawer Header */}
               <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                 <div className="space-y-1">
                   <h2 className="text-2xl font-display font-black text-slate-900">Cart Summary</h2>
                   <p className="text-[10px] font-black uppercase tracking-wider text-emerald-800">Fresh Botanicals Reserved</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setShowCheckoutPreview(false)}
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer border border-slate-100"
                 >
@@ -756,7 +814,7 @@ export default function ProductDetailPage() {
 
               {/* Drawer Content */}
               <div className="flex-grow overflow-y-auto p-6 space-y-6">
-                
+
                 {/* Item Card */}
                 <div className="flex gap-4 p-4 bg-slate-50 rounded-3xl border border-slate-100 shadow-inner">
                   <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-100 flex-shrink-0">
@@ -778,14 +836,14 @@ export default function ProductDetailPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-slate-400 font-black uppercase tracking-widest text-[9px] px-1">
                     <span>Delivery Credentials</span>
-                    <button 
+                    <button
                       onClick={() => router.push('/address')}
                       className="text-emerald-700 hover:underline cursor-pointer font-bold"
                     >
                       Alter Address
                     </button>
                   </div>
-                  
+
                   <div className="flex gap-3 items-start p-5 bg-emerald-50/20 rounded-3xl border border-emerald-100/50">
                     <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-xs text-emerald-700 flex-shrink-0 border border-emerald-100/50">
                       <MapPin className="w-5 h-5" />
@@ -839,15 +897,15 @@ export default function ProductDetailPage() {
                     <span className="text-3xl font-display font-black text-emerald-955">₹{currentPrice * quantity}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-3 pt-2">
-                  <button 
+                  <button
                     onClick={() => setShowCheckoutPreview(false)}
                     className="flex-1 bg-white border border-slate-200 text-slate-600 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-all cursor-pointer"
                   >
                     Hold Shop
                   </button>
-                  <button 
+                  <button
                     onClick={handleProceedToCheckout}
                     className="flex-[2] bg-emerald-700 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-emerald-800 transition-all shadow-md shadow-emerald-700/20 cursor-pointer flex items-center justify-center gap-1.5"
                   >
@@ -864,21 +922,21 @@ export default function ProductDetailPage() {
       <AnimatePresence>
         {showReviewForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowReviewForm(false)}
               className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
             />
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               className="relative w-full max-w-3xl z-10"
             >
-              <ProductReviewForm 
-                productName={product.name} 
+              <ProductReviewForm
+                productName={product.name}
                 onClose={() => setShowReviewForm(false)}
                 onSubmitSuccess={handleReviewSubmit}
               />
@@ -886,120 +944,52 @@ export default function ProductDetailPage() {
           </div>
         )}
       </AnimatePresence>
+      {/* Unified Floating Action Bar (Responsive) */}
+      <div className={`fixed left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-xl transition-all duration-300 pointer-events-none ${isNearBottom ? 'bottom-[-100px] opacity-0' : 'bottom-1 opacity-100'}`}>
+        <motion.div
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 150, delay: 0.1 }}
+          className="bg-white/80 backdrop-blur-2xl border border-white/50 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1),0_0_0_1px_rgba(16,185,129,0.05)] rounded-[24px] p-2 flex items-center gap-2 pointer-events-auto"
+        >
+          <div className="flex gap-1.5 flex-1 pl-1">
+            <button
+              onClick={handleAddToCart}
+              className="flex-1 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 h-12 rounded-xl font-black uppercase tracking-widest text-[10px] sm:text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-700" />
+              <span className="hidden sm:inline">Add to Bag</span>
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className="flex-1 bg-emerald-700 text-white hover:bg-emerald-800 shadow-md shadow-emerald-700/20 h-12 rounded-xl font-black uppercase tracking-widest text-[10px] sm:text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span className="hidden sm:inline">Buy Now</span>
+              <span className="sm:hidden">Buy</span>
+              <ArrowRight className="w-4 h-4 text-emerald-300" />
+            </button>
+          </div>
 
-      {/* Desktop Floating Action Bar (Right Side) */}
-      <div className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 flex-col gap-4">
-        <motion.button 
-          whileHover={{ scale: 1.05, x: -5 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleAddToCart}
-          className="w-14 h-14 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 rounded-2xl shadow-lg flex items-center justify-center group cursor-pointer relative"
-        >
-          <ShoppingCart className="w-6 h-6 text-emerald-700" />
-          <div className="absolute right-full mr-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-            Add to Cart
-          </div>
-        </motion.button>
-        
-        <motion.button 
-          whileHover={{ scale: 1.05, x: -5 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleBuyNow}
-          className="w-14 h-14 bg-emerald-700 text-white hover:bg-emerald-800 rounded-2xl shadow-lg shadow-emerald-700/20 flex items-center justify-center group cursor-pointer relative"
-        >
-          <ArrowRight className="w-6 h-6 text-emerald-300" />
-          <div className="absolute right-full mr-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-            Buy Now
-          </div>
-        </motion.button>
+          <div className="w-px h-8 bg-slate-200/50 mx-1"></div>
 
-        <motion.button 
-          whileHover={{ scale: 1.05, x: -5 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setWishlisted(!wishlisted)}
-          className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all border shadow-lg group cursor-pointer relative ${
-            wishlisted 
-              ? 'bg-red-50 text-red-500 border-red-100' 
-              : 'bg-white border-slate-200 hover:bg-slate-50'
-          }`}
-        >
-          <Heart className={`w-6 h-6 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
-          <div className="absolute right-full mr-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-            {wishlisted ? 'Remove Favorite' : 'Add Favorite'}
-          </div>
-        </motion.button>
+          <div className="flex gap-1 pr-1">
+            <button
+              onClick={handleToggleFavorite}
+              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all cursor-pointer ${wishlisted ? 'bg-red-50 text-red-500 shadow-inner' : 'bg-transparent text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
+            >
+              <Heart className={`w-5 h-5 ${wishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+            </button>
 
-        <motion.button 
-          whileHover={{ scale: 1.05, x: -5 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => {
-            navigator.clipboard.writeText(window.location.href);
-          }}
-          className="w-14 h-14 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 shadow-lg flex items-center justify-center group cursor-pointer relative"
-        >
-          <Share2 className="w-6 h-6 text-slate-400" />
-          <div className="absolute right-full mr-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-            Share Plant
+            <button
+              onClick={handleShare}
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
+            >
+              {copied ? <Check className="w-5 h-5 text-emerald-600" /> : <Share2 className="w-5 h-5" />}
+            </button>
           </div>
-        </motion.button>
+        </motion.div>
       </div>
 
-      {/* Mobile Sticky Quick-Purchase Bar (Always displayed at bottom when page is open) */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/90 backdrop-blur-xl border-t border-slate-100 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] px-5 py-4 pb-6 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <img 
-            src={product.images[0]} 
-            alt={product.name} 
-            className="w-12 h-12 rounded-xl object-cover border border-slate-100 flex-shrink-0"
-          />
-          <div className="min-w-0 leading-tight">
-            <h4 className="font-bold text-slate-900 truncate text-sm">{product.name}</h4>
-            <p className="text-emerald-800 font-extrabold text-base">₹{product.price}</p>
-          </div>
-        </div>
-        <div className="flex gap-2 flex-shrink-0">
-          <button 
-            onClick={handleAddToCart}
-            className="bg-emerald-50 text-emerald-800 hover:bg-emerald-100/70 border border-emerald-200/50 px-5 py-3.5 rounded-2xl font-black uppercase tracking-wider transition-colors flex items-center gap-2 cursor-pointer text-xs"
-          >
-            <ShoppingCart className="w-4 h-4 text-emerald-700" /> <span className="hidden sm:inline">Add to Cart</span>
-          </button>
-          
-          <motion.button 
-            whileHover={{ scale: 1.03 }} 
-            whileTap={{ scale: 0.97 }} 
-            onClick={handleBuyNow}
-            className="bg-emerald-700 text-white hover:bg-emerald-800 px-6 py-3.5 rounded-2xl font-black uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-emerald-700/20 cursor-pointer text-xs"
-          >
-            Buy Now <ArrowRight className="w-4 h-4 text-emerald-300 animate-pulse" />
-          </motion.button>
-
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setWishlisted(!wishlisted)}
-            className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all border flex-shrink-0 cursor-pointer ${
-              wishlisted 
-                ? 'bg-red-50 text-red-500 border-red-100 shadow-inner' 
-                : 'bg-white border-slate-200 hover:bg-slate-50 shadow-xs'
-            }`}
-          >
-            <Heart className={`w-4.5 h-4.5 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
-          </motion.button>
-
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              navigator.clipboard.writeText(window.location.href);
-              alert("Botanical link copied to clipboard!");
-            }}
-            className="w-11 h-11 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 shadow-xs flex items-center justify-center flex-shrink-0 cursor-pointer"
-          >
-            <Share2 className="w-4.5 h-4.5 text-slate-400" />
-          </motion.button>
-        </div>
-      </div>
     </div>
   );
 }

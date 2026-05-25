@@ -17,7 +17,10 @@ import {
   ChevronRight,
   ShieldCheck,
   Package,
-  Plus
+  Plus,
+  Star,
+  Leaf,
+  ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
@@ -429,32 +432,61 @@ export default function ProfilePage() {
                     const product = fav.product;
                     if (!product) return null;
                     return (
-                      <div key={fav.id} className="bg-white rounded-[32px] border border-slate-100 overflow-hidden group hover:shadow-xl transition-all">
-                        <div className="h-48 overflow-hidden bg-slate-50 relative">
+                      <div key={fav.id} className="group relative bg-white rounded-[32px] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/5 hover:-translate-y-1 transition-all duration-500 overflow-hidden flex flex-col">
+                        <div className="relative aspect-[4/3] overflow-hidden bg-slate-50 m-2 rounded-[24px]">
                           <img 
                             src={product.images?.[0] || '/images/default-plant.png'} 
                             alt={product.name} 
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                             onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1416879598056-0c8227656910?w=800&auto=format&fit=crop&q=80'; }}
                           />
+                          <div className="absolute inset-0 bg-linear-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                          
+                          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                            {product.category && (
+                              <div className="glass px-3 py-1 rounded-full text-[9px] font-black text-emerald-950 uppercase tracking-widest shadow-sm backdrop-blur-md border border-white/50">
+                                {product.category}
+                              </div>
+                            )}
+                          </div>
+
                           <button 
-                            onClick={async () => {
+                            onClick={async (e) => {
+                              e.preventDefault();
                               await fetch(`/api/favorites/${product._id}`, { method: 'DELETE' });
                               setFavorites(prev => prev.filter(f => f.id !== fav.id));
                             }}
-                            className="absolute top-4 right-4 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-rose-500 hover:bg-rose-50 transition-colors shadow-sm z-10"
+                            className="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-md border border-slate-100 rounded-full flex items-center justify-center text-rose-500 hover:scale-110 hover:bg-rose-50 transition-all shadow-md z-10 cursor-pointer"
                           >
-                            <Heart className="w-5 h-5 fill-current" />
+                            <Heart className="w-4 h-4 fill-current" />
                           </button>
                         </div>
-                        <div className="p-6 space-y-4">
-                          <div>
-                            <h4 className="font-display font-black text-xl text-slate-900 truncate">{product.name}</h4>
-                            <p className="text-sm font-bold text-emerald-600">₹{product.price}</p>
+
+                        <div className="p-5 pt-3 flex flex-col flex-grow justify-between gap-4">
+                          <div className="space-y-1.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <h4 className="font-display font-black text-lg text-slate-900 line-clamp-1 group-hover:text-emerald-700 transition-colors leading-tight">{product.name}</h4>
+                              <span className="flex items-center gap-1 text-[10px] font-black text-slate-600 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+                                <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
+                                {product.ratings?.average || '4.8'}
+                              </span>
+                            </div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                              <Leaf className="w-3 h-3 text-emerald-500" /> {product.seller?.shopName || 'Premium Nursery'}
+                            </p>
                           </div>
-                          <Link href={`/plants/${product._id}`} className="block w-full py-3 bg-slate-900 text-white text-center rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-colors">
-                            View Plant
-                          </Link>
+
+                          <div className="flex items-end justify-between pt-4 border-t border-slate-100/60">
+                            <div>
+                              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Price</p>
+                              <p className="text-2xl font-display font-black text-emerald-955 leading-none">
+                                <span className="text-xs font-bold mr-0.5">₹</span>{product.price}
+                              </p>
+                            </div>
+                            <Link href={`/plants/${product._id}`} className="bg-slate-900 text-white px-5 h-10 rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-600 transition-colors cursor-pointer shadow-lg text-[10px] font-black uppercase tracking-widest">
+                              View <ArrowRight className="w-3.5 h-3.5 text-emerald-300" />
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     );
