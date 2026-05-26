@@ -1,132 +1,171 @@
 'use client';
 
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { 
   Tag, 
-  Plus, 
   Search, 
   Calendar, 
-  Percent, 
   Trash2, 
-  Edit2, 
-  ToggleLeft, 
-  ToggleRight,
   TrendingUp,
   Clock,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Check,
+  X
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-// Mock data for promotions
-const initialPromotions = [
-  { 
-    id: '1', 
-    title: 'Monsoon Sale', 
-    description: 'Get 20% off on all indoor plants', 
-    type: 'percentage', 
-    value: 20, 
-    startDate: '2024-06-01', 
-    endDate: '2024-07-31', 
-    status: 'Active',
-    usageCount: 450
-  },
-  { 
-    id: '2', 
-    title: 'New User Bonus', 
-    description: '₹100 off on first order above ₹500', 
-    type: 'fixed', 
-    value: 100, 
-    startDate: '2024-01-01', 
-    endDate: '2024-12-31', 
-    status: 'Active',
-    usageCount: 1200
-  },
-  { 
-    id: '3', 
-    title: 'Succulent Sunday', 
-    description: 'Buy 2 Get 1 Free on all succulents', 
-    type: 'bogo', 
-    value: 0, 
-    startDate: '2024-05-10', 
-    endDate: '2024-05-15', 
-    status: 'Expired',
-    usageCount: 89
-  }
-];
+type Promotion = {
+  id: string;
+  sellerId: string;
+  title: string;
+  code: string;
+  description: string;
+  discountPercentage: number;
+  validFrom: string;
+  validUntil: string;
+  isApproved: boolean;
+  isActive: boolean;
+};
+
+type ProductDiscount = {
+  id: string;
+  sellerId: string;
+  productId: string;
+  productName: string;
+  productImage: string;
+  originalPrice: number;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  discountedPrice: number;
+  validFrom: string;
+  validUntil: string;
+  isApproved: boolean;
+  isActive: boolean;
+};
 
 export default function PromotionsPage() {
-  const [promotions, setPromotions] = useState(initialPromotions);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'promotions' | 'discounts'>('promotions');
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [discounts, setDiscounts] = useState<ProductDiscount[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [newPromo, setNewPromo] = useState({
-    title: '',
-    description: '',
-    type: 'percentage',
-    value: '',
-    startDate: '',
-    endDate: '',
-    status: 'Active'
-  });
+  const [loading, setLoading] = useState(true);
 
-  const handleAddPromotion = (e: React.FormEvent) => {
-    e.preventDefault();
-    const promo = {
-      ...newPromo,
-      id: Date.now().toString(),
-      value: Number(newPromo.value),
-      usageCount: 0
-    };
-    setPromotions([promo, ...promotions]);
-    setIsModalOpen(false);
-    setNewPromo({
-      title: '',
-      description: '',
-      type: 'percentage',
-      value: '',
-      startDate: '',
-      endDate: '',
-      status: 'Active'
-    });
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [promoRes, discRes] = await Promise.all([
+        fetch('/api/admin/promotions'),
+        fetch('/api/admin/product-discounts')
+      ]);
+      if (promoRes.ok) {
+        const pData = await promoRes.json();
+        setPromotions(pData.promotions || []);
+      }
+      if (discRes.ok) {
+        const dData = await discRes.json();
+        setDiscounts(dData.discounts || []);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deletePromotion = (id: string) => {
-    setPromotions(promotions.filter(p => p.id !== id));
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleApprove = async (id: string) => {
+    if (!confirm('Approve this promotion?')) return;
+    try {
+      const res = await fetch(`/api/admin/promotions/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isApproved: true, isActive: true })
+      });
+      if (res.ok) {
+        const { promotion } = await res.json();
+        setPromotions(promotions.map(p => p.id === id ? promotion : p));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const toggleStatus = (id: string) => {
-    setPromotions(promotions.map(p => 
-      p.id === id ? { ...p, status: p.status === 'Active' ? 'Inactive' : 'Active' } : p
-    ));
+  const handleReject = async (id: string) => {
+    if (!confirm('Reject and delete this promotion?')) return;
+    try {
+      const res = await fetch(`/api/admin/promotions/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setPromotions(promotions.filter(p => p.id !== id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleApproveDiscount = async (id: string) => {
+    if (!confirm('Approve this discount?')) return;
+    try {
+      const res = await fetch(`/api/admin/product-discounts/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isApproved: true, isActive: true })
+      });
+      if (res.ok) {
+        const { discount } = await res.json();
+        setDiscounts(discounts.map(d => d.id === id ? discount : d));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRejectDiscount = async (id: string) => {
+    if (!confirm('Reject and delete this discount?')) return;
+    try {
+      const res = await fetch(`/api/admin/product-discounts/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setDiscounts(discounts.filter(d => d.id !== id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const filteredPromotions = promotions.filter(p => 
     p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const filteredDiscounts = discounts.filter(d => 
+    d.productName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const currentList = activeTab === 'promotions' ? filteredPromotions : filteredDiscounts;
+  const currentTotalPending = activeTab === 'promotions' ? promotions.filter(p => !p.isApproved).length : discounts.filter(d => !d.isApproved).length;
+  const currentTotalActive = activeTab === 'promotions' ? promotions.filter(p => p.isActive).length : discounts.filter(d => d.isActive).length;
+  const currentTotalApproved = activeTab === 'promotions' ? promotions.filter(p => p.isApproved).length : discounts.filter(d => d.isApproved).length;
 
   return (
     <div className="space-y-8 pb-10">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
-          <h1 className="text-3xl font-display font-black text-slate-900 tracking-tight">Promotions & Offers</h1>
-          <p className="text-slate-500 font-medium italic">Manage platform-wide marketing campaigns and discount codes.</p>
+          <h1 className="text-3xl font-display font-black text-slate-900 tracking-tight">Seller Promotions</h1>
+          <p className="text-slate-500 font-medium italic">Review and approve discount codes requested by merchants.</p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-emerald-600 text-white px-8 py-4 rounded-[20px] font-black text-xs uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 flex items-center gap-3 active:scale-95"
-        >
-          <Plus className="w-4 h-4" /> Create New Offer
-        </button>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: 'Active Offers', value: promotions.filter(p => p.status === 'Active').length, icon: <TrendingUp />, color: 'bg-emerald-500' },
-          { label: 'Total Claims', value: promotions.reduce((acc, curr) => acc + curr.usageCount, 0).toLocaleString(), icon: <CheckCircle2 />, color: 'bg-blue-500' },
-          { label: 'Ending Soon', value: '2', icon: <Clock />, color: 'bg-amber-500' }
+          { label: 'Total Pending', value: currentTotalPending, icon: <Clock />, color: 'bg-amber-500' },
+          { label: 'Active', value: currentTotalActive, icon: <TrendingUp />, color: 'bg-emerald-500' },
+          { label: 'Approved', value: currentTotalApproved, icon: <CheckCircle2 />, color: 'bg-blue-500' }
         ].map((stat, i) => (
           <div key={i} className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm flex items-center justify-between group hover:border-emerald-200 transition-all duration-500">
             <div className="space-y-2">
@@ -140,13 +179,37 @@ export default function PromotionsPage() {
         ))}
       </div>
 
-      {/* Search and Filters */}
+      {/* Tabs */}
+      <div className="flex bg-slate-100 p-1.5 rounded-2xl w-fit">
+        <button
+          onClick={() => setActiveTab('promotions')}
+          className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+            activeTab === 'promotions' 
+              ? 'bg-white text-emerald-600 shadow-sm' 
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Coupon Codes
+        </button>
+        <button
+          onClick={() => setActiveTab('discounts')}
+          className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+            activeTab === 'discounts' 
+              ? 'bg-white text-emerald-600 shadow-sm' 
+              : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Specimen Discounts
+        </button>
+      </div>
+
+      {/* Search */}
       <div className="bg-white p-4 rounded-[28px] border border-slate-100 shadow-sm">
         <div className="relative">
           <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input 
             type="text" 
-            placeholder="Search promotions by title or description..."
+            placeholder="Search by title, code, or description..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-16 pr-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900"
@@ -168,202 +231,118 @@ export default function PromotionsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredPromotions.map((promo) => (
-                <tr key={promo.id} className="hover:bg-slate-50/50 transition-colors group">
+              {loading ? (
+                <tr><td colSpan={5} className="px-8 py-12 text-center text-slate-400 font-medium">Loading...</td></tr>
+              ) : currentList.map((item: any) => (
+                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-8 py-8">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
-                        <Tag className="w-6 h-6" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="font-bold text-slate-900">{promo.title}</p>
-                        <p className="text-xs text-slate-500 font-medium max-w-xs truncate italic">{promo.description}</p>
-                      </div>
+                      {activeTab === 'promotions' ? (
+                        <>
+                          <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                            <Tag className="w-6 h-6" />
+                          </div>
+                          <div className="space-y-1">
+                            <p className="font-bold text-slate-900">{item.title}</p>
+                            <p className="text-xs text-slate-500 font-medium max-w-xs truncate italic">{item.description}</p>
+                            <span className="inline-block mt-1 bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">
+                              {item.code}
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <img src={item.productImage} alt={item.productName} className="w-12 h-12 rounded-xl object-cover" />
+                          <div className="space-y-1">
+                            <p className="font-bold text-slate-900">{item.productName}</p>
+                            <p className="text-xs text-slate-500 font-medium max-w-xs truncate italic">Product Discount</p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </td>
                   <td className="px-8 py-8">
-                    <div className="flex flex-col">
-                      <span className="font-black text-slate-900">
-                        {promo.type === 'percentage' ? `${promo.value}% Off` : `₹${promo.value} Off`}
-                        {promo.type === 'bogo' && 'Buy 1 Get 1'}
+                    {activeTab === 'promotions' ? (
+                      <span className="font-black text-emerald-700 text-lg">
+                        {item.discountPercentage}% Off
                       </span>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{promo.usageCount} Claims</span>
-                    </div>
+                    ) : (
+                      <div className="space-y-1">
+                        <span className="font-black text-emerald-700 text-lg flex items-center gap-1">
+                          {item.discountType === 'percentage' ? `${item.discountValue}%` : `₹${item.discountValue}`} Off
+                        </span>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 line-through">₹{item.originalPrice}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">₹{item.discountedPrice}</p>
+                      </div>
+                    )}
                   </td>
                   <td className="px-8 py-8">
                     <div className="flex items-center gap-2 text-slate-600 font-bold text-xs">
                       <Calendar className="w-4 h-4 text-emerald-500" />
-                      <span>{promo.startDate}</span>
+                      <span>{new Date(item.validFrom).toLocaleDateString()}</span>
                       <span className="text-slate-300">→</span>
-                      <span>{promo.endDate}</span>
+                      <span>{new Date(item.validUntil).toLocaleDateString()}</span>
                     </div>
                   </td>
                   <td className="px-8 py-8">
-                    <button 
-                      onClick={() => toggleStatus(promo.id)}
-                      className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${
-                        promo.status === 'Active' 
-                          ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' 
-                          : 'bg-slate-100 text-slate-400 hover:bg-slate-200'
-                      }`}
-                    >
-                      <div className={`w-1.5 h-1.5 rounded-full ${promo.status === 'Active' ? 'bg-emerald-600' : 'bg-slate-400'}`} />
-                      {promo.status}
-                    </button>
+                    {!item.isApproved ? (
+                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-widest">
+                         <Clock className="w-3 h-3" /> Pending
+                       </span>
+                    ) : item.isActive ? (
+                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
+                         <CheckCircle2 className="w-3 h-3" /> Active
+                       </span>
+                    ) : (
+                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest">
+                         Inactive
+                       </span>
+                    )}
                   </td>
                   <td className="px-8 py-8 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => deletePromotion(promo.id)}
-                        className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    <div className="flex items-center justify-end gap-2">
+                      {!item.isApproved ? (
+                        <>
+                          <button 
+                            onClick={() => activeTab === 'promotions' ? handleApprove(item.id) : handleApproveDiscount(item.id)}
+                            className="p-3 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all flex items-center gap-2 font-black text-[10px] uppercase tracking-widest"
+                          >
+                            <Check className="w-4 h-4" /> Approve
+                          </button>
+                          <button 
+                            onClick={() => activeTab === 'promotions' ? handleReject(item.id) : handleRejectDiscount(item.id)}
+                            className="p-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all flex items-center gap-2 font-black text-[10px] uppercase tracking-widest"
+                          >
+                            <X className="w-4 h-4" /> Reject
+                          </button>
+                        </>
+                      ) : (
+                        <button 
+                          onClick={() => activeTab === 'promotions' ? handleReject(item.id) : handleRejectDiscount(item.id)}
+                          className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {filteredPromotions.length === 0 && (
+          {!loading && currentList.length === 0 && (
             <div className="py-20 text-center space-y-4">
               <div className="w-20 h-20 bg-slate-50 rounded-[32px] flex items-center justify-center mx-auto border border-slate-100">
                 <AlertCircle className="w-10 h-10 text-slate-300" />
               </div>
               <div className="space-y-1">
                 <h3 className="font-bold text-slate-900 text-xl">No promotions found</h3>
-                <p className="text-slate-500 text-sm italic font-medium">Try searching for something else or create a new offer.</p>
+                <p className="text-slate-500 text-sm italic font-medium">There are currently no promotions waiting for approval.</p>
               </div>
             </div>
           )}
         </div>
       </div>
-
-      {/* Add Promotion Modal */}
-      <AnimatePresence>
-        {isModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsModalOpen(false)}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-[48px] shadow-3xl border border-white/20 p-12 overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-32 -mt-32" />
-              
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-600/20">
-                  <Plus className="w-7 h-7" />
-                </div>
-                <div>
-                  <h2 className="text-3xl font-display font-black text-slate-900 tracking-tight">New Promotion</h2>
-                  <p className="text-slate-500 font-medium italic">Configure your marketing offer details.</p>
-                </div>
-              </div>
-
-              <form onSubmit={handleAddPromotion} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Promotion Title</label>
-                  <input 
-                    required
-                    type="text" 
-                    placeholder="e.g. Summer Blast Sale"
-                    className="w-full px-8 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900 placeholder:italic"
-                    value={newPromo.title}
-                    onChange={(e) => setNewPromo({...newPromo, title: e.target.value})}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Short Description</label>
-                  <textarea 
-                    required
-                    placeholder="Briefly describe the offer benefits..."
-                    className="w-full px-8 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900 placeholder:italic min-h-[100px]"
-                    value={newPromo.description}
-                    onChange={(e) => setNewPromo({...newPromo, description: e.target.value})}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Type</label>
-                    <select 
-                      className="w-full px-8 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900"
-                      value={newPromo.type}
-                      onChange={(e) => setNewPromo({...newPromo, type: e.target.value})}
-                    >
-                      <option value="percentage">Percentage Off (%)</option>
-                      <option value="fixed">Fixed Amount (₹)</option>
-                      <option value="bogo">Buy 1 Get 1 (BOGO)</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Value</label>
-                    <input 
-                      required
-                      type="number" 
-                      placeholder="e.g. 20"
-                      className="w-full px-8 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900"
-                      value={newPromo.value}
-                      onChange={(e) => setNewPromo({...newPromo, value: e.target.value})}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Start Date</label>
-                    <input 
-                      required
-                      type="date" 
-                      className="w-full px-8 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900"
-                      value={newPromo.startDate}
-                      onChange={(e) => setNewPromo({...newPromo, startDate: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">End Date</label>
-                    <input 
-                      required
-                      type="date" 
-                      className="w-full px-8 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900"
-                      value={newPromo.endDate}
-                      onChange={(e) => setNewPromo({...newPromo, endDate: e.target.value})}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-4 pt-4">
-                  <button 
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="flex-grow py-5 rounded-[24px] font-black text-xs uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all active:scale-95 border border-slate-100"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="flex-grow py-5 rounded-[24px] font-black text-xs uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 active:scale-95"
-                  >
-                    Publish Offer
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

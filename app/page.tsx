@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -70,37 +70,10 @@ const testimonials = [
   { name: 'Elena D.', role: 'New Hobbyist', text: 'Great customer support and very healthy plants. Highly recommend for beginners!', stars: 4 },
 ];
 
-const offers = [
-  {
-    id: 'monsoon',
-    title: 'Monsoon Magic',
-    discount: '20% OFF',
-    desc: 'Transform your home into a lush indoor garden with our Monsoon Special collection.',
-    code: 'MONSOON20',
-    color: 'emerald',
-    icon: <Tag className="w-10 h-10" />,
-    badge: 'Limited Time'
-  },
-  {
-    id: 'welcome',
-    title: 'Welcome Bonus',
-    discount: 'â‚¹150 OFF',
-    desc: 'New to the plant parent community? Start your journey with an exclusive discount.',
-    code: 'PLANTLOVE',
-    color: 'blue',
-    icon: <Gift className="w-10 h-10" />,
-    badge: 'New Users'
-  },
-  {
-    id: 'flash',
-    title: 'Flash Friday',
-    discount: 'Free Pot',
-    desc: 'Get a premium ceramic pot free with every purchase of an outdoor specimen.',
-    code: 'FREEPOT',
-    color: 'amber',
-    icon: <Sparkles className="w-10 h-10" />,
-    badge: 'Today Only'
-  }
+const offerStyles = [
+  { color: 'emerald', icon: <Tag className="w-10 h-10" />, badge: 'Limited Time' },
+  { color: 'blue', icon: <Gift className="w-10 h-10" />, badge: 'Special' },
+  { color: 'amber', icon: <Sparkles className="w-10 h-10" />, badge: 'Top Deal' }
 ];
 
 export default function HomePage() {
@@ -108,6 +81,7 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [promotions, setPromotions] = useState<any[]>([]);
   const { addItem } = useCart();
 
   const handleCopyCode = (code: string) => {
@@ -115,6 +89,14 @@ export default function HomePage() {
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
   };
+
+  useEffect(() => {
+    fetch('/api/offers').then(res => res.json()).then(data => {
+      if (data.promotions) {
+        setPromotions(data.promotions.slice(0, 3));
+      }
+    }).catch(console.error);
+  }, []);
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -270,56 +252,62 @@ export default function HomePage() {
       <h2 className="text-3xl font-display font-bold text-slate-900 tracking-tight">Exclusive Offers</h2>
       <p className="text-slate-500 text-base font-medium">Grab these botanical deals before they vanish!</p>
     </div>
+    <Link href="/offers" className="inline-flex items-center gap-2 text-emerald-600 font-bold hover:text-emerald-700 transition-colors">
+      View All Offers & Discounts <ArrowRight className="w-5 h-5" />
+    </Link>
   </div>
 
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    {offers.map((offer, i) => (
+    {promotions.length === 0 ? (
+      <div className="col-span-3 text-center py-10 text-slate-400">No exclusive offers at the moment.</div>
+    ) : promotions.map((promo, i) => {
+      const style = offerStyles[i % offerStyles.length];
+      return (
       <motion.div
-        key={offer.id}
+        key={promo.id}
         initial={{ opacity: 0, y: 15 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: i * 0.1 }}
         className="group relative p-6 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-500 bg-white overflow-hidden"
       >
         {/* Background Accent - Scaled down */}
-        <div className={`absolute top-0 right-0 w-32 h-32 bg-${offer.color}-500/5 rounded-full blur-[60px] -mr-16 -mt-16 group-hover:bg-${offer.color}-500/10 transition-colors`} />
+        <div className={`absolute top-0 right-0 w-32 h-32 bg-${style.color}-500/5 rounded-full blur-[60px] -mr-16 -mt-16 group-hover:bg-${style.color}-500/10 transition-colors`} />
         
         <div className="relative z-10 space-y-5">
           <div className="flex items-start justify-between">
             {/* Icon - Scaled from 20 to 14 */}
-            <div className={`w-14 h-14 bg-${offer.color}-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-${offer.color}-600/20 group-hover:scale-105 transition-all duration-500`}>
-              {/* Ensure your icons within offer.icon have size constraints like className="w-6 h-6" */}
-              {offer.icon}
+            <div className={`w-14 h-14 bg-${style.color}-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-${style.color}-600/20 group-hover:scale-105 transition-all duration-500`}>
+              {style.icon}
             </div>
-            <div className={`px-3 py-1 bg-${offer.color}-50 rounded-full text-${offer.color}-700 text-[9px] font-black uppercase tracking-widest border border-${offer.color}-100`}>
-              {offer.badge}
+            <div className={`px-3 py-1 bg-${style.color}-50 rounded-full text-${style.color}-700 text-[9px] font-black uppercase tracking-widest border border-${style.color}-100`}>
+              {style.badge}
             </div>
           </div>
 
           <div className="space-y-2">
             <h3 className="text-xl font-display font-black text-slate-900 leading-tight">
-              {offer.title} <br />
-              <span className={`text-${offer.color}-600`}>{offer.discount}</span>
+              {promo.title} <br />
+              <span className={`text-${style.color}-600`}>{promo.discountPercentage}% OFF</span>
             </h3>
-            <p className="text-slate-500 text-xs font-medium leading-relaxed italic line-clamp-2">{offer.desc}</p>
+            <p className="text-slate-500 text-xs font-medium leading-relaxed italic line-clamp-2">{promo.description}</p>
           </div>
 
           <div className="pt-4 border-t border-slate-50">
             <div className="flex items-center justify-between p-1.5 bg-slate-50 rounded-2xl border border-slate-100 group-hover:bg-white transition-all">
               <div className="px-3">
                 <span className="text-[8px] text-slate-400 font-black uppercase tracking-widest block">Code</span>
-                <span className="text-base font-display font-black text-slate-900 tracking-wider">{offer.code}</span>
+                <span className="text-base font-display font-black text-slate-900 tracking-wider">{promo.code}</span>
               </div>
               <button 
-                onClick={() => handleCopyCode(offer.code)}
+                onClick={() => handleCopyCode(promo.code)}
                 className={`relative px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${
-                  copiedCode === offer.code 
+                  copiedCode === promo.code 
                     ? 'bg-emerald-500 text-white' 
-                    : `bg-slate-900 text-white hover:bg-${offer.color}-600`
+                    : `bg-slate-900 text-white hover:bg-${style.color}-600`
                 }`}
               >
                 <AnimatePresence mode="wait">
-                  {copiedCode === offer.code ? (
+                  {copiedCode === promo.code ? (
                     <motion.span key="copied" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3" /> Copied
                     </motion.span>
@@ -334,7 +322,7 @@ export default function HomePage() {
           </div>
         </div>
       </motion.div>
-    ))}
+    )})}
   </div>
 </section>
       <CatalogProductsSection />

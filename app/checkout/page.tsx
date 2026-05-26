@@ -31,6 +31,7 @@ function CheckoutContent() {
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'upi' | 'cod'>('card');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     const fetchAddress = async () => {
@@ -57,27 +58,51 @@ function CheckoutContent() {
     fetchAddress();
   }, [addressId]);
 
-  // If cart is empty, redirect back to cart
+  // If cart is empty and we haven't just placed an order, redirect back to cart
   useEffect(() => {
-    if (!loading && items.length === 0) {
+    if (!loading && items.length === 0 && !showSuccessModal) {
       router.push('/cart');
     }
-  }, [items, loading, router]);
+  }, [items, loading, router, showSuccessModal]);
 
   const handleCompleteOrder = async () => {
-    setIsProcessing(true);
-    // Simulate payment processing delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    if (!address) {
+      alert('Please select a delivery address');
+      return;
+    }
     
-    // In a real app, we would send the order to the backend here
-    clearCart();
-    router.push('/checkout/success');
+    setIsProcessing(true);
+    
+    try {
+      const payload = {
+        items: items.map(i => ({ productId: i.id, quantity: i.quantity })),
+        addressId: address.id || address._id,
+        paymentMethod
+      };
+
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to place order');
+      }
+
+      clearCart();
+      setShowSuccessModal(true);
+    } catch (err: any) {
+      alert(err.message);
+      setIsProcessing(false);
+    }
   };
 
   const deliveryFee = totalAmount > 999 ? 0 : 99;
   const grandTotal = totalAmount + deliveryFee;
 
-  if (loading || items.length === 0) {
+  if (loading || (items.length === 0 && !showSuccessModal)) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-emerald-600 animate-spin" />
@@ -270,6 +295,34 @@ function CheckoutContent() {
           </aside>
         </div>
       </div>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white rounded-[32px] p-8 max-w-sm w-full shadow-2xl text-center space-y-6"
+            >
+              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-display font-black text-slate-900 tracking-tight">Order Placed!</h3>
+                <p className="text-slate-500 font-medium mt-2">Your beautiful plants will be on their way soon.</p>
+              </div>
+              <button
+                onClick={() => router.push('/')}
+                className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-xl shadow-emerald-600/20 active:scale-[0.98]"
+              >
+                OK
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

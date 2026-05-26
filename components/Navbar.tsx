@@ -93,7 +93,7 @@ export function Navbar() {
               </Link>
 
               {/* Address Selector */}
-              {user && (
+              {mounted && user && (
                 <Link 
                   href="/address" 
                   className="hidden md:flex items-center gap-3 px-4 py-2 rounded-2xl hover:bg-slate-100 transition-all duration-300 group border border-transparent hover:border-slate-200"
@@ -129,7 +129,9 @@ export function Navbar() {
 
             {/* Actions */}
             <div className="flex items-center gap-6">
-              {user ? (
+              {!mounted ? (
+                <div className="w-20 h-10 bg-slate-100/50 rounded-2xl animate-pulse" />
+              ) : user ? (
                 <div className="flex items-center gap-6">
                   <div className="relative group">
                     <button className="flex items-center gap-3 text-sm font-bold text-slate-700 hover:text-emerald-800 transition-colors">
@@ -178,8 +180,6 @@ export function Navbar() {
                           <span>Account Settings</span>
                           <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover/link:opacity-100 -translate-x-2 group-hover/link:translate-x-0 transition-all" />
                         </Link>
-
-                        
                       </div>
 
                       <div className="h-px bg-slate-100 my-2 mx-4" />

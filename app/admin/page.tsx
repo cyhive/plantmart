@@ -28,6 +28,7 @@ interface Stats {
   pendingSellers: number;
   totalOrders: number;
   totalRevenue: number;
+  activePromos: number;
 }
 
 function StatCard({ label, value, sub, icon, color = 'bg-emerald-500', delay = 0 }: { label: string; value: any; sub?: string; icon: React.ReactNode; color?: string; delay?: number }) {
@@ -59,19 +60,18 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = () => {
-      const mockStats: Stats = {
-        totalSellers: 24,
-        totalBuyers: 1450,
-        totalProducts: 450,
-        pendingProducts: 12,
-        pendingSellers: 3,
-        totalOrders: 890,
-        totalRevenue: 2450000,
-      };
-      
-      setStats(mockStats);
-      setLoading(false);
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/admin/stats');
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data.stats);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     if (!authLoading) {
@@ -122,7 +122,7 @@ export default function AdminDashboardPage() {
             <StatCard label="Total Sellers" value={stats.totalSellers} icon={<Store className="w-7 h-7" />} color="bg-blue-600" delay={0.1} />
             <StatCard label="Pending Review" value={stats.pendingProducts} sub="Action Required" icon={<Clock className="w-7 h-7" />} color="bg-orange-600" delay={0.2} />
             <StatCard label="Total Sales" value={stats.totalOrders} icon={<ShoppingCart className="w-7 h-7" />} color="bg-purple-600" delay={0.3} />
-            <StatCard label="Active Promos" value="3" icon={<Tag className="w-7 h-7" />} color="bg-amber-600" delay={0.4} />
+            <StatCard label="Active Promos" value={stats.activePromos} icon={<Tag className="w-7 h-7" />} color="bg-amber-600" delay={0.4} />
             <StatCard label="Platform Revenue" value={`₹${(stats.totalRevenue / 1000).toFixed(1)}k`} icon={<TrendingUp className="w-7 h-7" />} color="bg-emerald-600" delay={0.5} />
           </>
         )}

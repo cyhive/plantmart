@@ -43,57 +43,49 @@ export default function AdminProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('all');
 
-  const MOCK_PRODUCTS: Product[] = [
-    {
-      _id: '1',
-      name: 'Monstera Deliciosa',
-      description: 'Premium split-leaf philodendron.',
-      price: 1299,
-      category: 'Indoor',
-      stock: 12,
-      images: ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600'],
-      isApproved: true,
-      seller: { name: 'Nandan K.', shopName: 'Green Garden Nursery' },
-      createdAt: '2023-11-01T10:00:00Z'
-    },
-    {
-      _id: '2',
-      name: 'Snake Plant',
-      description: 'Air purifying tall snake plant.',
-      price: 899,
-      category: 'Indoor',
-      stock: 45,
-      images: ['https://images.unsplash.com/photo-1593482892290-f54927ae1bbc?auto=format&fit=crop&q=80&w=600'],
-      isApproved: false,
-      seller: { name: 'Arjun S.', shopName: 'Pure Air Botanicals' },
-      createdAt: '2024-01-15T14:30:00Z'
-    },
-    {
-      _id: '3',
-      name: 'Bonsai Pine',
-      description: 'Artistically pruned miniature pine.',
-      price: 4500,
-      category: 'Outdoor',
-      stock: 3,
-      images: ['https://images.unsplash.com/photo-1512428813824-f7139c82b346?auto=format&fit=crop&q=80&w=600'],
-      isApproved: true,
-      seller: { name: 'Rahul V.', shopName: 'Himalayan Greens' },
-      createdAt: '2023-12-10T09:15:00Z'
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch('/api/admin/products');
+      const data = await res.json();
+      if (res.ok && data.products) {
+        setProducts(data.products);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  useEffect(() => {
-    setProducts(MOCK_PRODUCTS);
-    setLoading(false);
-  }, []);
-
-  const handleApproval = (id: string, isApproved: boolean) => {
-    setProducts(prev => prev.map(p => p._id === id ? { ...p, isApproved } : p));
   };
 
-  const handleDelete = (id: string) => {
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleApproval = async (id: string, isApproved: boolean) => {
+    try {
+      const res = await fetch(`/api/admin/products/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isApproved })
+      });
+      if (res.ok) {
+        setProducts(prev => prev.map(p => p._id === id ? { ...p, isApproved } : p));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to remove this specimen?')) return;
-    setProducts(prev => prev.filter(p => p._id !== id));
+    try {
+      const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setProducts(prev => prev.filter(p => p._id !== id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const filteredProducts = products.filter(p => {
@@ -252,9 +244,7 @@ export default function AdminProductsPage() {
                         >
                            <Trash2 className="w-4 h-4" />
                         </button>
-                        <button className="p-3 bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-xl transition-all shadow-sm active:scale-90">
-                           <Eye className="w-4 h-4" />
-                        </button>
+                        
                       </div>
                     </td>
                   </tr>

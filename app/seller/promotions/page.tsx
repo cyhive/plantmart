@@ -25,13 +25,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
-// Standard mock products for selection
-const MOCK_PRODUCTS = [
-  { _id: '1', name: 'Monstera Deliciosa', price: 1299, image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600' },
-  { _id: '2', name: 'Snake Plant', price: 899, image: 'https://images.unsplash.com/photo-1593482892290-f54927ae1bbc?auto=format&fit=crop&q=80&w=600' },
-  { _id: '3', name: 'Fiddle Leaf Fig', price: 2499, image: 'https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&q=80&w=600' },
-  { _id: '4', name: 'Peace Lily', price: 699, image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=600' }
-];
+// Products are fetched dynamically from the API
 
 interface PromoCode {
   id: string;
@@ -42,7 +36,7 @@ interface PromoCode {
   minPurchase: number;
   startDate: string;
   endDate: string;
-  status: 'Active' | 'Inactive';
+  status: 'Active' | 'Inactive' | 'Pending';
   usageCount: number;
 }
 
@@ -57,7 +51,7 @@ interface ProductDiscount {
   discountedPrice: number;
   startDate: string;
   endDate: string;
-  status: 'Active' | 'Inactive';
+  status: 'Active' | 'Inactive' | 'Pending';
 }
 
 export default function SellerPromotionsPage() {
@@ -73,6 +67,7 @@ export default function SellerPromotionsPage() {
   const [discounts, setDiscounts] = useState<ProductDiscount[]>([]);
   const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
   const [editingDiscount, setEditingDiscount] = useState<ProductDiscount | null>(null);
+  const [sellerProducts, setSellerProducts] = useState<any[]>([]);
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -97,75 +92,78 @@ export default function SellerPromotionsPage() {
     status: 'Active' as 'Active' | 'Inactive'
   });
 
-  // Load from local storage
+  // Load from API and local storage
   useEffect(() => {
-    // Promo codes loading
-    const storedPromos = localStorage.getItem('plantmart_promotions');
-    if (storedPromos) {
+    // Promo codes loading from API
+    const fetchPromos = async () => {
       try {
-        setPromocodes(JSON.parse(storedPromos));
+        const res = await fetch('/api/seller/promotions');
+        const data = await res.json();
+        if (res.ok && data.promotions) {
+          const mapped = data.promotions.map((p: any) => ({
+            id: p.id,
+            code: p.code,
+            description: p.description,
+            type: 'percentage',
+            value: p.discountPercentage,
+            minPurchase: p.minPurchase || 0,
+            startDate: new Date(p.validFrom).toISOString().split('T')[0],
+            endDate: new Date(p.validUntil).toISOString().split('T')[0],
+            status: p.isActive ? 'Active' : (p.isApproved ? 'Inactive' : 'Pending'),
+            usageCount: 0
+          }));
+          setPromocodes(mapped);
+        }
       } catch (e) {
         console.error(e);
       }
-    } else {
-      // Seed initial codes
-      const defaults: PromoCode[] = [
-        {
-          id: 'd1',
-          code: 'MONSOON20',
-          description: 'Get 20% off on your botanical order',
-          type: 'percentage',
-          value: 20,
-          minPurchase: 0,
-          startDate: '2026-05-01',
-          endDate: '2026-08-31',
-          status: 'Active',
-          usageCount: 142
-        },
-        {
-          id: 'd2',
-          code: 'WELCOME100',
-          description: 'Flat ₹100 discount on your first order',
-          type: 'fixed',
-          value: 100,
-          minPurchase: 499,
-          startDate: '2026-01-01',
-          endDate: '2026-12-31',
-          status: 'Active',
-          usageCount: 389
+    };
+
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        if (res.ok && data.products) {
+          setSellerProducts(data.products.map((p: any) => ({
+            _id: p.id,
+            name: p.name,
+            price: p.price,
+            image: p.images?.[0] || 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600'
+          })));
         }
-      ];
-      localStorage.setItem('plantmart_promotions', JSON.stringify(defaults));
-      setPromocodes(defaults);
-    }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    fetchPromos();
+    fetchProducts();
 
     // Product discounts loading
-    const storedDiscounts = localStorage.getItem('plantmart_seller_discounts');
-    if (storedDiscounts) {
+    const fetchDiscounts = async () => {
       try {
-        setDiscounts(JSON.parse(storedDiscounts));
+        const res = await fetch('/api/seller/product-discounts');
+        const data = await res.json();
+        if (res.ok && data.discounts) {
+          setDiscounts(data.discounts.map((d: any) => ({
+            id: d.id,
+            productId: d.productId,
+            productName: d.productName,
+            productImage: d.productImage,
+            originalPrice: d.originalPrice,
+            discountType: d.discountType,
+            discountValue: d.discountValue,
+            discountedPrice: d.discountedPrice,
+            startDate: new Date(d.validFrom).toISOString().split('T')[0],
+            endDate: new Date(d.validUntil).toISOString().split('T')[0],
+            status: d.isActive ? 'Active' : (d.isApproved ? 'Inactive' : 'Pending')
+          })));
+        }
       } catch (e) {
         console.error(e);
       }
-    } else {
-      const defaults: ProductDiscount[] = [
-        {
-          id: 'disc1',
-          productId: '1',
-          productName: 'Monstera Deliciosa',
-          productImage: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600',
-          originalPrice: 1299,
-          discountType: 'percentage',
-          discountValue: 15,
-          discountedPrice: 1104,
-          startDate: '2026-05-10',
-          endDate: '2026-06-30',
-          status: 'Active'
-        }
-      ];
-      localStorage.setItem('plantmart_seller_discounts', JSON.stringify(defaults));
-      setDiscounts(defaults);
-    }
+    };
+    fetchDiscounts();
   }, []);
 
   // Save promocodes to localStorage
@@ -181,49 +179,69 @@ export default function SellerPromotionsPage() {
   };
 
   // Handle Promocode Submit
-  const handlePromoSubmit = (e: React.FormEvent) => {
+  const handlePromoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingPromo) {
-      const updated = promocodes.map(p => 
-        p.id === editingPromo.id 
-          ? { 
-              ...p, 
-              code: promoForm.code.toUpperCase().replace(/\s+/g, ''),
-              description: promoForm.description,
-              type: promoForm.type,
-              value: Number(promoForm.value),
-              minPurchase: Number(promoForm.minPurchase),
-              startDate: promoForm.startDate,
-              endDate: promoForm.endDate,
-              status: promoForm.status
-            } 
-          : p
-      );
-      savePromocodes(updated);
-      setEditingPromo(null);
-    } else {
-      const newPromo: PromoCode = {
-        id: 'promo-' + Date.now(),
-        code: promoForm.code.toUpperCase().replace(/\s+/g, ''),
-        description: promoForm.description,
-        type: promoForm.type,
-        value: Number(promoForm.value),
-        minPurchase: Number(promoForm.minPurchase),
-        startDate: promoForm.startDate,
-        endDate: promoForm.endDate,
-        status: promoForm.status,
-        usageCount: 0
-      };
-      savePromocodes([newPromo, ...promocodes]);
+      alert('Editing promotions is not supported yet.');
+      return;
     }
+
+    try {
+      const res = await fetch('/api/seller/promotions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: promoForm.description.substring(0, 15) || 'Promo',
+          code: promoForm.code,
+          discountPercentage: promoForm.type === 'percentage' ? Number(promoForm.value) : 10,
+          minPurchase: Number(promoForm.minPurchase),
+          description: promoForm.description,
+          validFrom: promoForm.startDate,
+          validUntil: promoForm.endDate
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        const p = data.promotion;
+        const newPromo: PromoCode = {
+          id: p.id,
+          code: p.code,
+          description: p.description,
+          type: 'percentage',
+          value: p.discountPercentage,
+          minPurchase: p.minPurchase || 0,
+          startDate: new Date(p.validFrom).toISOString().split('T')[0],
+          endDate: new Date(p.validUntil).toISOString().split('T')[0],
+          status: 'Pending',
+          usageCount: 0
+        };
+        setPromocodes([newPromo, ...promocodes]);
+      } else {
+        alert(data.error || 'Failed to create promotion');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error');
+    }
+
     setIsPromoModalOpen(false);
     resetPromoForm();
   };
 
   // Handle Product Discount Submit
-  const handleDiscountSubmit = (e: React.FormEvent) => {
+  const handleDiscountSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const selectedProd = MOCK_PRODUCTS.find(p => p._id === discountForm.productId) || MOCK_PRODUCTS[0];
+    if (editingDiscount) {
+      alert('Editing discounts is not supported yet.');
+      return;
+    }
+
+    const selectedProd = sellerProducts.find(p => p._id === discountForm.productId) || sellerProducts[0];
+    if (!selectedProd) {
+      alert('No product selected');
+      return;
+    }
     const originalPrice = selectedProd.price;
     const value = Number(discountForm.discountValue);
     
@@ -234,42 +252,48 @@ export default function SellerPromotionsPage() {
       discountedPrice = Math.max(0, originalPrice - value);
     }
 
-    if (editingDiscount) {
-      const updated = discounts.map(d => 
-        d.id === editingDiscount.id 
-          ? {
-              ...d,
-              productId: discountForm.productId,
-              productName: selectedProd.name,
-              productImage: selectedProd.image,
-              originalPrice,
-              discountType: discountForm.discountType,
-              discountValue: value,
-              discountedPrice,
-              startDate: discountForm.startDate,
-              endDate: discountForm.endDate,
-              status: discountForm.status
-            }
-          : d
-      );
-      saveDiscounts(updated);
-      setEditingDiscount(null);
-    } else {
-      const newDiscount: ProductDiscount = {
-        id: 'disc-' + Date.now(),
-        productId: discountForm.productId,
-        productName: selectedProd.name,
-        productImage: selectedProd.image,
-        originalPrice,
-        discountType: discountForm.discountType,
-        discountValue: value,
-        discountedPrice,
-        startDate: discountForm.startDate,
-        endDate: discountForm.endDate,
-        status: discountForm.status
-      };
-      saveDiscounts([newDiscount, ...discounts]);
+    try {
+      const res = await fetch('/api/seller/product-discounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: selectedProd._id,
+          productName: selectedProd.name,
+          productImage: selectedProd.image,
+          originalPrice,
+          discountType: discountForm.discountType,
+          discountValue: value,
+          discountedPrice,
+          validFrom: discountForm.startDate,
+          validUntil: discountForm.endDate
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        const d = data.discount;
+        const newDiscount: ProductDiscount = {
+          id: d.id,
+          productId: d.productId,
+          productName: d.productName,
+          productImage: d.productImage,
+          originalPrice: d.originalPrice,
+          discountType: d.discountType,
+          discountValue: d.discountValue,
+          discountedPrice: d.discountedPrice,
+          startDate: new Date(d.validFrom).toISOString().split('T')[0],
+          endDate: new Date(d.validUntil).toISOString().split('T')[0],
+          status: 'Pending'
+        };
+        setDiscounts([newDiscount, ...discounts]);
+      } else {
+        alert(data.error || 'Failed to create discount');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error');
     }
+
     setIsDiscountModalOpen(false);
     resetDiscountForm();
   };
@@ -319,11 +343,34 @@ export default function SellerPromotionsPage() {
     }
   };
 
-  const togglePromoStatus = (id: string) => {
-    const updated = promocodes.map(p => 
-      p.id === id ? { ...p, status: p.status === 'Active' ? 'Inactive' : 'Active' as 'Active' | 'Inactive' } : p
-    );
-    savePromocodes(updated);
+  const togglePromoStatus = async (id: string) => {
+    const promo = promocodes.find(p => p.id === id);
+    if (!promo) return;
+    
+    if (promo.status === 'Pending') {
+      alert('Cannot activate a pending promotion. Please wait for admin approval.');
+      return;
+    }
+
+    const newIsActive = promo.status !== 'Active';
+    try {
+      const res = await fetch(`/api/seller/promotions/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: newIsActive })
+      });
+      if (res.ok) {
+        setPromocodes(promocodes.map(p => 
+          p.id === id ? { ...p, status: newIsActive ? 'Active' : 'Inactive' } : p
+        ));
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to update status');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error');
+    }
   };
 
   const handleEditDiscount = (disc: ProductDiscount) => {
@@ -345,11 +392,34 @@ export default function SellerPromotionsPage() {
     }
   };
 
-  const toggleDiscountStatus = (id: string) => {
-    const updated = discounts.map(d => 
-      d.id === id ? { ...d, status: d.status === 'Active' ? 'Inactive' : 'Active' as 'Active' | 'Inactive' } : d
-    );
-    saveDiscounts(updated);
+  const toggleDiscountStatus = async (id: string) => {
+    const disc = discounts.find(d => d.id === id);
+    if (!disc) return;
+
+    if (disc.status === 'Pending') {
+      alert('Cannot activate a pending discount. Please wait for admin approval.');
+      return;
+    }
+
+    const newIsActive = disc.status !== 'Active';
+    try {
+      const res = await fetch(`/api/seller/product-discounts/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: newIsActive })
+      });
+      if (res.ok) {
+        setDiscounts(discounts.map(d => 
+          d.id === id ? { ...d, status: newIsActive ? 'Active' : 'Inactive' } : d
+        ));
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to update status');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error');
+    }
   };
 
   // Filter listings based on search
@@ -517,10 +587,12 @@ export default function SellerPromotionsPage() {
                         className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 transition-all cursor-pointer ${
                           promo.status === 'Active' 
                             ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' 
+                            : promo.status === 'Pending'
+                            ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
                             : 'bg-slate-100 text-slate-400 hover:bg-slate-200'
                         }`}
                       >
-                        <div className={`w-1.5 h-1.5 rounded-full ${promo.status === 'Active' ? 'bg-emerald-600' : 'bg-slate-400'}`} />
+                        <div className={`w-1.5 h-1.5 rounded-full ${promo.status === 'Active' ? 'bg-emerald-600' : promo.status === 'Pending' ? 'bg-amber-600' : 'bg-slate-400'}`} />
                         {promo.status}
                       </button>
                     </td>
@@ -610,10 +682,12 @@ export default function SellerPromotionsPage() {
                         className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 transition-all cursor-pointer ${
                           disc.status === 'Active' 
                             ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' 
+                            : disc.status === 'Pending'
+                            ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
                             : 'bg-slate-100 text-slate-400 hover:bg-slate-200'
                         }`}
                       >
-                        <div className={`w-1.5 h-1.5 rounded-full ${disc.status === 'Active' ? 'bg-emerald-600' : 'bg-slate-400'}`} />
+                        <div className={`w-1.5 h-1.5 rounded-full ${disc.status === 'Active' ? 'bg-emerald-600' : disc.status === 'Pending' ? 'bg-amber-600' : 'bg-slate-400'}`} />
                         {disc.status}
                       </button>
                     </td>
@@ -863,11 +937,15 @@ export default function SellerPromotionsPage() {
                     onChange={(e) => setDiscountForm({...discountForm, productId: e.target.value})}
                     disabled={!!editingDiscount}
                   >
-                    {MOCK_PRODUCTS.map(prod => (
-                      <option key={prod._id} value={prod._id}>
-                        {prod.name} (Original: ₹{prod.price})
-                      </option>
-                    ))}
+                    {sellerProducts.length === 0 ? (
+                      <option disabled value="">No products available</option>
+                    ) : (
+                      sellerProducts.map(prod => (
+                        <option key={prod._id} value={prod._id}>
+                          {prod.name} (Original: ₹{prod.price})
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
 

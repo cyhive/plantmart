@@ -64,6 +64,21 @@ export default function SellerSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  const handleIdProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setFormData({ ...formData, idProof: event.target?.result as string });
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setFormData({ ...formData, idProof: file.name });
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -288,16 +303,38 @@ export default function SellerSettingsPage() {
                     </div>
                     <div className="md:col-span-2 space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Identity Proof (PDF/Image)</label>
-                      <div className="flex items-center gap-4">
-                        <div className="flex-1 relative">
-                          <FileCheck className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-                          <div className="w-full pl-12 pr-6 py-4 bg-emerald-50/50 border-2 border-dashed border-emerald-100 rounded-2xl font-bold text-emerald-700 text-sm">
-                            {formData.idProof ? 'document_verified.pdf' : 'No document uploaded'}
+                      <div className="relative">
+                        <div className={`flex flex-col sm:flex-row items-center gap-4 p-4 rounded-[24px] border-2 border-dashed transition-all group ${
+                          formData.idProof ? 'border-emerald-500/50 bg-emerald-50/20' : 'border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/30'
+                        }`}>
+                          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm flex-shrink-0 relative overflow-hidden group-hover:scale-105 transition-transform">
+                            {formData.idProof && formData.idProof.startsWith('data:image') ? (
+                              <img src={formData.idProof} alt="ID Proof Preview" className="w-full h-full object-cover" />
+                            ) : (
+                              <FileCheck className="w-6 h-6" />
+                            )}
+                          </div>
+                          
+                          <div className="flex-1 text-center sm:text-left">
+                            <p className="text-sm font-bold text-slate-900">
+                              {formData.idProof ? (formData.idProof.startsWith('data:image') ? 'Image Uploaded successfully' : formData.idProof) : 'Upload Document'}
+                            </p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
+                              Max size 5MB. JPG, PNG, PDF.
+                            </p>
+                          </div>
+
+                          <div className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-[10px] uppercase tracking-widest text-slate-600 group-hover:bg-emerald-50 group-hover:text-emerald-700 group-hover:border-emerald-200 transition-colors pointer-events-none">
+                            {formData.idProof ? 'Replace File' : 'Browse Files'}
                           </div>
                         </div>
-                        <button type="button" className="px-6 py-4 bg-white border border-slate-200 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-colors">
-                          Replace
-                        </button>
+                        
+                        <input 
+                          type="file" 
+                          accept="image/*,application/pdf" 
+                          onChange={handleIdProofChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
                       </div>
                     </div>
                   </div>

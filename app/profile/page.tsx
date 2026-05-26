@@ -20,10 +20,21 @@ import {
   Plus,
   Star,
   Leaf,
-  ArrowRight
+  ArrowRight,
+  Tag,
+  Gift,
+  Sparkles,
+  Copy,
+  CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
+
+const offerStyles = [
+  { color: 'emerald', icon: <Tag className="w-10 h-10" />, badge: 'Limited Time' },
+  { color: 'blue', icon: <Gift className="w-10 h-10" />, badge: 'Special' },
+  { color: 'amber', icon: <Sparkles className="w-10 h-10" />, badge: 'Top Deal' }
+];
 
 export default function ProfilePage() {
   const { user, login } = useAuth();
@@ -34,8 +45,17 @@ export default function ProfilePage() {
     email: '',
     phone: ''
   });
+  const [orders, setOrders] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
+  const [promotions, setPromotions] = useState<any[]>([]);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
 
   useEffect(() => {
     if (user) {
@@ -55,6 +75,20 @@ export default function ProfilePage() {
         .then(res => res.json())
         .then(data => {
           if (data.favorites) setFavorites(data.favorites);
+        })
+        .catch(console.error);
+
+      fetch('/api/offers')
+        .then(res => res.json())
+        .then(data => {
+          if (data.promotions) setPromotions(data.promotions.slice(0, 3));
+        })
+        .catch(console.error);
+
+      fetch('/api/profile/orders')
+        .then(res => res.json())
+        .then(data => {
+          if (data.orders) setOrders(data.orders);
         })
         .catch(console.error);
     }
@@ -118,10 +152,6 @@ export default function ProfilePage() {
     }
   };
 
-  const mockOrders = [
-    { id: 'ORD-8821', date: '2024-03-01', items: 3, total: 2450, status: 'Delivered' },
-    { id: 'ORD-7742', date: '2024-03-12', items: 1, total: 899, status: 'Processing' }
-  ];
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
@@ -369,35 +399,56 @@ export default function ProfilePage() {
               exit={{ opacity: 0, y: -10 }}
               className="space-y-6"
             >
-              {mockOrders.map((order) => (
-                <div key={order.id} className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm hover:shadow-xl transition-all flex flex-col md:flex-row items-center justify-between gap-8 group">
-                   <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner group-hover:rotate-6 transition-transform">
-                         <Package className="w-8 h-8" />
-                      </div>
-                      <div className="space-y-1 text-center md:text-left">
-                         <p className="text-xl font-display font-black text-slate-900 tracking-tight italic">#{order.id}</p>
-                         <div className="flex items-center justify-center md:justify-start gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {order.date}</span>
-                            <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                            <span>{order.items} Items</span>
-                         </div>
-                      </div>
-                   </div>
-                   
-                   <div className="flex flex-col md:flex-row items-center gap-8">
-                      <div className="text-center md:text-right">
-                         <p className="text-2xl font-display font-black text-emerald-900">₹{order.total}</p>
-                         <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest rounded-lg border border-emerald-100 italic">
-                            {order.status}
-                         </span>
-                      </div>
-                      <button className="bg-slate-900 text-white w-14 h-14 rounded-2xl flex items-center justify-center hover:bg-emerald-600 transition-all shadow-xl shadow-slate-900/10">
-                         <ChevronRight className="w-6 h-6" />
-                      </button>
-                   </div>
+              {orders.length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-[40px] border border-slate-100 shadow-sm">
+                  <Package className="w-16 h-16 text-slate-200 mx-auto mb-4" />
+                  <p className="text-slate-500 font-medium">You haven't placed any orders yet.</p>
                 </div>
-              ))}
+              ) : (
+                orders.map((order) => (
+                  <div key={order._id} className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm hover:shadow-xl transition-all flex flex-col md:flex-row items-center justify-between gap-8 group">
+                     <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner group-hover:rotate-6 transition-transform">
+                           <Package className="w-8 h-8" />
+                        </div>
+                        <div className="space-y-1 text-center md:text-left">
+                           <p className="text-xl font-display font-black text-slate-900 tracking-tight italic">#{order._id.slice(-6).toUpperCase()}</p>
+                           <div className="flex items-center justify-center md:justify-start gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                              <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(order.createdAt).toLocaleDateString()}</span>
+                              <span className="w-1 h-1 bg-slate-200 rounded-full" />
+                              <span>{order.items?.length || 0} Items</span>
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <div className="flex-grow flex items-center gap-2 overflow-x-auto px-4 py-2 scrollbar-none">
+                       {order.items?.map((item: any) => (
+                         <div key={item.productId} className="flex-shrink-0 w-12 h-12 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 relative group/item">
+                           <img src={item.productImage || ''} alt={item.productName} className="w-full h-full object-cover" />
+                           <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center justify-center text-[10px] font-bold text-white">
+                             x{item.quantity}
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                     
+                     <div className="flex flex-col md:flex-row items-center gap-8 shrink-0">
+                        <div className="text-center md:text-right">
+                           <p className="text-2xl font-display font-black text-emerald-900">₹{order.totalAmount}</p>
+                           <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg border italic ${
+                             order.status === 'delivered' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                             order.status === 'processing' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                             order.status === 'shipped' ? 'bg-purple-50 text-purple-700 border-purple-100' :
+                             order.status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-100' :
+                             'bg-amber-50 text-amber-700 border-amber-100' // pending
+                           }`}>
+                              {order.status}
+                           </span>
+                        </div>
+                     </div>
+                  </div>
+                ))
+              )}
               
               <div className="text-center py-12">
                  <button className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] hover:underline">View Archived Transactions</button>
@@ -496,6 +547,88 @@ export default function ProfilePage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Exclusive Offers Section */}
+        <section className="mt-16 space-y-8 bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-display font-bold text-slate-900 tracking-tight">Exclusive Offers</h2>
+              <p className="text-slate-500 text-base font-medium">Just for you. Grab these deals before they vanish!</p>
+            </div>
+            <Link href="/offers" className="inline-flex items-center gap-2 text-emerald-600 font-bold hover:text-emerald-700 transition-colors">
+              View All Offers & Discounts <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {promotions.length === 0 ? (
+              <div className="col-span-3 text-center py-10 text-slate-400">No exclusive offers at the moment.</div>
+            ) : (
+              promotions.map((promo, i) => {
+                const style = offerStyles[i % offerStyles.length];
+                return (
+                <motion.div
+                  key={promo.id}
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="group relative p-6 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-500 bg-white overflow-hidden"
+                >
+                  <div className={`absolute top-0 right-0 w-32 h-32 bg-${style.color}-500/5 rounded-full blur-[60px] -mr-16 -mt-16 group-hover:bg-${style.color}-500/10 transition-colors`} />
+                  
+                  <div className="relative z-10 space-y-5">
+                    <div className="flex items-start justify-between">
+                      <div className={`w-14 h-14 bg-${style.color}-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-${style.color}-600/20 group-hover:scale-105 transition-all duration-500`}>
+                        {style.icon}
+                      </div>
+                      <div className={`px-3 py-1 bg-${style.color}-50 rounded-full text-${style.color}-700 text-[9px] font-black uppercase tracking-widest border border-${style.color}-100`}>
+                        {style.badge}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-display font-black text-slate-900 leading-tight">
+                        {promo.title} <br />
+                        <span className={`text-${style.color}-600`}>{promo.discountPercentage}% OFF</span>
+                      </h3>
+                      <p className="text-slate-500 text-xs font-medium leading-relaxed italic line-clamp-2">{promo.description}</p>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-50">
+                      <div className="flex items-center justify-between p-1.5 bg-slate-50 rounded-2xl border border-slate-100 group-hover:bg-white transition-all">
+                        <div className="px-3">
+                          <span className="text-[8px] text-slate-400 font-black uppercase tracking-widest block">Code</span>
+                          <span className="text-base font-display font-black text-slate-900 tracking-wider">{promo.code}</span>
+                        </div>
+                        <button 
+                          onClick={() => handleCopyCode(promo.code)}
+                          className={`relative px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${
+                            copiedCode === promo.code 
+                              ? 'bg-emerald-500 text-white' 
+                              : `bg-slate-900 text-white hover:bg-${style.color}-600`
+                          }`}
+                        >
+                          <AnimatePresence mode="wait">
+                            {copiedCode === promo.code ? (
+                              <motion.span key="copied" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" /> Copied
+                              </motion.span>
+                            ) : (
+                              <motion.span key="copy" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                Copy
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+                )
+              })
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );
