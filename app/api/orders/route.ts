@@ -100,7 +100,7 @@ export async function POST(request: Request) {
           building: addressDoc.building,
         },
         paymentMethod,
-        status: 'pending',
+        status: 'awaiting_approval',
         subtotal,
         deliveryFee,
         totalAmount: subtotal + deliveryFee,
@@ -118,21 +118,7 @@ export async function POST(request: Request) {
     // Insert orders
     await db.collection(ORDERS_COLLECTION).insertMany(newOrders);
 
-    // Decrement stock for purchased products
-    for (const product of products) {
-      const purchasedItem = items.find((i: any) => i.productId === product._id.toString());
-      if (purchasedItem) {
-        await db.collection(PRODUCTS_COLLECTION).updateOne(
-          { _id: product._id },
-          { 
-            $inc: { 
-              stock: -purchasedItem.quantity,
-              sales: purchasedItem.quantity 
-            } 
-          }
-        );
-      }
-    }
+    // Note: Stock decrementation now happens when the seller approves the order
 
     return NextResponse.json({ success: true, orderCount: newOrders.length });
   } catch (error) {

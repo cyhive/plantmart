@@ -50,6 +50,7 @@ export default function ProfilePage() {
   const [favorites, setFavorites] = useState<any[]>([]);
   const [promotions, setPromotions] = useState<any[]>([]);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -206,7 +207,7 @@ export default function ProfilePage() {
               <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
                  <div className="bg-slate-50 px-6 py-2 rounded-2xl border border-slate-100 text-center">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Orders</p>
-                    <p className="text-xl font-display font-black text-slate-900">12</p>
+                    <p className="text-xl font-display font-black text-slate-900">{orders.length}</p>
                  </div>
                  <div className="bg-slate-50 px-6 py-2 rounded-2xl border border-slate-100 text-center">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Wishlist</p>
@@ -406,46 +407,141 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 orders.map((order) => (
-                  <div key={order._id} className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm hover:shadow-xl transition-all flex flex-col md:flex-row items-center justify-between gap-8 group">
-                     <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner group-hover:rotate-6 transition-transform">
-                           <Package className="w-8 h-8" />
-                        </div>
-                        <div className="space-y-1 text-center md:text-left">
-                           <p className="text-xl font-display font-black text-slate-900 tracking-tight italic">#{order._id.slice(-6).toUpperCase()}</p>
-                           <div className="flex items-center justify-center md:justify-start gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                              <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(order.createdAt).toLocaleDateString()}</span>
-                              <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                              <span>{order.items?.length || 0} Items</span>
+                  <div key={order._id} className="bg-white rounded-[40px] border border-slate-100 shadow-sm hover:shadow-xl transition-all flex flex-col group overflow-hidden">
+                    <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                       <div className="flex items-center gap-6">
+                          <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner group-hover:rotate-6 transition-transform shrink-0">
+                             <Package className="w-8 h-8" />
+                          </div>
+                          <div className="space-y-1 text-center md:text-left">
+                             <h3 className="text-xl font-display font-black text-slate-900 tracking-tight line-clamp-1">
+                               {order.items?.[0]?.productName || 'Plant Order'}
+                               {(order.items?.length || 0) > 1 && <span className="text-sm text-slate-400 font-bold ml-2 tracking-normal">+ {(order.items?.length || 0) - 1} more</span>}
+                             </h3>
+                             <div className="flex flex-col md:flex-row items-center md:justify-start gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">#{order._id.slice(-6).toUpperCase()}</span>
+                                <span className="hidden md:block w-1 h-1 bg-slate-200 rounded-full" />
+                                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(order.createdAt).toLocaleDateString()}</span>
+                                <span className="hidden md:block w-1 h-1 bg-slate-200 rounded-full" />
+                                <span>{order.items?.length || 0} Items</span>
+                             </div>
+                          </div>
+                       </div>
+                       
+                       <div className="flex-grow flex items-center justify-center md:justify-start gap-2 overflow-x-auto px-4 py-2 scrollbar-none">
+                         {order.items?.slice(0, 4).map((item: any) => (
+                           <div key={item.productId} className="flex-shrink-0 w-12 h-12 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 relative group/item">
+                             <img src={item.productImage || ''} alt={item.productName} className="w-full h-full object-cover" />
+                             <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center justify-center text-[10px] font-bold text-white">
+                               x{item.quantity}
+                             </div>
                            </div>
-                        </div>
-                     </div>
-                     
-                     <div className="flex-grow flex items-center gap-2 overflow-x-auto px-4 py-2 scrollbar-none">
-                       {order.items?.map((item: any) => (
-                         <div key={item.productId} className="flex-shrink-0 w-12 h-12 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 relative group/item">
-                           <img src={item.productImage || ''} alt={item.productName} className="w-full h-full object-cover" />
-                           <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center justify-center text-[10px] font-bold text-white">
-                             x{item.quantity}
+                         ))}
+                         {(order.items?.length || 0) > 4 && (
+                           <div className="flex-shrink-0 w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 font-bold text-xs border border-slate-200">
+                             +{(order.items?.length || 0) - 4}
                            </div>
-                         </div>
-                       ))}
-                     </div>
-                     
-                     <div className="flex flex-col md:flex-row items-center gap-8 shrink-0">
-                        <div className="text-center md:text-right">
-                           <p className="text-2xl font-display font-black text-emerald-900">₹{order.totalAmount}</p>
-                           <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg border italic ${
-                             order.status === 'delivered' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                             order.status === 'processing' ? 'bg-blue-50 text-blue-700 border-blue-100' :
-                             order.status === 'shipped' ? 'bg-purple-50 text-purple-700 border-purple-100' :
-                             order.status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-100' :
-                             'bg-amber-50 text-amber-700 border-amber-100' // pending
-                           }`}>
-                              {order.status}
-                           </span>
-                        </div>
-                     </div>
+                         )}
+                       </div>
+                       
+                       <div className="flex flex-col md:flex-row items-center gap-8 shrink-0">
+                          <div className="text-center md:text-right flex flex-col items-center md:items-end gap-2">
+                             <p className="text-2xl font-display font-black text-emerald-900 leading-none">₹{order.totalAmount}</p>
+                             <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg border italic ${
+                               order.status === 'delivered' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                               order.status === 'processing' ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
+                               order.status === 'pending' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                               order.status === 'awaiting_approval' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                               order.status === 'shipped' ? 'bg-purple-50 text-purple-700 border-purple-100' :
+                               order.status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-100' :
+                               'bg-slate-50 text-slate-700 border-slate-100'
+                             }`}>
+                                {order.status}
+                             </span>
+                             <div className="flex items-center gap-2 mt-2">
+                               <button 
+                                 onClick={() => setExpandedOrder(expandedOrder === order._id ? null : order._id)}
+                                 className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-emerald-600 px-4 py-2 rounded-xl transition-colors border border-slate-100 hover:border-emerald-200 bg-white"
+                               >
+                                 {expandedOrder === order._id ? 'Hide Details' : 'View Details'}
+                               </button>
+                               <Link 
+                                 href={`/track?orderId=${order._id}`} 
+                                 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:bg-emerald-600 hover:text-white bg-emerald-50 px-4 py-2 rounded-xl transition-colors border border-emerald-100"
+                               >
+                                 Track Order
+                               </Link>
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+
+                    {/* Expandable Order Details */}
+                    <AnimatePresence>
+                      {expandedOrder === order._id && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="border-t border-slate-100 bg-slate-50/50"
+                        >
+                          <div className="p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 space-y-6">
+                              <h4 className="text-sm font-black uppercase tracking-widest text-slate-900 flex items-center gap-2">
+                                <Leaf className="w-4 h-4 text-emerald-500" /> Items Ordered
+                              </h4>
+                              <div className="space-y-4">
+                                {order.items?.map((item: any) => (
+                                  <div key={item.productId} className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                    <img src={item.productImage || ''} alt={item.productName} className="w-16 h-16 rounded-xl object-cover bg-slate-50" />
+                                    <div className="flex-grow">
+                                      <p className="font-bold text-slate-900">{item.productName}</p>
+                                      <p className="text-xs text-slate-500 font-medium">Qty: {item.quantity}</p>
+                                    </div>
+                                    <div className="text-right">
+                                      <p className="font-black text-emerald-900">₹{item.price * item.quantity}</p>
+                                      <p className="text-[10px] text-slate-400 font-bold">₹{item.price} each</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-8">
+                              <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Delivery Information</h4>
+                                <div className="space-y-1">
+                                  <p className="font-bold text-slate-900">{order.shippingAddress?.street}</p>
+                                  <p className="text-sm text-slate-600">{order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}</p>
+                                  <p className="text-sm text-slate-500 flex items-center gap-1 mt-2">
+                                    <Phone className="w-3 h-3" /> {order.shippingAddress?.phone || formData.phone}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-3">
+                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Order Summary</h4>
+                                <div className="flex justify-between text-sm font-medium text-slate-600">
+                                  <span>Subtotal</span>
+                                  <span>₹{order.subtotal}</span>
+                                </div>
+                                <div className="flex justify-between text-sm font-medium text-slate-600">
+                                  <span>Delivery Fee</span>
+                                  <span>{order.deliveryFee === 0 ? <span className="text-emerald-600 font-bold">FREE</span> : `₹${order.deliveryFee}`}</span>
+                                </div>
+                                <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
+                                  <span className="font-bold text-slate-900">Total Paid</span>
+                                  <span className="text-xl font-display font-black text-emerald-600">₹{order.totalAmount}</span>
+                                </div>
+                                <div className="mt-2 text-[10px] text-slate-400 uppercase tracking-widest text-right">
+                                  via {order.paymentMethod === 'card' ? 'Credit Card' : order.paymentMethod}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 ))
               )}
