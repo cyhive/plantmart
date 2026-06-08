@@ -52,52 +52,50 @@ export default function NurseryDetailPage() {
     { id: 2, author: 'Rahul K.', rating: 4, date: 'September 28, 2025', comment: 'Healthy plant, but it took a bit longer to arrive than expected. Otherwise, very happy with the purchase.' },
     { id: 3, author: 'Anita M.', rating: 5, date: 'September 15, 2025', comment: 'Thriving beautifully in my living room. The care instructions provided were very helpful for a beginner like me.' },
   ]);
-  const mockNurseries: Record<string, Nursery> = {
-    '1': { 
-      id: '1', 
-      name: 'Green Garden', 
-      shopName: 'Green Garden Nursery', 
-      image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=1200',
-      location: 'Pune, Maharashtra',
-      rating: 4.8,
-      plants: 1200,
-      description: 'Specializing in exotic indoor foliage and rare succulents. Our family-run nursery has been providing high-quality botanical specimens since 2012. We pride ourselves on our sustainable growing practices and healthy plant guarantees.',
-      joinedDate: 'Jan 2024',
-      verified: true
-    },
-    '2': { 
-      id: '2', 
-      name: 'Air Purifiers', 
-      shopName: 'Pure Air Nursery', 
-      image: 'https://images.unsplash.com/photo-1592150621344-82d439ec42f2?auto=format&fit=crop&q=80&w=1200',
-      location: 'Bangalore, KA',
-      rating: 4.9,
-      plants: 850,
-      description: 'Dedicated to helping city dwellers breathe better. We curate the best NASA-approved air-purifying plants for urban homes. Every plant comes with a specialized care guide tailored for the Indian climate.',
-      joinedDate: 'Mar 2024',
-      verified: true
-    },
-    '3': { 
-      id: '3', 
-      name: 'Tree Experts', 
-      shopName: 'Expert Tree Farm', 
-      image: 'https://images.unsplash.com/photo-1598902108854-10e335adac99?auto=format&fit=crop&q=80&w=1200',
-      location: 'Delhi, NCR',
-      rating: 4.7,
-      plants: 2400,
-      description: 'The largest collection of fruit trees and ornamental outdoor plants in the NCR region. We provide professional landscaping consultations and high-yield grafts for garden enthusiasts.',
-      joinedDate: 'Feb 2024',
-      verified: true
+  const [nursery, setNursery] = useState<Nursery | null>(null);
+  const [plants, setPlants] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchSellerData = async () => {
+      try {
+        const [sellerRes, plantsRes] = await Promise.all([
+          fetch(`/api/sellers/${id}`),
+          fetch(`/api/catalog/products?sellerId=${id}`)
+        ]);
+
+        if (sellerRes.ok) {
+          const sellerData = await sellerRes.json();
+          setNursery(sellerData.seller);
+        }
+        
+        if (plantsRes.ok) {
+          const plantsData = await plantsRes.json();
+          setPlants(plantsData.products || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch seller details:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchSellerData();
     }
-  };
+  }, [id]);
 
-  const nursery = mockNurseries[id as string] || mockNurseries['1'];
+  if (loading) return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
-  const mockPlants = [
-    { id: '1', name: 'Monstera Deliciosa', price: 1299, image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800', category: 'Indoor' },
-    { id: '2', name: 'Snake Plant', price: 899, image: 'https://images.unsplash.com/photo-1593482892290-f54927ae1bbc?auto=format&fit=crop&q=80&w=800', category: 'Indoor' },
-    { id: '4', name: 'Peace Lily', price: 699, image: 'https://images.unsplash.com/photo-1593691509543-c55fb32e7355?auto=format&fit=crop&q=80&w=800', category: 'Indoor' }
-  ];
+  if (!nursery) return (
+    <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+      <h2 className="text-2xl font-bold text-slate-800">Seller Not Found</h2>
+      <Link href="/sellers" className="text-emerald-600 hover:underline">Return to Sellers</Link>
+    </div>
+  );
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -108,18 +106,7 @@ export default function NurseryDetailPage() {
 
   const handleReviewSubmit = (newReview: any) => {
     setReviews([newReview, ...reviews]);
-    // Close form after a short delay (handled in component or here)
   };
-
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 800);
-  }, []);
-
-  if (loading) return (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-slate-50/50">
@@ -216,28 +203,30 @@ export default function NurseryDetailPage() {
                </div>
 
                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                  {mockPlants.map((plant) => (
+                  {plants.length === 0 ? (
+                    <div className="col-span-full py-20 text-center text-slate-400 font-medium">This seller has no plants currently listed.</div>
+                  ) : plants.map((plant) => (
                     <Link key={plant.id} href={`/plants/${plant.id}`}>
                       <motion.div 
                         whileHover={{ y: -6 }}
                         className="group bg-white rounded-[24px] border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 p-3 flex flex-col h-full"
                       >
                          <div className="relative aspect-square overflow-hidden rounded-[18px] bg-slate-50 mb-3 flex-shrink-0">
-                            <img src={plant.image} alt={plant.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                            <img src={plant.images?.[0] || 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=800'} alt={plant.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                             <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-widest text-emerald-900 border border-white">
-                               {plant.category}
+                               {plant.category || 'Indoor'}
                             </div>
                             <button 
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                toggleFavorite(plant.id, e);
-                              }}
-                              className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all backdrop-blur-md shadow-md cursor-pointer border ${
-                                favorites?.includes(plant.id) 
-                                  ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' 
-                                  : 'bg-white/80 border-white/40 text-slate-400 hover:text-rose-500 hover:bg-white'
-                              }`}
+                               onClick={(e) => {
+                                 e.preventDefault();
+                                 e.stopPropagation();
+                                 toggleFavorite(plant.id, e);
+                               }}
+                               className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all backdrop-blur-md shadow-md cursor-pointer border ${
+                                 favorites?.includes(plant.id) 
+                                   ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' 
+                                   : 'bg-white/80 border-white/40 text-slate-400 hover:text-rose-500 hover:bg-white'
+                               }`}
                             >
                               <Heart className={`w-3.5 h-3.5 ${favorites?.includes(plant.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
                             </button>
@@ -260,7 +249,7 @@ export default function NurseryDetailPage() {
                                  id: plant.id,
                                  name: plant.name,
                                  price: plant.price,
-                                 image: plant.image,
+                                 image: plant.images?.[0] || '',
                                  quantity: 1,
                                  seller: { name: nursery.name, shopName: nursery.shopName }
                                });
@@ -277,7 +266,7 @@ export default function NurseryDetailPage() {
                                  id: plant.id,
                                  name: plant.name,
                                  price: plant.price,
-                                 image: plant.image,
+                                 image: plant.images?.[0] || '',
                                  quantity: 1,
                                  seller: { name: nursery.name, shopName: nursery.shopName }
                                });

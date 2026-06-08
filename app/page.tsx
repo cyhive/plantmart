@@ -44,11 +44,7 @@ const heroSlides = [
   }
 ];
 
-const nurseries = [
-  { id: '1', name: 'Green Garden Nursery', location: 'Bangalore, KA', rating: 4.9, plants: 450, image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=400' },
-  { id: '2', name: 'Pure Air Botanicals', location: 'Pune, MH', rating: 4.8, plants: 320, image: 'https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&q=80&w=400' },
-  { id: '3', name: 'Tropical Haven', location: 'Kochi, KL', rating: 4.7, plants: 280, image: 'https://images.unsplash.com/photo-1599591037488-8a306485987a?auto=format&fit=crop&q=80&w=400' },
-];
+// nurseries state will be fetched dynamically
 
 const careTips = [
   { icon: <Droplets className="w-6 h-6" />, title: "Watering Wisdom", desc: "Most plants prefer to dry out slightly between waterings. Use the finger test!" },
@@ -82,6 +78,7 @@ export default function HomePage() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [promotions, setPromotions] = useState<any[]>([]);
+  const [topNurseries, setTopNurseries] = useState<any[]>([]);
   const { addItem } = useCart();
 
   const handleCopyCode = (code: string) => {
@@ -94,6 +91,12 @@ export default function HomePage() {
     fetch('/api/offers').then(res => res.json()).then(data => {
       if (data.promotions) {
         setPromotions(data.promotions.slice(0, 3));
+      }
+    }).catch(console.error);
+
+    fetch('/api/sellers').then(res => res.json()).then(data => {
+      if (data.sellers) {
+        setTopNurseries(data.sellers);
       }
     }).catch(console.error);
   }, []);
@@ -410,7 +413,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {nurseries.map((nursery, i) => (
+          {topNurseries.map((nursery, i) => (
             <Link key={nursery.name} href={`/sellers/${nursery.id}`}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

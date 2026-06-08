@@ -419,7 +419,7 @@ export default function ProfilePage() {
                                {(order.items?.length || 0) > 1 && <span className="text-sm text-slate-400 font-bold ml-2 tracking-normal">+ {(order.items?.length || 0) - 1} more</span>}
                              </h3>
                              <div className="flex flex-col md:flex-row items-center md:justify-start gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">#{order._id.slice(-6).toUpperCase()}</span>
+                                <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Order ID: #{order._id}</span>
                                 <span className="hidden md:block w-1 h-1 bg-slate-200 rounded-full" />
                                 <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(order.createdAt).toLocaleDateString()}</span>
                                 <span className="hidden md:block w-1 h-1 bg-slate-200 rounded-full" />

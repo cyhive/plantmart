@@ -180,7 +180,7 @@ export default function SellerDashboardPage() {
                 <CartesianGrid vertical={false} stroke="#f1f5f9" />
                 <Tooltip 
                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}
-                  formatter={(value: number) => [`₹${value}`, 'Revenue']}
+                  formatter={(value: any) => [`₹${value}`, 'Revenue']}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
               </AreaChart>

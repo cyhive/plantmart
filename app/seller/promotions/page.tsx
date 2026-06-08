@@ -80,7 +80,7 @@ export default function SellerPromotionsPage() {
     minPurchase: '0',
     startDate: '',
     endDate: '',
-    status: 'Active' as 'Active' | 'Inactive'
+    status: 'Active' as 'Active' | 'Inactive' | 'Pending'
   });
 
   const [discountForm, setDiscountForm] = useState({
@@ -89,7 +89,7 @@ export default function SellerPromotionsPage() {
     discountValue: '',
     startDate: '',
     endDate: '',
-    status: 'Active' as 'Active' | 'Inactive'
+    status: 'Active' as 'Active' | 'Inactive' | 'Pending'
   });
 
   // Load from API and local storage

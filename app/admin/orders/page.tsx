@@ -33,6 +33,7 @@ interface Order {
   status: string;
   createdAt: string;
   shippingAddress: any;
+  subtotal?: number;
 }
 
 export default function AdminOrdersPage() {

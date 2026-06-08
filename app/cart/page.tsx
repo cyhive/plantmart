@@ -500,7 +500,7 @@ export default function CartPage() {
                   className="w-full bg-slate-900 text-white py-6 rounded-[32px] font-black text-xl hover:bg-emerald-600 transition-all shadow-2xl shadow-slate-900/10 active:scale-[0.98] flex items-center justify-center gap-4 group disabled:opacity-50 disabled:bg-slate-300 disabled:cursor-not-allowed"
                   disabled={!selectedAddress && !user?.address?.street}
                   onClick={() => {
-                    const addrId = selectedAddress?.id || user?.address?.id;
+                    const addrId = selectedAddress?.id || (user?.address as any)?.id;
                     if(addrId) {
                        router.push(`/checkout?addressId=${addrId}`);
                     } else {

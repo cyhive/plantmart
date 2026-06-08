@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
     const productIds = items.map((i: any) => {
       try { return new ObjectId(i.productId); } catch { return null; }
-    }).filter(Boolean);
+    }).filter(Boolean) as ObjectId[];
 
     const products = await db.collection(PRODUCTS_COLLECTION).find({
       _id: { $in: productIds }

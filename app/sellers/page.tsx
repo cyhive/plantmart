@@ -15,7 +15,7 @@ import {
   Clock
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // Mock data for nurseries - expanded version of the home page data
 const allNurseries = [
@@ -96,10 +96,29 @@ const allNurseries = [
 export default function SellersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [nurseries, setNurseries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSellers = async () => {
+      try {
+        const res = await fetch('/api/sellers');
+        if (res.ok) {
+          const data = await res.json();
+          setNurseries(data.sellers || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch sellers:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSellers();
+  }, []);
 
   const categories = ['All', 'Premium', 'Eco-friendly', 'Outdoor', 'Cactus', 'Flowering', 'Herbs'];
 
-  const filteredNurseries = allNurseries.filter(nursery => {
+  const filteredNurseries = nurseries.filter(nursery => {
     const matchesSearch = nursery.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          nursery.location.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || nursery.category === selectedCategory;
@@ -203,7 +222,9 @@ export default function SellersPage() {
       {/* Sellers Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-          {filteredNurseries.length > 0 ? (
+          {loading ? (
+            <div className="col-span-full py-32 text-center text-slate-400 font-medium">Loading registered sellers...</div>
+          ) : filteredNurseries.length > 0 ? (
             filteredNurseries.map((nursery, i) => (
               <motion.div
                 key={nursery.id}
@@ -256,7 +277,7 @@ export default function SellersPage() {
                   </p>
 
                   <div className="flex flex-wrap gap-2">
-                    {nursery.tags.map(tag => (
+                    {(nursery.tags || []).map((tag: string) => (
                       <span key={tag} className="px-3 py-1 bg-slate-50 text-slate-500 rounded-lg text-[10px] font-bold border border-slate-100">
                         #{tag}
                       </span>

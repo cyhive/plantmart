@@ -25,7 +25,7 @@ export async function GET(
     const order = await db.collection(ORDERS_COLLECTION).findOne({
       $or: [
         { _id: new ObjectId(orderId) },
-        { _id: orderId }
+        { _id: orderId as any }
       ]
     });
 
