@@ -58,7 +58,7 @@ export function Footer() {
         { name: 'Sustainability', href: '/sustainability' },
         { name: 'Careers', href: '/careers' },
         { name: 'Merchant Portal', href: '/seller' },
-        { name: 'Admin Control', href: '/admin' },
+        
         { name: 'Privacy Policy', href: '/privacy' },
       ],
     },

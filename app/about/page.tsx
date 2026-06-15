@@ -337,6 +337,7 @@ export default function AboutPage() {
             {faqs.map((faq, i) => (
               <div 
                 key={i}
+                id={faq.question.includes('7-Day Health Guarantee') ? 'guarantee' : undefined}
                 className={`group rounded-[32px] border transition-all duration-500 overflow-hidden ${
                   openFaq === i 
                     ? 'bg-white border-emerald-200 shadow-xl shadow-emerald-500/5' 

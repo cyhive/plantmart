@@ -13,7 +13,8 @@ import {
   X,
   Bell,
   Tag,
-  ShieldCheck
+  ShieldCheck,
+  IndianRupee
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'motion/react';
@@ -38,6 +39,7 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
     { href: '/seller/products', icon: <Package className="w-5 h-5" />, label: 'Inventory' },
     { href: '/seller/orders', icon: <ShoppingBag className="w-5 h-5" />, label: 'Sales' },
     { href: '/seller/promotions', icon: <Tag className="w-5 h-5" />, label: 'Promotions' },
+    { href: '/seller/payouts', icon: <IndianRupee className="w-5 h-5" />, label: 'Payouts' },
     { href: '/seller/notifications', icon: <Bell className="w-5 h-5" />, label: 'Notifications' },
     { href: '/seller/kyc', icon: <ShieldCheck className="w-5 h-5" />, label: 'KYC Verification' },
     { href: '/seller/settings', icon: <Settings className="w-5 h-5" />, label: 'Shop Settings' },

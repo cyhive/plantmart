@@ -98,7 +98,6 @@ export default function SellerLoginPage() {
             <div className="space-y-2">
               <div className="flex justify-between items-center px-1">
                 <label className="block text-xs font-black uppercase tracking-widest text-slate-400">Password</label>
-                <Link href="#" className="text-xs font-bold text-emerald-600 hover:underline">Forgot password?</Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
