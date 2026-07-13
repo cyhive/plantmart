@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 type Promotion = {
   id: string;
@@ -252,7 +253,7 @@ export default function PromotionsPage() {
                         </>
                       ) : (
                         <>
-                          <img src={item.productImage} alt={item.productName} className="w-12 h-12 rounded-xl object-cover" />
+                          <Image src={item.productImage} alt={item.productName} className="w-12 h-12 rounded-xl object-cover" width={100} height={100} />
                           <div className="space-y-1">
                             <p className="font-bold text-slate-900">{item.productName}</p>
                             <p className="text-xs text-slate-500 font-medium max-w-xs truncate italic">Product Discount</p>

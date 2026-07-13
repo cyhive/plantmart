@@ -24,6 +24,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
 import SellerReviewForm from '@/components/seller/SellerReviewForm';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface Nursery {
   id: string;
@@ -42,25 +43,30 @@ export default function NurseryDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const { addItem } = useCart();
+  const { user } = useAuth();
   const [favorites, setFavorites] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'plants' | 'reviews' | 'about'>('plants');
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [openAboutAccordion, setOpenAboutAccordion] = useState<number | null>(0);
-  const [reviews, setReviews] = useState([
-    { id: 1, author: 'Priya S.', rating: 5, date: 'October 12, 2025', comment: 'Absolutely beautiful plant! Arrived in perfect condition and the packaging was very secure. Highly recommend this nursery.' },
-    { id: 2, author: 'Rahul K.', rating: 4, date: 'September 28, 2025', comment: 'Healthy plant, but it took a bit longer to arrive than expected. Otherwise, very happy with the purchase.' },
-    { id: 3, author: 'Anita M.', rating: 5, date: 'September 15, 2025', comment: 'Thriving beautifully in my living room. The care instructions provided were very helpful for a beginner like me.' },
-  ]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
+  
+  const totalReviews = reviews.length;
+  const averageRating = totalReviews > 0 
+    ? (reviews.reduce((acc, rev) => acc + rev.rating, 0) / totalReviews).toFixed(1)
+    : '0.0';
+
   const [nursery, setNursery] = useState<Nursery | null>(null);
   const [plants, setPlants] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchSellerData = async () => {
       try {
-        const [sellerRes, plantsRes] = await Promise.all([
+        const [sellerRes, plantsRes, reviewsRes] = await Promise.all([
           fetch(`/api/sellers/${id}`),
-          fetch(`/api/catalog/products?sellerId=${id}`)
+          fetch(`/api/catalog/products?sellerId=${id}`),
+          fetch(`/api/sellers/${id}/reviews`)
         ]);
 
         if (sellerRes.ok) {
@@ -71,6 +77,19 @@ export default function NurseryDetailPage() {
         if (plantsRes.ok) {
           const plantsData = await plantsRes.json();
           setPlants(plantsData.products || []);
+        }
+
+        if (reviewsRes.ok) {
+          const reviewsData = await reviewsRes.json();
+          setReviews(
+            (reviewsData.reviews || []).map((r: any) => ({
+              id: r._id,
+              author: r.author,
+              rating: r.rating,
+              date: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+              comment: r.comment
+            }))
+          );
         }
       } catch (err) {
         console.error('Failed to fetch seller details:', err);
@@ -83,6 +102,21 @@ export default function NurseryDetailPage() {
       fetchSellerData();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (user) {
+      fetch('/api/favorites')
+        .then(res => res.json())
+        .then(data => {
+          if (data.favorites) {
+            setFavorites(data.favorites.map((f: any) => f.productId));
+          }
+        })
+        .catch(console.error);
+    } else {
+      setFavorites([]);
+    }
+  }, [user]);
 
   if (loading) return (
     <div className="min-h-[60vh] flex items-center justify-center">
@@ -97,15 +131,47 @@ export default function NurseryDetailPage() {
     </div>
   );
 
-  const toggleFavorite = (id: string, e: React.MouseEvent) => {
+  const toggleFavorite = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    const isFavorite = favorites.includes(id);
+    // Optimistic update
     setFavorites(prev => 
-      prev.includes(id) ? prev.filter(fId => fId !== id) : [...prev, id]
+      isFavorite ? prev.filter(fId => fId !== id) : [...prev, id]
     );
+
+    try {
+      if (isFavorite) {
+        await fetch(`/api/favorites/${id}`, { method: 'DELETE' });
+      } else {
+        await fetch('/api/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId: id })
+        });
+      }
+    } catch (err) {
+      console.error('Failed to toggle favorite', err);
+      // Revert on error
+      setFavorites(prev => 
+        isFavorite ? [...prev, id] : prev.filter(fId => fId !== id)
+      );
+    }
   };
 
   const handleReviewSubmit = (newReview: any) => {
-    setReviews([newReview, ...reviews]);
+    const formattedReview = {
+      id: newReview._id || Date.now(),
+      author: newReview.author,
+      rating: newReview.rating,
+      date: new Date(newReview.createdAt || new Date()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      comment: newReview.comment
+    };
+    setReviews([formattedReview, ...reviews]);
   };
 
   return (
@@ -146,7 +212,7 @@ export default function NurseryDetailPage() {
                <div className="glass px-8 py-4 rounded-[32px] text-center border-white/20">
                   <div className="flex items-center justify-center gap-1 text-amber-400">
                      <Star className="w-5 h-5 fill-amber-400" />
-                     <span className="text-2xl font-black text-white">{nursery.rating}</span>
+                     <span className="text-2xl font-black text-white">{averageRating}</span>
                   </div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mt-1">Average Rating</p>
                </div>
@@ -206,7 +272,7 @@ export default function NurseryDetailPage() {
                   {plants.length === 0 ? (
                     <div className="col-span-full py-20 text-center text-slate-400 font-medium">This seller has no plants currently listed.</div>
                   ) : plants.map((plant) => (
-                    <Link key={plant.id} href={`/plants/${plant.id}`}>
+                    <Link key={plant._id} href={`/plants/${plant._id}`}>
                       <motion.div 
                         whileHover={{ y: -6 }}
                         className="group bg-white rounded-[24px] border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 p-3 flex flex-col h-full"
@@ -220,15 +286,15 @@ export default function NurseryDetailPage() {
                                onClick={(e) => {
                                  e.preventDefault();
                                  e.stopPropagation();
-                                 toggleFavorite(plant.id, e);
+                                 toggleFavorite(plant._id, e);
                                }}
                                className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all backdrop-blur-md shadow-md cursor-pointer border ${
-                                 favorites?.includes(plant.id) 
+                                 favorites?.includes(plant._id) 
                                    ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' 
                                    : 'bg-white/80 border-white/40 text-slate-400 hover:text-rose-500 hover:bg-white'
                                }`}
                             >
-                              <Heart className={`w-3.5 h-3.5 ${favorites?.includes(plant.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
+                              <Heart className={`w-3.5 h-3.5 ${favorites?.includes(plant._id) ? 'fill-rose-500 text-rose-500' : ''}`} />
                             </button>
                          </div>
                          <div className="px-1.5 pb-2 space-y-2 flex flex-col justify-between flex-grow">
@@ -245,8 +311,9 @@ export default function NurseryDetailPage() {
                              onClick={(e) => {
                                e.preventDefault();
                                e.stopPropagation();
+                               if (!user) { router.push('/login'); return; }
                                addItem({
-                                 id: plant.id,
+                                 id: plant._id,
                                  name: plant.name,
                                  price: plant.price,
                                  image: plant.images?.[0] || '',
@@ -262,8 +329,9 @@ export default function NurseryDetailPage() {
                              onClick={(e) => {
                                e.preventDefault();
                                e.stopPropagation();
+                               if (!user) { router.push('/login'); return; }
                                addItem({
-                                 id: plant.id,
+                                 id: plant._id,
                                  name: plant.name,
                                  price: plant.price,
                                  image: plant.images?.[0] || '',
@@ -293,7 +361,7 @@ export default function NurseryDetailPage() {
               className="grid grid-cols-1 lg:grid-cols-3 gap-12"
             >
                <div className="lg:col-span-2 space-y-8">
-                  {reviews.map((review) => (
+                  {reviews.slice(0, visibleReviewsCount).map((review) => (
                     <div key={review.id} className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm space-y-6">
                        <div className="flex items-start justify-between">
                           <div className="flex items-center gap-4">
@@ -317,6 +385,14 @@ export default function NurseryDetailPage() {
                        </div>
                     </div>
                   ))}
+                  {visibleReviewsCount < reviews.length && (
+                     <button 
+                       onClick={() => setVisibleReviewsCount(prev => prev + 3)}
+                       className="w-full py-4 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors border-2 border-slate-100 rounded-2xl hover:border-slate-200 border-dashed cursor-pointer"
+                     >
+                       Load More Reviews
+                     </button>
+                   )}
                </div>
 
                <div className="space-y-8">
@@ -325,10 +401,16 @@ export default function NurseryDetailPage() {
                      <div className="space-y-4 relative z-10">
                         <Award className="w-12 h-12 text-emerald-400" />
                         <h3 className="text-3xl font-display font-bold">Trusted Expert</h3>
-                        <p className="text-slate-400 text-sm font-medium leading-relaxed italic">This nursery has maintained a 4.5+ rating for over 12 consecutive months.</p>
+                        <p className="text-slate-400 text-sm font-medium leading-relaxed italic">This nursery has maintained a {averageRating} rating from our community.</p>
                      </div>
                      <button 
-                        onClick={() => setShowReviewForm(true)}
+                        onClick={() => {
+                          if (!user) {
+                            router.push('/login');
+                            return;
+                          }
+                          setShowReviewForm(true);
+                        }}
                         className="w-full bg-white text-slate-900 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all shadow-lg hover:shadow-emerald-500/30"
                      >
                         Write a Review
@@ -468,7 +550,9 @@ export default function NurseryDetailPage() {
                 className="relative w-full max-w-2xl z-10"
               >
                 <SellerReviewForm 
+                  sellerId={nursery.id}
                   sellerName={nursery.shopName} 
+                  userName={user?.name || user?.shopName || 'You'}
                   onClose={() => setShowReviewForm(false)}
                   onSubmitSuccess={handleReviewSubmit}
                 />

@@ -5,12 +5,14 @@ import { Star, Send, X, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface SellerReviewFormProps {
+  sellerId: string;
   sellerName: string;
+  userName?: string;
   onClose?: () => void;
   onSubmitSuccess?: (review: any) => void;
 }
 
-export default function SellerReviewForm({ sellerName, onClose, onSubmitSuccess }: SellerReviewFormProps) {
+export default function SellerReviewForm({ sellerId, sellerName, userName, onClose, onSubmitSuccess }: SellerReviewFormProps) {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
@@ -23,23 +25,28 @@ export default function SellerReviewForm({ sellerName, onClose, onSubmitSuccess 
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const newReview = {
-      id: Date.now(),
-      author: 'You', // In a real app, this would be the logged-in user
-      rating,
-      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-      comment
-    };
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    
-    if (onSubmitSuccess) {
-      onSubmitSuccess(newReview);
+    try {
+      const res = await fetch(`/api/sellers/${sellerId}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating, comment, author: userName || 'You' })
+      });
+      
+      if (!res.ok) throw new Error('Failed to submit review');
+      const data = await res.json();
+      
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      
+      if (onSubmitSuccess) {
+        onSubmitSuccess(data.review);
+      }
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+      return;
     }
+    
 
     // Auto close after 2 seconds if requested
     if (onClose) {

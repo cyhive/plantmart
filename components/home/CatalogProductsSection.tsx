@@ -189,6 +189,7 @@ export function CatalogProductsSection() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
+                          if (!user) { router.push('/login'); return; }
                           addItem({ id: product._id, name: product.name, price: product.price, image, quantity: 1, seller });
                         }}
                         className="flex-1 bg-emerald-50 text-emerald-700 h-9 rounded-lg flex items-center justify-center hover:bg-emerald-100 transition-colors border border-emerald-500/10 text-[9px] font-bold cursor-pointer"
@@ -199,6 +200,7 @@ export function CatalogProductsSection() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
+                          if (!user) { router.push('/login'); return; }
                           addItem({ id: product._id, name: product.name, price: product.price, image, quantity: 1, seller });
                           router.push('/cart');
                         }}

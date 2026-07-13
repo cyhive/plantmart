@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const journalCategories = [
   { id: 'all', name: 'All Guides', icon: <Leaf className="w-5 h-5" /> },
@@ -48,7 +49,7 @@ const articles = [
     category: 'sunlight',
     title: 'Decoding Light Levels: From Low to Bright Indirect',
     excerpt: 'North-facing? South-facing? We break down what these terms actually mean for your leafy friends.',
-    image: 'https://images.unsplash.com/photo-1512428813824-f7139c82b346?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1416879598056-0c8227656910?auto=format&fit=crop&q=80&w=800',
     author: 'Sun Specialist',
     readTime: '8 min read',
     date: 'May 10, 2024'
@@ -78,7 +79,7 @@ const articles = [
     category: 'repotting',
     title: 'Is Your Plant Root-Bound? Signs to Look For',
     excerpt: 'Repotting at the wrong time can cause shock. Learn how to identify when it is truly time for a new home.',
-    image: 'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80&w=800',
     author: 'Soil Scientist',
     readTime: '7 min read',
     date: 'May 02, 2024'
@@ -114,16 +115,15 @@ export default function CareJournalPage() {
 
       {/* Hero Section */}
       <section className="relative h-[500px] md:h-[600px] rounded-[60px] overflow-hidden group">
-        <img 
-          src={featuredArticle?.image} 
-          alt={featuredArticle?.title} 
-          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-        />
+        <Image src={featuredArticle?.image || ''} 
+          alt={featuredArticle?.title || 'Featured'} 
+          className="object-cover transition-transform duration-1000 group-hover:scale-105" fill />
         <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/20 to-transparent" />
         
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 space-y-6">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
+
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-3"
           >
@@ -210,11 +210,9 @@ export default function CareJournalPage() {
               className="group bg-white rounded-[48px] border border-slate-100 overflow-hidden hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] transition-all duration-700 flex flex-col"
             >
               <div className="relative h-64 overflow-hidden">
-                <img 
-                  src={article.image} 
+                <Image src={article.image} 
                   alt={article.title} 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                />
+                  className="object-cover group-hover:scale-110 transition-transform duration-1000" fill />
                 <div className="absolute top-6 left-6">
                   <span className="px-4 py-1.5 glass rounded-full text-[10px] font-black uppercase tracking-widest text-emerald-900 border-white/40">
                     {article.category}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
+import Image from 'next/image';
 import { 
   Package, 
   Search, 
@@ -183,7 +184,7 @@ export default function AdminProductsPage() {
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-                          <img src={product.images[0]} className="w-full h-full object-cover" alt="" />
+                          <Image src={product.images[0]} className="object-cover" alt="" fill />
                         </div>
                         <div>
                           <p className="font-bold text-slate-900">{product.name}</p>

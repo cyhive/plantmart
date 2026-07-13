@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Leaf, ArrowRight, Truck, ShieldCheck, Zap, Star, Quote, Mail, ShoppingBag, Store, MapPin, CheckCircle2, Droplets, Sun, Wind, Home, Trees, Sprout, HeartPulse, Box, Heart, Tag, Gift, Clock, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
 import { CatalogProductsSection } from '@/components/home/CatalogProductsSection';
@@ -23,7 +24,7 @@ const heroSlides = [
     title: 'Indoor',
     highlight: 'Sanctuary',
     desc: 'Transform your bedroom into a tropical paradise with our hard-to-kill indoor collection.',
-    image: 'https://images.unsplash.com/photo-1512428813824-f7139c82b346?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1416879598056-0c8227656910?auto=format&fit=crop&q=80&w=800',
     color: 'teal'
   },
   {
@@ -31,7 +32,7 @@ const heroSlides = [
     title: 'Exotic',
     highlight: 'Botanicals',
     desc: 'Limited edition variegated plants for the serious collector. Hand-delivered with extreme care.',
-    image: 'https://images.unsplash.com/photo-1597055181300-e3633a207519?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80&w=800',
     color: 'lime'
   },
   {
@@ -187,9 +188,11 @@ export default function HomePage() {
                 <div className="relative group">
                   <div className={`absolute inset-0 bg-${slide.color}-500/20 blur-[120px] rounded-full group-hover:bg-${slide.color}-400/30 transition-colors duration-1000`} />
                   <div className="relative z-10 p-4 bg-white/5 rounded-[96px] backdrop-blur-sm border border-white/10 shadow-2xl">
-                    <img
+                    <Image
                       src={slide.image}
                       alt={slide.title}
+                      width={400}
+                      height={500}
                       className="w-[280px] h-[350px] md:w-[400px] md:h-[500px] object-cover rounded-[70px] shadow-2xl border-4 border-white/20 transform group-hover:scale-[1.02] transition-transform duration-700"
                     />
                   </div>
@@ -220,7 +223,7 @@ export default function HomePage() {
                       <div className="flex -space-x-3">
                         {[1, 2, 3].map(i => (
                           <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden">
-                            <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="User" />
+                            <Image src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="User" width={32} height={32} />
                           </div>
                         ))}
                       </div>
@@ -422,7 +425,7 @@ export default function HomePage() {
                 className="group bg-white rounded-[48px] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 h-full"
               >
                 <div className="relative h-64 overflow-hidden">
-                  <img src={nursery.image} alt={nursery.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <Image src={nursery.image} alt={nursery.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 via-transparent to-transparent" />
                   <div className="absolute bottom-6 left-8 right-8 text-white space-y-1">
                     <h3 className="text-2xl font-bold">{nursery.name}</h3>
@@ -487,7 +490,7 @@ export default function HomePage() {
 
           <div className="relative">
             <div className="aspect-[4/5] rounded-[80px] overflow-hidden border-8 border-white/10 relative z-10 group">
-              <img src="https://images.unsplash.com/photo-1512428813824-f7139c82b346?auto=format&fit=crop&q=80&w=800" alt="Plant Care" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+              <Image src="https://images.unsplash.com/photo-1416879598056-0c8227656910?auto=format&fit=crop&q=80&w=800" alt="Plant Care" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
               <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent opacity-60" />
               <div className="absolute bottom-12 left-12 right-12">
                 <div className="glass p-8 rounded-[32px] border-white/20">

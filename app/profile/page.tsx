@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const offerStyles = [
   { color: 'emerald', icon: <Tag className="w-10 h-10" />, badge: 'Limited Time' },
@@ -173,7 +174,7 @@ export default function ProfilePage() {
             <div className="relative group">
               <div className="w-40 h-40 rounded-[40px] bg-slate-100 border-4 border-white shadow-xl overflow-hidden flex items-center justify-center relative">
                 {user.avatar ? (
-                  <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                  <Image src={user.avatar} alt="" className="object-cover" fill />
                 ) : (
                   <User className="w-16 h-16 text-slate-300" />
                 )}
@@ -431,7 +432,7 @@ export default function ProfilePage() {
                        <div className="flex-grow flex items-center justify-center md:justify-start gap-2 overflow-x-auto px-4 py-2 scrollbar-none">
                          {order.items?.slice(0, 4).map((item: any) => (
                            <div key={item.productId} className="flex-shrink-0 w-12 h-12 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 relative group/item">
-                             <img src={item.productImage || ''} alt={item.productName} className="w-full h-full object-cover" />
+                             <Image src={item.productImage || ''} alt={item.productName} className="object-cover" fill />
                              <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center justify-center text-[10px] font-bold text-white">
                                x{item.quantity}
                              </div>
@@ -493,7 +494,7 @@ export default function ProfilePage() {
                               <div className="space-y-4">
                                 {order.items?.map((item: any) => (
                                   <div key={item.productId} className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                                    <img src={item.productImage || ''} alt={item.productName} className="w-16 h-16 rounded-xl object-cover bg-slate-50" />
+                                    <Image src={item.productImage || ''} alt={item.productName} className="w-16 h-16 rounded-xl object-cover bg-slate-50" width={100} height={100} />
                                     <div className="flex-grow">
                                       <p className="font-bold text-slate-900">{item.productName}</p>
                                       <p className="text-xs text-slate-500 font-medium">Qty: {item.quantity}</p>
@@ -581,10 +582,10 @@ export default function ProfilePage() {
                     return (
                       <div key={fav.id} className="group relative bg-white rounded-[32px] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/5 hover:-translate-y-1 transition-all duration-500 overflow-hidden flex flex-col">
                         <div className="relative aspect-[4/3] overflow-hidden bg-slate-50 m-2 rounded-[24px]">
-                          <img 
-                            src={product.images?.[0] || '/images/default-plant.png'} 
+                          <Image src={product.images?.[0] || '/images/default-plant.png'} 
                             alt={product.name} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                            className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                            fill
                             onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1416879598056-0c8227656910?w=800&auto=format&fit=crop&q=80'; }}
                           />
                           <div className="absolute inset-0 bg-linear-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />

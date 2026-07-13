@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
+import Image from 'next/image';
 import { 
   Store, 
   Mail, 
@@ -93,7 +94,7 @@ export default function SellerSettingsPage() {
     <div className="min-h-screen bg-slate-50/50 pb-20">
       {/* Immersive Header Backdrop - Matches Nursery Detail Page style */}
       <div className="relative h-[30vh] overflow-hidden">
-        <img src={formData.image} alt="" className="w-full h-full object-cover blur-[2px] opacity-40" />
+        <Image src={formData.image} alt="" className="object-cover blur-[2px] opacity-40" fill />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-50/0 to-slate-50" />
       </div>
 
@@ -116,7 +117,7 @@ export default function SellerSettingsPage() {
               <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-xl text-center space-y-6">
                 <div className="relative w-40 h-40 mx-auto group">
                   <div className="w-full h-full bg-emerald-50 rounded-[32px] flex items-center justify-center border-4 border-white shadow-inner overflow-hidden">
-                    <img src={formData.image} alt="Shop Preview" className="w-full h-full object-cover" />
+                    <Image src={formData.image} alt="Shop Preview" className="object-cover" fill />
                   </div>
                   <button type="button" className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-[32px] flex items-center justify-center text-white">
                     <Camera className="w-8 h-8" />
@@ -309,7 +310,7 @@ export default function SellerSettingsPage() {
                         }`}>
                           <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm flex-shrink-0 relative overflow-hidden group-hover:scale-105 transition-transform">
                             {formData.idProof && formData.idProof.startsWith('data:image') ? (
-                              <img src={formData.idProof} alt="ID Proof Preview" className="w-full h-full object-cover" />
+                              <Image src={formData.idProof} alt="ID Proof Preview" className="object-cover" fill />
                             ) : (
                               <FileCheck className="w-6 h-6" />
                             )}

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 // Mock data for nurseries - expanded version of the home page data
 const allNurseries = [
@@ -236,7 +237,7 @@ export default function SellersPage() {
               >
                 {/* Visual Header */}
                 <div className="relative h-64 overflow-hidden">
-                  <img src={nursery.image} alt={nursery.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                  <Image src={nursery.image} alt={nursery.name} className="object-cover group-hover:scale-110 transition-transform duration-1000" fill />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
                   
                   {/* Category Tag */}

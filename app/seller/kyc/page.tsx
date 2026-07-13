@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'motion/react';
+import Image from 'next/image';
 import { 
   ShieldCheck, 
   UploadCloud, 
@@ -201,7 +202,7 @@ export default function SellerKYCPage() {
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     {formData.documentUrls.map((url, idx) => (
                       <div key={idx} className="relative aspect-video rounded-xl overflow-hidden shadow-sm border border-emerald-200">
-                        <img src={url} alt={`Doc ${idx}`} className="w-full h-full object-cover" />
+                        <Image src={url} alt={`Doc ${idx}`} className="object-cover" fill />
                         {!isReadOnly && (
                           <button 
                             type="button" 

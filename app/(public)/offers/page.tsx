@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Tag, Sparkles, Clock, Copy, ArrowRight, IndianRupee } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type PublicPromotion = {
   id: string;
@@ -143,7 +144,7 @@ export default function OffersPage() {
                       className="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm group"
                     >
                       <div className="relative aspect-square rounded-2xl overflow-hidden mb-4">
-                        <img src={disc.productImage} alt={disc.productName} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                        <Image src={disc.productImage} alt={disc.productName} className="object-cover group-hover:scale-110 transition-transform duration-700" fill />
                         <div className="absolute top-3 left-3 bg-red-500 text-white px-2.5 py-1 rounded-lg text-xs font-black shadow-lg">
                           {disc.discountType === 'percentage' ? `${disc.discountValue}% OFF` : `₹${disc.discountValue} OFF`}
                         </div>

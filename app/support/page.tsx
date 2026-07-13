@@ -21,6 +21,7 @@ import {
   MapPin
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const helpCategories = [
   {
@@ -264,11 +265,9 @@ export default function SupportPage() {
 
             <div className="relative">
               <div className="aspect-[4/5] rounded-[60px] overflow-hidden border-8 border-white/10 shadow-2xl relative z-10">
-                <img 
-                  src="/nursery_customer_support_1778929357327.png" 
+                <Image src="/nursery_customer_support_1778929357327.png" 
                   alt="Customer Support" 
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                />
+                  className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" fill />
               </div>
               {/* Stats overlay */}
               <div className="absolute -bottom-10 -left-10 bg-white p-10 rounded-[40px] z-20 shadow-2xl border border-slate-100 hidden md:block">

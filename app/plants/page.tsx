@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import Image from 'next/image';
 
 interface Seller {
   _id: string;
@@ -427,7 +428,7 @@ function CatalogPageContent() {
                           className={`flex items-center gap-3 w-full p-2 rounded-xl transition-all border ${filters.sellerId === seller._id ? 'bg-emerald-50 border-emerald-200' : 'border-transparent hover:bg-slate-50'}`}
                         >
                           <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-[10px] overflow-hidden flex-shrink-0">
-                            {seller.avatar ? <img src={seller.avatar} className="w-full h-full object-cover" alt="" /> : seller.shopName.charAt(0)}
+                            {seller.avatar ? <Image src={seller.avatar} className="object-cover" alt="" fill /> : seller.shopName.charAt(0)}
                           </div>
                           <div className="text-left overflow-hidden">
                             <p className={`text-[10px] font-black uppercase tracking-tight truncate ${filters.sellerId === seller._id ? 'text-emerald-900' : 'text-slate-700'}`}>{seller.shopName}</p>
@@ -542,11 +543,9 @@ function CatalogPageContent() {
                     className="group relative bg-white rounded-2xl border border-slate-100 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden h-full"
                   >
                     <div className="relative aspect-square overflow-hidden m-1.5 rounded-xl bg-slate-50 flex-shrink-0">
-                      <img
-                        src={product.images[0] || 'https://via.placeholder.com/400x400?text=No+Image'}
+                      <Image src={product.images[0] || 'https://via.placeholder.com/400x400?text=No+Image'}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                      />
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" fill />
                       
                       <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
                         <div className="glass px-2.5 py-0.5 rounded-full text-[7.5px] font-black text-emerald-900 uppercase tracking-widest shadow-xs backdrop-blur-md border border-white/40">
@@ -624,6 +623,7 @@ function CatalogPageContent() {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
+                              if (!user) { router.push('/login'); return; }
                               addItem({
                                 id: product._id,
                                 name: product.name,
@@ -641,6 +641,7 @@ function CatalogPageContent() {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
+                              if (!user) { router.push('/login'); return; }
                               addItem({
                                 id: product._id,
                                 name: product.name,

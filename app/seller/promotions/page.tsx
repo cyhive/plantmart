@@ -24,6 +24,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import Image from 'next/image';
 
 // Products are fetched dynamically from the API
 
@@ -649,7 +650,7 @@ export default function SellerPromotionsPage() {
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 flex-shrink-0 shadow-sm border border-slate-200/50">
-                          <img src={disc.productImage} className="w-full h-full object-cover" alt="" />
+                          <Image src={disc.productImage} className="object-cover" alt="" fill />
                         </div>
                         <div>
                           <p className="font-bold text-slate-900 text-sm group-hover:text-emerald-700 transition-colors">{disc.productName}</p>

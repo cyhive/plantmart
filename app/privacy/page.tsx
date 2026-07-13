@@ -14,6 +14,7 @@ import {
   Leaf
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const sections = [
   {
@@ -47,11 +48,9 @@ export default function PrivacyPage() {
       <section className="relative pt-32 pb-24 overflow-hidden mesh-gradient">
         <div className="absolute inset-0 bg-slate-900/40 z-10" />
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/botanical_security_privacy_1778930003593.png" 
+          <Image src="/botanical_security_privacy_1778930003593.png" 
             alt="Privacy Security" 
-            className="w-full h-full object-cover"
-          />
+            className="object-cover" fill />
         </div>
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 text-center space-y-8">

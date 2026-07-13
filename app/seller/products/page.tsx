@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
+import Image from 'next/image';
 import { 
   Package, 
   Plus, 
@@ -327,8 +328,8 @@ export default function SellerProductsPage() {
                   <tr key={product._id} className="group border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-                          <img src={product.images[0] || 'https://via.placeholder.com/100'} className="w-full h-full object-cover" alt="" />
+                        <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                          <Image src={product.images[0] || 'https://via.placeholder.com/100'} className="object-cover" alt="" fill />
                         </div>
                         <div>
                           <p className="font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">{product.name}</p>
@@ -506,7 +507,7 @@ export default function SellerProductsPage() {
                         <div className={`w-full h-40 border-2 border-dashed rounded-[32px] flex flex-col items-center justify-center transition-all ${formData.images[0] ? 'border-emerald-500/50 bg-emerald-50/30' : 'border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-emerald-300'}`}>
                           {formData.images[0] ? (
                             <div className="relative w-full h-full p-2">
-                              <img src={formData.images[0]} alt="Preview" className="w-full h-full object-cover rounded-2xl" />
+                              <Image src={formData.images[0]} alt="Preview" className="object-cover rounded-2xl" fill />
                               <button 
                                 type="button"
                                 onClick={() => setFormData({...formData, images: ['']})}

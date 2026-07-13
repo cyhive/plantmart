@@ -1,0 +1,64 @@
+import { NextResponse } from 'next/server';
+import { getDb } from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
+
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    
+    if (!ObjectId.isValid(id)) {
+      return NextResponse.json({ error: 'Invalid seller ID' }, { status: 400 });
+    }
+
+    const db = await getDb();
+    const reviews = await db.collection('sellerReviews').find({ sellerId: id }).sort({ createdAt: -1 }).toArray();
+
+    return NextResponse.json({ reviews });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Failed to load seller reviews' }, { status: 500 });
+  }
+}
+
+export async function POST(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    
+    if (!ObjectId.isValid(id)) {
+      return NextResponse.json({ error: 'Invalid seller ID' }, { status: 400 });
+    }
+
+    const { author, rating, comment } = await req.json();
+
+    if (!rating || !comment) {
+      return NextResponse.json({ error: 'Rating and comment are required' }, { status: 400 });
+    }
+
+    const db = await getDb();
+    const newReview = {
+      sellerId: id,
+      author: author || 'Anonymous',
+      rating,
+      comment,
+      createdAt: new Date(),
+    };
+
+    const result = await db.collection('sellerReviews').insertOne(newReview);
+    
+    return NextResponse.json({ 
+      review: { 
+        _id: result.insertedId,
+        ...newReview 
+      } 
+    }, { status: 201 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Failed to add review' }, { status: 500 });
+  }
+}

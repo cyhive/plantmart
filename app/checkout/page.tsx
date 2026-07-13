@@ -19,6 +19,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import Image from 'next/image';
 
 function CheckoutContent() {
   const router = useRouter();
@@ -244,7 +245,7 @@ function CheckoutContent() {
                 {items.map(item => (
                   <div key={item.id} className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-2xl bg-white/10 overflow-hidden flex-shrink-0">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <Image src={item.image} alt={item.name} className="object-cover" fill />
                     </div>
                     <div className="flex-grow">
                       <h3 className="text-sm font-bold leading-tight line-clamp-1">{item.name}</h3>

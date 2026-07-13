@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { 
   ShoppingBag, 
   Clock, 
@@ -84,8 +85,8 @@ const OrderCard = ({ order, onApprove, onUpdateStatus }: OrderProps) => {
           <div className="space-y-4">
             {order.items?.map((item: any, index: number) => (
               <div key={index} className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 shadow-sm flex-shrink-0">
-                  <img src={item.productImage || ''} className="w-full h-full object-cover" alt={item.productName} />
+                <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 shadow-sm flex-shrink-0">
+                  <Image src={item.productImage || ''} className="object-cover" alt={item.productName} fill />
                 </div>
                 <div className="flex-grow">
                   <p className="font-bold text-slate-900 text-sm">{item.productName}</p>

@@ -185,11 +185,19 @@ export default function ProductDetailPage() {
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
   const [isZoomed, setIsZoomed] = useState(false);
 
-  const [reviews, setReviews] = useState([
-    { id: 1, author: 'Priya S.', rating: 5, date: 'October 12, 2025', comment: 'Absolutely beautiful plant! Arrived in perfect condition and the packaging was very secure. Highly recommend this nursery.', helpfulCount: 12, userClickedHelpful: false },
-    { id: 2, author: 'Rahul K.', rating: 4, date: 'September 28, 2025', comment: 'Healthy plant, but it took a bit longer to arrive than expected. Otherwise, very happy with the purchase.', helpfulCount: 4, userClickedHelpful: false },
-    { id: 3, author: 'Anita M.', rating: 5, date: 'September 15, 2025', comment: 'Thriving beautifully in my living room. The care instructions provided were very helpful for a beginner like me.', helpfulCount: 8, userClickedHelpful: false },
-  ]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
+
+  const totalReviews = reviews.length;
+  const averageRating = totalReviews > 0 
+    ? (reviews.reduce((acc, rev) => acc + rev.rating, 0) / totalReviews).toFixed(1)
+    : '0.0';
+
+  const getRatingPercentage = (rating: number) => {
+    if (totalReviews === 0) return 0;
+    const count = reviews.filter(r => r.rating === rating).length;
+    return Math.round((count / totalReviews) * 100);
+  };
 
   const [userAddress, setUserAddress] = useState<any>(null);
 
@@ -218,7 +226,10 @@ export default function ProductDetailPage() {
     (async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/catalog/products/${encodeURIComponent(productId)}`);
+        const [res, reviewsRes] = await Promise.all([
+          fetch(`/api/catalog/products/${encodeURIComponent(productId)}`),
+          fetch(`/api/products/${encodeURIComponent(productId)}/reviews`)
+        ]);
         const data = await res.json().catch(() => ({}));
         if (cancelled) return;
         if (!res.ok || !data.product) {
@@ -228,6 +239,21 @@ export default function ProductDetailPage() {
         setProduct(catalogToDetailProduct(data.product));
         setActiveImage(0);
         setQuantity(1);
+
+        if (reviewsRes.ok) {
+          const reviewsData = await reviewsRes.json();
+          setReviews(
+            (reviewsData.reviews || []).map((r: any) => ({
+              id: r._id,
+              author: r.author,
+              rating: r.rating,
+              date: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+              comment: r.comment,
+              helpfulCount: 0,
+              userClickedHelpful: false
+            }))
+          );
+        }
       } catch {
         if (!cancelled) setProduct(null);
       } finally {
@@ -294,10 +320,16 @@ export default function ProductDetailPage() {
   };
 
   const handleReviewSubmit = (newReview: any) => {
-    setReviews([
-      { ...newReview, helpfulCount: 0, userClickedHelpful: false },
-      ...reviews
-    ]);
+    const formattedReview = {
+      id: newReview._id || Date.now(),
+      author: newReview.author,
+      rating: newReview.rating,
+      date: new Date(newReview.createdAt || new Date()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      comment: newReview.comment,
+      helpfulCount: 0,
+      userClickedHelpful: false
+    };
+    setReviews([formattedReview, ...reviews]);
   };
 
   if (loading) return (
@@ -717,32 +749,48 @@ export default function ProductDetailPage() {
                       <div className="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto">
 
                         <div className="text-center space-y-1 pr-0 sm:pr-8 border-r-0 sm:border-r border-slate-200 w-full sm:w-auto">
-                          <div className="text-6xl font-display font-black text-slate-900">{product.ratings.average}</div>
+                          <div className="text-6xl font-display font-black text-slate-900">{averageRating}</div>
                           <div className="flex text-amber-400 justify-center">
-                            {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.floor(product.ratings.average) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />)}
+                            {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.floor(parseFloat(averageRating)) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />)}
                           </div>
-                          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">Based on {product.ratings.count} ratings</p>
+                          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">Based on {totalReviews} ratings</p>
                         </div>
 
                         <div className="flex-grow space-y-2 w-full max-w-xs">
-                          {[5, 4, 3, 2, 1].map(rating => (
-                            <div key={rating} className="flex items-center gap-4 text-xs font-semibold">
-                              <span className="text-slate-500 w-6 flex items-center gap-0.5">{rating} <Star className="w-3 h-3 text-amber-400 fill-amber-400" /></span>
-                              <div className="flex-grow h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-amber-400 rounded-full"
-                                  style={{ width: `${rating === 5 ? 85 : rating === 4 ? 10 : rating === 3 ? 3 : 2}%` }}
-                                />
+                          {[5, 4, 3, 2, 1].map(rating => {
+                            const percent = getRatingPercentage(rating);
+                            return (
+                              <div key={rating} className="flex items-center gap-4 text-xs font-semibold">
+                                <span className="text-slate-500 w-6 flex items-center gap-0.5">{rating} <Star className="w-3 h-3 text-amber-400 fill-amber-400" /></span>
+                                <div className="flex-grow h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-amber-400 rounded-full transition-all duration-500"
+                                    style={{ width: `${percent}%` }}
+                                  />
+                                </div>
+                                <span className="text-slate-400 w-8 text-right">{percent}%</span>
                               </div>
-                              <span className="text-slate-400 w-8 text-right">{rating === 5 ? '85%' : rating === 4 ? '10%' : rating === 3 ? '3%' : '2%'}</span>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
+                      
+                      <button 
+                        onClick={() => {
+                          if (!user) {
+                            router.push('/login');
+                            return;
+                          }
+                          setShowReviewForm(true);
+                        }}
+                        className="bg-slate-900 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-colors shadow-lg hover:shadow-emerald-500/30 w-full md:w-auto"
+                      >
+                        Write a Review
+                      </button>
                     </div>
 
                     <div className="space-y-6">
-                      {reviews.map(review => (
+                      {reviews.slice(0, visibleReviewsCount).map(review => (
                         <div key={review.id} className="p-8 bg-white rounded-[32px] border border-slate-100 shadow-xs space-y-4">
                           <div className="flex items-start justify-between flex-wrap gap-4">
                             <div className="flex items-center gap-4">
@@ -764,9 +812,14 @@ export default function ProductDetailPage() {
                           </div>
                         </div>
                       ))}
-                      <button className="w-full py-4 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors border-2 border-slate-100 rounded-2xl hover:border-slate-200 border-dashed cursor-pointer">
-                        Load More Reviews
-                      </button>
+                      {visibleReviewsCount < reviews.length && (
+                        <button 
+                          onClick={() => setVisibleReviewsCount(prev => prev + 3)}
+                          className="w-full py-4 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors border-2 border-slate-100 rounded-2xl hover:border-slate-200 border-dashed cursor-pointer"
+                        >
+                          Load More Reviews
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -936,7 +989,9 @@ export default function ProductDetailPage() {
               className="relative w-full max-w-3xl z-10"
             >
               <ProductReviewForm
+                productId={product._id}
                 productName={product.name}
+                userName={user?.name || user?.shopName || 'You'}
                 onClose={() => setShowReviewForm(false)}
                 onSubmitSuccess={handleReviewSubmit}
               />

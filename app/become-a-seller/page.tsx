@@ -22,6 +22,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { registerAccount } from '@/lib/auth/register-client';
+import Image from 'next/image';
 
 const steps = [
   { id: 1, title: 'Identity', icon: User },
@@ -436,7 +437,7 @@ export default function BecomeSellerPage() {
                       >
                         {formData.shopImage ? (
                           <>
-                            <img src={formData.shopImage} alt="Shop Preview" className="w-full h-full object-cover" />
+                            <Image src={formData.shopImage} alt="Shop Preview" className="object-cover" fill />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                               <Upload className="w-8 h-8 text-white" />
                             </div>

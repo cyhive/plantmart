@@ -17,6 +17,7 @@ import {
   Clock3
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Component logic extracted so we can wrap it in Suspense for useSearchParams
 function TrackOrderContent() {
@@ -152,11 +153,9 @@ function TrackOrderContent() {
       <section className="relative pt-32 pb-20 overflow-hidden mesh-gradient">
         <div className="absolute inset-0 bg-slate-900/60 z-10" />
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/botanical_delivery_tracking_1778929633492.png" 
+          <Image src="/botanical_delivery_tracking_1778929633492.png" 
             alt="Delivery Tracking" 
-            className="w-full h-full object-cover"
-          />
+            className="object-cover" fill />
         </div>
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 text-center space-y-12">

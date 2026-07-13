@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Leaf, Sprout, ShieldCheck, HeartPulse, Globe, Users, ArrowRight, Star, Quote, ChevronDown, Sparkles, Trophy } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const stats = [
   { label: 'Verified Nurseries', value: '150+', icon: <ShieldCheck className="w-6 h-6" /> },
@@ -113,10 +114,11 @@ export default function AboutPage() {
           transition={{ duration: 2 }}
           className="absolute inset-0 z-0"
         >
-          <img 
+          <Image 
             src="/botanical_story_hero_1778924083538.png" 
             alt="Lush Garden" 
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         </motion.div>
 
@@ -212,10 +214,11 @@ export default function AboutPage() {
             className="relative"
           >
             <div className="aspect-square rounded-[60px] overflow-hidden border-8 border-white shadow-2xl relative z-10">
-              <img 
+              <Image 
                 src="/nursery_owner_handshake_1778924104492.png" 
                 alt="The Seed" 
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
               />
             </div>
             <div className="absolute -bottom-10 -right-10 glass p-10 rounded-[40px] z-20 max-w-xs border border-emerald-100 hidden md:block">

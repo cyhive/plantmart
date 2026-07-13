@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import { MapPin, Crosshair } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents, ZoomControl } from 'react-leaflet';
+import { MapPin, Crosshair, Search } from 'lucide-react';
 import L from 'leaflet';
 
 // Fix Leaflet marker missing icon issue
@@ -29,17 +29,57 @@ export default function AddressMap({ address, setAddress, setActiveTab, handleGe
     ? [address.coordinates.lat, address.coordinates.lng] 
     : defaultCenter;
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(async () => {
+      if (searchQuery.trim().length > 2) {
+        setIsSearching(true);
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&addressdetails=1`);
+          const data = await res.json();
+          setSuggestions(data || []);
+        } catch (err) {
+          console.error('Failed to fetch suggestions', err);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        setSuggestions([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  const handleSelectSuggestion = (suggestion: any) => {
+    setSearchQuery(suggestion.display_name);
+    setSuggestions([]);
+    fetchAddressDetails(parseFloat(suggestion.lat), parseFloat(suggestion.lon));
+  };
+
   const fetchAddressDetails = async (lat: number, lng: number) => {
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=en`);
       const data = await res.json();
       if (data && data.address) {
         const addr = data.address;
+        
+        const streetParts = [
+          addr.house_number,
+          addr.road || addr.street || addr.pedestrian || addr.residential || addr.path,
+          addr.suburb || addr.neighbourhood || addr.hamlet || addr.quarter
+        ].filter(Boolean);
+        
+        const fetchedStreet = streetParts.length > 0 ? streetParts.join(', ') : '';
+
         setAddress((prev: any) => ({
           ...prev,
           coordinates: { lat, lng },
-          street: addr.road || addr.suburb || addr.neighbourhood || prev.street || '',
-          city: addr.city || addr.town || addr.village || addr.county || prev.city || '',
+          street: fetchedStreet || prev.street || '',
+          city: addr.city || addr.town || addr.village || addr.county || addr.municipality || prev.city || '',
           state: addr.state || prev.state || '',
           zipCode: addr.postcode || prev.zipCode || ''
         }));
@@ -99,19 +139,69 @@ export default function AddressMap({ address, setAddress, setActiveTab, handleGe
         center={currentCoords} 
         zoom={13} 
         style={{ height: '100%', width: '100%' }}
+        zoomControl={false}
       >
+        <style>{`
+          .leaflet-left .leaflet-control {
+            margin-top: 0 !important;
+          }
+          .leaflet-top.leaflet-left {
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+          }
+        `}</style>
+        {/* We re-add zoom control to ensure it renders inside the modified top-left container */}
+        <ZoomControl position="topleft" />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <LocationMarker />
       </MapContainer>
       
-      <div className="absolute top-6 right-6 z-[1000]">
+      <div className="absolute top-6 left-4 right-4 sm:left-6 sm:right-6 z-[1000] flex flex-col sm:flex-row sm:justify-between items-start gap-4 pointer-events-none">
+        
+        {/* Search Bar Container */}
+        <div className="w-full sm:w-80 flex flex-col relative pointer-events-auto">
+          <div className="flex bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+            <input 
+              type="text" 
+              placeholder="Search location..." 
+              className="flex-1 px-4 py-3 outline-none text-sm font-medium text-slate-800 placeholder-slate-400 w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <div className="px-4 bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              {isSearching ? (
+                 <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                 <Search className="w-5 h-5" />
+              )}
+            </div>
+          </div>
+          
+          {suggestions.length > 0 && (
+            <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden max-h-60 overflow-y-auto z-50">
+              {suggestions.map((sugg, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => handleSelectSuggestion(sugg)}
+                  className="w-full text-left px-4 py-3 hover:bg-slate-50 border-b border-slate-50 last:border-0 transition-colors flex flex-col gap-0.5 cursor-pointer"
+                >
+                  <span className="text-sm font-bold text-slate-800 line-clamp-1">{sugg.name || sugg.display_name.split(',')[0]}</span>
+                  <span className="text-xs font-medium text-slate-500 line-clamp-1">{sugg.display_name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Live Location Button */}
         <button 
           onClick={onGetLiveLocation}
-          className="bg-white text-emerald-600 px-4 py-3 rounded-2xl text-sm font-bold shadow-xl flex items-center gap-2 hover:bg-emerald-50 transition-all border border-emerald-100"
+          className="bg-white text-emerald-600 px-4 py-3 rounded-2xl text-sm font-bold shadow-xl flex items-center gap-2 hover:bg-emerald-50 transition-all border border-emerald-100 pointer-events-auto self-end sm:self-auto"
         >
-          <Crosshair className="w-5 h-5" /> Live Location
+          <Crosshair className="w-5 h-5" />
         </button>
       </div>
       

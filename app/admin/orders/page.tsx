@@ -3,6 +3,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
+import Image from 'next/image';
 import { 
   ShoppingBag, 
   Search, 
@@ -218,7 +219,7 @@ export default function AdminOrdersPage() {
                                     <div className="space-y-3">
                                       {order.items?.map((item: any, i: number) => (
                                         <div key={i} className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                                          <img src={item.productImage || ''} alt={item.productName} className="w-12 h-12 rounded-xl object-cover border border-slate-200" />
+                                          <Image src={item.productImage || ''} alt={item.productName} className="w-12 h-12 rounded-xl object-cover border border-slate-200" width={100} height={100} />
                                           <div className="flex-grow">
                                             <p className="text-sm font-bold text-slate-900">{item.productName}</p>
                                             <p className="text-[10px] font-medium text-slate-500">Qty: {item.quantity} × ₹{item.price}</p>

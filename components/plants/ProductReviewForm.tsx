@@ -5,12 +5,14 @@ import { Star, Send, X, CheckCircle2, Camera, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ProductReviewFormProps {
+  productId: string;
   productName: string;
+  userName?: string;
   onClose?: () => void;
   onSubmitSuccess?: (review: any) => void;
 }
 
-export default function ProductReviewForm({ productName, onClose, onSubmitSuccess }: ProductReviewFormProps) {
+export default function ProductReviewForm({ productId, productName, userName, onClose, onSubmitSuccess }: ProductReviewFormProps) {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
@@ -24,22 +26,26 @@ export default function ProductReviewForm({ productName, onClose, onSubmitSucces
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const newReview = {
-      id: Date.now(),
-      author: 'You', 
-      rating,
-      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-      comment
-    };
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    
-    if (onSubmitSuccess) {
-      onSubmitSuccess(newReview);
+    try {
+      const res = await fetch(`/api/products/${productId}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating, comment, author: userName || 'You' })
+      });
+      
+      if (!res.ok) throw new Error('Failed to submit review');
+      const data = await res.json();
+      
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      
+      if (onSubmitSuccess) {
+        onSubmitSuccess(data.review);
+      }
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+      return;
     }
 
     // Auto close after 2 seconds if requested

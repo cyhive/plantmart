@@ -14,6 +14,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const shippingMethods = [
   {
@@ -69,11 +70,9 @@ export default function ShippingPage() {
       <section className="relative pt-32 pb-24 overflow-hidden mesh-gradient">
         <div className="absolute inset-0 bg-slate-900/40 z-10" />
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/eco_plant_shipping_packaging_1778929477070.png" 
+          <Image src="/eco_plant_shipping_packaging_1778929477070.png" 
             alt="Shipping Packaging" 
-            className="w-full h-full object-cover"
-          />
+            className="object-cover" fill />
         </div>
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 text-center space-y-8">
@@ -170,11 +169,9 @@ export default function ShippingPage() {
 
             <div className="relative">
               <div className="aspect-square rounded-[60px] overflow-hidden border-8 border-white/5 relative z-10">
-                <img 
-                  src="/eco_plant_shipping_packaging_1778929477070.png" 
+                <Image src="/eco_plant_shipping_packaging_1778929477070.png" 
                   alt="Packaging Details" 
-                  className="w-full h-full object-cover"
-                />
+                  className="object-cover" fill />
               </div>
               <div className="absolute -bottom-10 -left-10 bg-emerald-500 p-10 rounded-[40px] z-20 shadow-2xl">
                 <p className="text-emerald-950 font-display font-black text-4xl leading-tight">100%<br />Plastic Free</p>

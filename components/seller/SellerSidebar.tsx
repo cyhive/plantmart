@@ -14,7 +14,8 @@ import {
   Bell,
   Tag,
   ShieldCheck,
-  IndianRupee
+  IndianRupee,
+  Star
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'motion/react';
@@ -38,6 +39,7 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
     { href: '/seller', icon: <PieChart className="w-5 h-5" />, label: 'Overview' },
     { href: '/seller/products', icon: <Package className="w-5 h-5" />, label: 'Inventory' },
     { href: '/seller/orders', icon: <ShoppingBag className="w-5 h-5" />, label: 'Sales' },
+    { href: '/seller/reviews', icon: <Star className="w-5 h-5" />, label: 'Reviews' },
     { href: '/seller/promotions', icon: <Tag className="w-5 h-5" />, label: 'Promotions' },
     { href: '/seller/payouts', icon: <IndianRupee className="w-5 h-5" />, label: 'Payouts' },
     { href: '/seller/notifications', icon: <Bell className="w-5 h-5" />, label: 'Notifications' },

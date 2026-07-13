@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
+import Image from 'next/image';
 import { 
   Mail, 
   Phone, 
@@ -23,11 +24,9 @@ export default function ContactPage() {
       <section className="relative pt-32 pb-24 overflow-hidden mesh-gradient">
         <div className="absolute inset-0 bg-slate-900/40 z-10" />
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/botanist_consultant_contact_1778929648581.png" 
+          <Image src="/botanist_consultant_contact_1778929648581.png" 
             alt="Contact Us" 
-            className="w-full h-full object-cover"
-          />
+            className="object-cover" fill />
         </div>
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 text-center space-y-8">
