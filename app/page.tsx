@@ -119,9 +119,9 @@ export default function HomePage() {
   const slide = heroSlides[currentSlide];
 
   return (
-    <div className="space-y-32 pb-32">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative min-h-[700px] flex items-center overflow-hidden mesh-gradient">
+      <section className="relative min-h-[700px] flex items-center overflow-hidden bg-emerald-900">
         <div className="absolute inset-0 bg-slate-900/40 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative pt-12">
@@ -252,7 +252,8 @@ export default function HomePage() {
       </section>
 
       {/* Promotions & Offers Section */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 py-8">
+      <section className="bg-emerald-50 py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
   <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
     <div className="space-y-2">
       <h2 className="text-3xl font-display font-bold text-slate-900 tracking-tight">Exclusive Offers</h2>
@@ -330,11 +331,16 @@ export default function HomePage() {
       </motion.div>
     )})}
   </div>
-</section>
-      <CatalogProductsSection />
+</div>
+      </section>
+
+      <section className="bg-white py-16">
+        <CatalogProductsSection />
+      </section>
 
       {/* Features */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-green-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { icon: <Truck />, title: "Safe Delivery", desc: "Eco-friendly packaging" },
@@ -356,10 +362,12 @@ export default function HomePage() {
             </motion.div>
           ))}
         </div>
+        </div>
       </section>
 
       {/* Categories Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <section className="bg-white py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 text-center md:text-left">
           <div className="space-y-2">
             <h2 className="text-5xl font-display font-bold text-slate-900 tracking-tight">Explore Categories</h2>
@@ -400,10 +408,12 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+        </div>
       </section>
 
       {/* Meet Top Nurseries */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <section className="bg-teal-50 py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4">
             <h2 className="text-5xl font-display font-bold text-slate-900 tracking-tight">Top Rated Nurseries</h2>
@@ -449,10 +459,11 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+        </div>
       </section>
 
       {/* Plant Care Section */}
-      <section className="relative py-32 overflow-hidden bg-slate-900">
+      <section className="relative py-32 overflow-hidden bg-[#0A3834]">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_30%,#10b981_0%,transparent_50%)]" />
         </div>
@@ -506,44 +517,48 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        <div className="text-center space-y-4">
-          <h2 className="text-5xl font-display font-bold text-slate-900">What Our Gardeners Say</h2>
-          <p className="text-slate-500 text-lg font-medium">Join 50,000+ happy plant parents</p>
-        </div>
+      <section className="bg-white py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 md:space-y-16">
+          <div className="text-center space-y-3 md:space-y-4">
+            <h2 className="text-4xl md:text-5xl font-display font-black text-slate-900 tracking-tight">What Our Gardeners Say</h2>
+            <p className="text-slate-500 text-base md:text-lg font-medium">Join 50,000+ happy plant parents</p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              className="glass p-10 rounded-[40px] space-y-6 border border-white relative shadow-sm hover:shadow-2xl transition-all"
-            >
-              <Quote className="absolute top-8 right-8 w-12 h-12 text-emerald-100 -z-10" />
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, idx) => (
-                  <Star key={idx} className={`w-4 h-4 ${idx < t.stars ? 'text-amber-400 fill-amber-400' : 'text-slate-200'}`} />
-                ))}
-              </div>
-              <p className="text-slate-700 text-lg font-medium leading-relaxed italic">"{t.text}"</p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center font-black text-emerald-700">
-                  {t.name.charAt(0)}
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-8 pb-8 md:pb-0 md:grid md:grid-cols-3 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+            {testimonials.map((t, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-slate-50 p-8 md:p-10 rounded-[32px] md:rounded-[48px] space-y-6 border border-slate-100 relative hover:shadow-xl hover:-translate-y-2 hover:bg-white transition-all duration-500 w-[280px] sm:w-[320px] shrink-0 snap-center md:w-auto group overflow-hidden"
+              >
+                <Quote className="absolute top-6 right-6 w-16 h-16 text-emerald-500/5 group-hover:text-emerald-500/10 transition-colors -rotate-12" />
+                <div className="flex gap-1.5 relative z-10">
+                  {[...Array(5)].map((_, idx) => (
+                    <Star key={idx} className={`w-4 h-4 md:w-5 md:h-5 ${idx < t.stars ? 'text-amber-400 fill-amber-400' : 'text-slate-200'}`} />
+                  ))}
                 </div>
-                <div>
-                  <h4 className="font-bold text-slate-900">{t.name}</h4>
-                  <p className="text-emerald-600 text-[10px] font-black uppercase tracking-widest">{t.role}</p>
+                <p className="text-slate-700 text-base md:text-lg font-medium leading-relaxed italic relative z-10">"{t.text}"</p>
+                <div className="flex items-center gap-4 relative z-10 pt-4 border-t border-slate-200/60">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-emerald-100 flex items-center justify-center font-black text-emerald-700 text-xl shadow-inner group-hover:scale-110 transition-transform">
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 md:text-lg tracking-tight">{t.name}</h4>
+                    <p className="text-emerald-600 text-[9px] md:text-[10px] font-black uppercase tracking-widest">{t.role}</p>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
 
       {/* Newsletter */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-emerald-50 py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mesh-gradient rounded-[60px] p-12 md:p-24 relative overflow-hidden text-center space-y-10 border-4 border-white/10 shadow-2xl">
           <div className="absolute inset-0 bg-emerald-900/60 pointer-events-none" />
           <div className="relative z-10 space-y-4">
@@ -564,6 +579,7 @@ export default function HomePage() {
               Subscribe
             </button>
           </form>
+          </div>
         </div>
       </section>
     </div>

@@ -111,8 +111,8 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Search Bar */}
-            <div className="flex-grow max-w-xl mx-4">
+            {/* Search Bar (Desktop) */}
+            <div className="flex-grow max-w-xl mx-4 hidden md:block">
               <form onSubmit={handleSearch} className="relative group">
                 <input
                   type="text"
@@ -133,7 +133,7 @@ export function Navbar() {
                 <div className="w-20 h-10 bg-slate-100/50 rounded-2xl animate-pulse" />
               ) : user ? (
                 <div className="flex items-center gap-6">
-                  <div className="relative group">
+                  <div className="relative group hidden md:block">
                     <button className="flex items-center gap-3 text-sm font-bold text-slate-700 hover:text-emerald-800 transition-colors">
                       <div className="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100 group-hover:bg-emerald-100 transition-colors overflow-hidden">
                         {user.avatar ? (
@@ -194,12 +194,12 @@ export function Navbar() {
                   </div>
                 </div>
               ) : (
-                <Link href="/login" className="bg-emerald-600 text-white px-8 py-2.5 rounded-2xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 active:scale-95">
+                <Link href="/login" className="bg-emerald-600 text-white px-8 py-2.5 rounded-2xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 active:scale-95 hidden md:block">
                   Login
                 </Link>
               )}
 
-              <Link href="/cart" className="relative text-slate-600 hover:text-emerald-600 transition-all duration-300 group">
+              <Link href="/cart" className="relative text-slate-600 hover:text-emerald-600 transition-all duration-300 group hidden md:block">
                 <div className="p-2.5 rounded-2xl bg-slate-100 group-hover:bg-emerald-50 transition-colors">
                   <ShoppingCart className="w-6 h-6" />
                 </div>

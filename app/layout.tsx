@@ -5,6 +5,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { MobileTabBar } from '@/components/MobileTabBar';
 
 export const metadata: Metadata = {
   title: 'PlantMart – Multi-Vendor Plant Marketplace',
@@ -30,6 +31,7 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
+              <MobileTabBar />
             </div>
           </CartProvider>
         </AuthProvider>

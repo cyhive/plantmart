@@ -1000,7 +1000,7 @@ export default function ProductDetailPage() {
         )}
       </AnimatePresence>
       {/* Unified Floating Action Bar (Responsive) */}
-      <div className={`fixed left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-xl transition-all duration-300 pointer-events-none ${isNearBottom ? 'bottom-[-100px] opacity-0' : 'bottom-1 opacity-100'}`}>
+      <div className={`fixed left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-xl transition-all duration-300 pointer-events-none ${isNearBottom ? 'bottom-[-100px] opacity-0' : 'bottom-[4.5rem] md:bottom-4 opacity-100'}`}>
         <motion.div
           initial={{ y: 80, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

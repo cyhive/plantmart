@@ -145,7 +145,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-[85vh] flex items-center justify-center px-4 relative">
+      <div className="min-h-[85vh] flex items-center justify-center px-4 relative overflow-hidden">
         {/* Soft glowing ambient circles */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-100/30 rounded-full blur-3xl pointer-events-none -z-10" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-50/40 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -237,19 +237,19 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50/50 py-8 md:py-16 pb-24 md:pb-16 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="mb-12">
            <Breadcrumbs items={breadcrumbs} />
         </div>
         
-        <div className="flex flex-col xl:flex-row gap-16">
+        <div className="flex flex-col xl:flex-row gap-16 w-full">
           {/* Cart Items */}
-          <div className="flex-grow space-y-12">
-            <div className="flex items-end justify-between border-b-4 border-slate-100 pb-8">
-              <div className="space-y-2">
-                <h1 className="text-6xl font-display font-black text-slate-900 tracking-tighter">Botanical Bag</h1>
-                <p className="text-emerald-600 font-black uppercase tracking-[0.3em] text-[10px]">Verified Specimens Only</p>
+          <div className="flex-grow space-y-12 min-w-0 w-full">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b-4 border-slate-100 pb-6 md:pb-8 w-full">
+              <div className="space-y-1 md:space-y-2">
+                <h1 className="text-4xl md:text-6xl font-display font-black text-slate-900 tracking-tighter">Botanical Bag</h1>
+                <p className="text-emerald-600 font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[10px]">Verified Specimens Only</p>
               </div>
               <div className="text-right">
                 <p className="text-3xl font-display font-black text-slate-900 italic">{totalItems}</p>
@@ -266,11 +266,11 @@ export default function CartPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="group bg-white rounded-[56px] border border-slate-100 p-8 flex flex-col md:flex-row gap-10 hover:shadow-2xl transition-all duration-700 relative overflow-hidden"
+                    className="group bg-white rounded-[32px] md:rounded-[56px] border border-slate-100 p-5 md:p-8 flex flex-col md:flex-row gap-6 md:gap-10 hover:shadow-2xl transition-all duration-700 relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-50 rounded-bl-[120px] -z-10 opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-y-10 translate-x-10 group-hover:translate-y-0 group-hover:translate-x-0" />
                     
-                    <div className="w-full md:w-56 h-56 rounded-[40px] overflow-hidden bg-slate-50 flex-shrink-0 shadow-2xl group-hover:rotate-2 transition-transform duration-700">
+                    <div className="w-full md:w-56 h-48 md:h-56 rounded-[24px] md:rounded-[40px] overflow-hidden bg-slate-50 flex-shrink-0 shadow-xl md:shadow-2xl group-hover:rotate-2 transition-transform duration-700">
                       <img
                         src={item.image || DEFAULT_PRODUCT_IMAGE}
                         alt={item.name}
@@ -283,12 +283,12 @@ export default function CartPage() {
 
                     <div className="flex-grow flex flex-col justify-between py-2 space-y-6">
                       <div className="space-y-4">
-                        <div className="flex items-start justify-between gap-6">
-                          <div className="space-y-1">
-                            <Link href={`/plants/${normalizeCartProductId(item.id)}`}>
-                              <h3 className="text-3xl font-display font-black text-slate-900 hover:text-emerald-700 transition-colors tracking-tight italic">{item.name}</h3>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-1 min-w-0 flex-1">
+                            <Link href={`/plants/${normalizeCartProductId(item.id)}`} className="block">
+                              <h3 className="text-2xl md:text-3xl font-display font-black text-slate-900 hover:text-emerald-700 transition-colors tracking-tight italic truncate pr-2">{item.name}</h3>
                             </Link>
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-2 md:gap-3">
                                <div className="px-3 py-1 bg-slate-50 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-100">
                                   {item.seller.shopName}
                                </div>
@@ -304,7 +304,7 @@ export default function CartPage() {
                           </div>
                           <button 
                             onClick={() => removeItem(item.id)}
-                            className="p-4 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-[24px] transition-all active:scale-90 shadow-sm bg-slate-50"
+                            className="p-3 md:p-4 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-[20px] md:rounded-[24px] transition-all active:scale-90 shadow-sm bg-slate-50 flex-shrink-0"
                           >
                             <Trash2 className="w-5 h-5" />
                           </button>
@@ -332,7 +332,7 @@ export default function CartPage() {
                         </div>
                         <div className="space-y-1 text-right">
                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Subtotal</p>
-                           <div className="text-4xl font-display font-black text-emerald-900 tracking-tighter">
+                           <div className="text-3xl md:text-4xl font-display font-black text-emerald-900 tracking-tighter">
                              ₹{item.price * item.quantity}
                            </div>
                         </div>
@@ -344,9 +344,9 @@ export default function CartPage() {
             </div>
 
             {/* Premium Note */}
-            <div className="bg-slate-900 p-12 rounded-[60px] text-white flex flex-col md:flex-row items-center gap-10 relative overflow-hidden group">
+            <div className="bg-slate-900 p-8 md:p-12 rounded-[32px] md:rounded-[60px] text-white flex flex-col md:flex-row items-center gap-6 md:gap-10 relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full group-hover:bg-emerald-500/20 transition-colors" />
-               <div className="w-20 h-20 bg-emerald-500/20 rounded-[32px] flex items-center justify-center text-emerald-400 flex-shrink-0">
+               <div className="w-16 h-16 md:w-20 md:h-20 bg-emerald-500/20 rounded-[24px] md:rounded-[32px] flex items-center justify-center text-emerald-400 flex-shrink-0">
                   <Package className="w-10 h-10" />
                </div>
                <div className="space-y-2">
@@ -357,10 +357,10 @@ export default function CartPage() {
           </div>
 
           {/* Order Summary */}
-          <aside className="w-full xl:w-[450px]">
-            <div className="glass p-12 rounded-[64px] border-4 border-white shadow-2xl sticky top-28 space-y-10 backdrop-blur-3xl">
+          <aside className="w-full xl:w-[450px] max-w-full">
+            <div className="glass p-6 md:p-12 rounded-[32px] md:rounded-[64px] border-4 border-white shadow-2xl xl:sticky xl:top-28 space-y-6 md:space-y-10 backdrop-blur-3xl w-full">
               <div className="space-y-2">
-                <h2 className="text-4xl font-display font-black text-slate-900 tracking-tighter italic">Investment</h2>
+                <h2 className="text-3xl md:text-4xl font-display font-black text-slate-900 tracking-tighter italic">Investment</h2>
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Order Reference: {Math.random().toString(36).substr(2, 6).toUpperCase()}</p>
               </div>
               
@@ -394,9 +394,9 @@ export default function CartPage() {
                 
                 <div className="space-y-2">
                   <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Total Payable</p>
-                  <div className="flex items-baseline gap-2">
-                     <span className="text-2xl font-display font-black text-emerald-900">₹</span>
-                     <span className="text-6xl font-display font-black text-emerald-900 tracking-tighter">{finalTotal.toFixed(0)}</span>
+                  <div className="flex items-baseline gap-1 md:gap-2">
+                     <span className="text-xl md:text-2xl font-display font-black text-emerald-900">₹</span>
+                     <span className="text-5xl md:text-6xl font-display font-black text-emerald-900 tracking-tighter">{finalTotal.toFixed(0)}</span>
                   </div>
                 </div>
               </div>
@@ -414,12 +414,12 @@ export default function CartPage() {
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                     disabled={isCouponApplied}
-                    className="flex-grow bg-white/50 border-2 border-slate-100 rounded-2xl px-5 py-3 text-sm font-bold focus:border-emerald-500/30 focus:bg-white outline-none transition-all placeholder:text-slate-300 disabled:opacity-50"
+                    className="flex-grow w-full min-w-0 bg-white/50 border-2 border-slate-100 rounded-2xl px-4 md:px-5 py-3 text-sm font-bold focus:border-emerald-500/30 focus:bg-white outline-none transition-all placeholder:text-slate-300 disabled:opacity-50"
                   />
                   <button 
                     onClick={applyCoupon}
                     disabled={isCouponApplied || !couponCode}
-                    className="px-6 py-3 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:bg-slate-200"
+                    className="px-4 md:px-6 py-3 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:bg-slate-200 whitespace-nowrap"
                   >
                     {isCouponApplied ? 'Applied' : 'Apply'}
                   </button>
@@ -453,7 +453,7 @@ export default function CartPage() {
                         const addr = addresses.find(a => a.id === e.target.value);
                         if(addr) setSelectedAddress(addr);
                       }}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-emerald-500 transition-colors cursor-pointer appearance-none"
+                      className="w-full max-w-full truncate bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-emerald-500 transition-colors cursor-pointer appearance-none"
                     >
                       {addresses.map(a => (
                         <option key={a.id} value={a.id}>

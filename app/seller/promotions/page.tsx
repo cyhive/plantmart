@@ -125,12 +125,16 @@ export default function SellerPromotionsPage() {
         const res = await fetch('/api/products');
         const data = await res.json();
         if (res.ok && data.products) {
-          setSellerProducts(data.products.map((p: any) => ({
+          const mappedProducts = data.products.map((p: any) => ({
             _id: p.id,
             name: p.name,
             price: p.price,
             image: p.images?.[0] || 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&q=80&w=600'
-          })));
+          }));
+          setSellerProducts(mappedProducts);
+          if (mappedProducts.length > 0) {
+            setDiscountForm(prev => ({...prev, productId: mappedProducts[0]._id}));
+          }
         }
       } catch (e) {
         console.error(e);
@@ -194,7 +198,7 @@ export default function SellerPromotionsPage() {
         body: JSON.stringify({
           title: promoForm.description.substring(0, 15) || 'Promo',
           code: promoForm.code,
-          discountPercentage: promoForm.type === 'percentage' ? Number(promoForm.value) : 10,
+          discountPercentage: Number(promoForm.value),
           minPurchase: Number(promoForm.minPurchase),
           description: promoForm.description,
           validFrom: promoForm.startDate,
@@ -649,7 +653,7 @@ export default function SellerPromotionsPage() {
                   <tr key={disc.id} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 flex-shrink-0 shadow-sm border border-slate-200/50">
+                        <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 flex-shrink-0 shadow-sm border border-slate-200/50">
                           <Image src={disc.productImage} className="object-cover" alt="" fill />
                         </div>
                         <div>
@@ -791,33 +795,20 @@ export default function SellerPromotionsPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Discount Type</label>
-                    <select 
-                      className="w-full px-5 py-3.5 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900 text-sm cursor-pointer"
-                      value={promoForm.type}
-                      onChange={(e) => setPromoForm({...promoForm, type: e.target.value as 'percentage' | 'fixed'})}
-                    >
-                      <option value="percentage">Percentage (%)</option>
-                      <option value="fixed">Fixed Amount (₹)</option>
-                    </select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">
-                      {promoForm.type === 'percentage' ? 'Percentage Off' : 'Fixed Savings (₹)'}
-                    </label>
-                    <input 
-                      required
-                      type="number" 
-                      placeholder={promoForm.type === 'percentage' ? '30' : '200'}
-                      min="1"
-                      max={promoForm.type === 'percentage' ? '99' : '9999'}
-                      className="w-full px-5 py-3.5 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900 text-sm"
-                      value={promoForm.value}
-                      onChange={(e) => setPromoForm({...promoForm, value: e.target.value})}
-                    />
-                  </div>
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                    Percentage Off (%)
+                  </label>
+                  <input 
+                    required
+                    type="number" 
+                    placeholder="30"
+                    min="1"
+                    max="99"
+                    className="w-full px-5 py-3.5 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-900 text-sm"
+                    value={promoForm.value}
+                    onChange={(e) => setPromoForm({...promoForm, value: e.target.value})}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

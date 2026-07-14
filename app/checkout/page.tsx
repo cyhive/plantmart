@@ -236,7 +236,7 @@ function CheckoutContent() {
 
           {/* Order Summary Sidebar */}
           <aside className="w-full lg:w-[400px] shrink-0">
-            <div className="bg-slate-900 rounded-[40px] p-8 text-white shadow-2xl sticky top-8">
+            <div className="bg-slate-900 rounded-[32px] md:rounded-[40px] p-6 md:p-8 text-white shadow-2xl lg:sticky lg:top-8">
               <h2 className="text-xl font-display font-black mb-8 flex items-center gap-3">
                 <Package className="w-6 h-6 text-emerald-400" /> Order Summary
               </h2>
