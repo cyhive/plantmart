@@ -298,9 +298,14 @@ export default function NurseryDetailPage() {
                             </button>
                          </div>
                          <div className="px-1.5 pb-2 space-y-2 flex flex-col justify-between flex-grow">
-                            <div className="flex justify-between items-center gap-2">
-                               <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors line-clamp-1">{plant.name}</h3>
-                               <div className="text-lg font-display font-black text-emerald-900 flex-shrink-0">₹{plant.price}</div>
+                            <div className="flex justify-between items-start gap-2">
+                               <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors line-clamp-2 mt-0.5">{plant.name}</h3>
+                               <div className="flex flex-col items-end flex-shrink-0 gap-0.5">
+                                 {plant.originalPrice && plant.originalPrice > plant.price && (
+                                   <span className="text-[10px] font-bold text-slate-400 line-through leading-none mt-1">₹{plant.originalPrice}</span>
+                                 )}
+                                 <div className="text-lg font-display font-black text-emerald-900 leading-none">₹{plant.price}</div>
+                               </div>
                             </div>
                             <div className="flex items-center gap-0.5 text-amber-400">
                                {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}

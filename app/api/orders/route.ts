@@ -48,6 +48,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Products not found' }, { status: 404 });
     }
 
+    const { getActiveDiscountsForProducts } = await import('@/lib/product_discounts/active');
+    const discounts = await getActiveDiscountsForProducts(productIds);
+    const discountByProductId = new Map(discounts.map(d => [d.productId.toString(), d]));
+
     // Group items by sellerId
     const ordersBySeller = new Map<string, any[]>();
 
@@ -60,9 +64,8 @@ export async function POST(request: Request) {
         ordersBySeller.set(sellerIdStr, []);
       }
       
-      const priceToUse = product.discountedPrice && product.discountedPrice > 0 
-          ? product.discountedPrice 
-          : product.price;
+      const discount = discountByProductId.get(product._id.toString());
+      const priceToUse = discount ? discount.discountedPrice : product.price;
 
       ordersBySeller.get(sellerIdStr)!.push({
         productId: product._id,

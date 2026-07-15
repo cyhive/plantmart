@@ -610,7 +610,7 @@ function CatalogPageContent() {
                            </span>
                            <div className="flex items-baseline gap-1.5 flex-wrap justify-end">
                              {product.originalPrice && (
-                               <span className="text-[10px] text-slate-450 font-medium line-through">₹{product.originalPrice}</span>
+                               <span className="text-[10px] text-slate-400 font-medium line-through">₹{product.originalPrice}</span>
                              )}
                              <div className="flex items-baseline gap-0.5">
                                <span className="text-xs font-black text-emerald-600 italic">₹</span>

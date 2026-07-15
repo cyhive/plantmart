@@ -158,7 +158,7 @@ export default function OffersPage() {
                           <span className="text-xs font-bold text-slate-400 line-through">₹{disc.originalPrice}</span>
                         </div>
                         <Link 
-                          href={`/products/${disc.productId}`}
+                          href={`/plants/${disc.productId}`}
                           className="mt-4 w-full flex items-center justify-center gap-2 py-3 bg-slate-50 text-slate-700 font-bold text-xs rounded-xl hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
                         >
                           View Details <ArrowRight className="w-4 h-4" />

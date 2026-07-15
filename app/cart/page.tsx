@@ -332,6 +332,11 @@ export default function CartPage() {
                         </div>
                         <div className="space-y-1 text-right">
                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Subtotal</p>
+                           {item.originalPrice && item.originalPrice > item.price && (
+                             <div className="text-sm font-display font-bold text-slate-400 line-through tracking-tighter">
+                               ₹{(item.originalPrice * item.quantity).toFixed(0)}
+                             </div>
+                           )}
                            <div className="text-3xl md:text-4xl font-display font-black text-emerald-900 tracking-tighter">
                              ₹{item.price * item.quantity}
                            </div>

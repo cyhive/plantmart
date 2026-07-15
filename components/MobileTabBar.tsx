@@ -26,7 +26,15 @@ export function MobileTabBar() {
     { label: 'Home', href: '/', icon: <Home className="w-5 h-5" /> },
     { label: 'Explore', href: '/plants', icon: <Search className="w-5 h-5" /> },
     { label: 'Cart', href: '/cart', icon: <ShoppingCart className="w-5 h-5" />, badge: totalItems },
-    { label: 'Profile', href: user ? '/profile' : '/login', icon: <User className="w-5 h-5" /> },
+    { 
+      label: user ? user.name.split(' ')[0] : 'Profile', 
+      href: user ? '/profile' : '/login', 
+      icon: user?.avatar ? (
+        <img src={user.avatar} alt={user.name} className="w-5 h-5 rounded-full object-cover" />
+      ) : (
+        <User className="w-5 h-5" />
+      )
+    },
   ];
 
   return (

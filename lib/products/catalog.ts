@@ -1,6 +1,7 @@
 import type { ObjectId } from 'mongodb';
 import type { ProductDocument } from '@/lib/models/product';
 import type { UserDocument } from '@/lib/models/user';
+import type { ProductDiscountDocument } from '@/lib/models/product_discount';
 
 export type CatalogSeller = {
   _id: string;
@@ -17,6 +18,7 @@ export type CatalogProduct = {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
   category: string;
   images: string[];
   stock: number;
@@ -34,13 +36,14 @@ export function toCatalogSeller(seller: UserDocument): CatalogSeller {
   };
 }
 
-export function toCatalogProduct(doc: ProductDocument, seller: UserDocument | null): CatalogProduct {
+export function toCatalogProduct(doc: ProductDocument, seller: UserDocument | null, discount?: ProductDiscountDocument | null): CatalogProduct {
   const sellerId = doc.sellerId.toHexString();
   return {
     _id: doc._id.toHexString(),
     name: doc.name,
     description: doc.description,
-    price: doc.price,
+    price: discount ? discount.discountedPrice : doc.price,
+    originalPrice: discount ? doc.price : undefined,
     category: doc.category,
     images: doc.images,
     stock: doc.stock,
@@ -148,7 +151,15 @@ export async function loadCatalogProducts(filter: Record<string, unknown>) {
   const sellers = await userCol.find({ _id: { $in: sellerIds } }).toArray();
   const sellerById = new Map(sellers.map((seller) => [seller._id.toHexString(), seller]));
 
-  return docs.map((doc) => toCatalogProduct(doc, sellerById.get(doc.sellerId.toHexString()) ?? null));
+  const { getActiveDiscountsForProducts } = await import('@/lib/product_discounts/active');
+  const discounts = await getActiveDiscountsForProducts(docs.map((d) => d._id));
+  const discountByProductId = new Map(discounts.map((d) => [d.productId.toHexString(), d]));
+
+  return docs.map((doc) => toCatalogProduct(
+    doc, 
+    sellerById.get(doc.sellerId.toHexString()) ?? null,
+    discountByProductId.get(doc._id.toHexString())
+  ));
 }
 
 export async function loadCatalogProductById(id: string) {
@@ -169,5 +180,9 @@ export async function loadCatalogProductById(id: string) {
 
   const userCol = await getUsersCollection();
   const seller = await userCol.findOne({ _id: doc.sellerId });
-  return toCatalogProduct(doc, seller);
+  
+  const { getActiveDiscountsForProducts } = await import('@/lib/product_discounts/active');
+  const discounts = await getActiveDiscountsForProducts([productId]);
+
+  return toCatalogProduct(doc, seller, discounts[0]);
 }

@@ -470,6 +470,9 @@ export default function ProductDetailPage() {
               <div className="space-y-1">
                 <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest block ml-1">Price</span>
                 <div className="flex items-baseline gap-3">
+                  {product.originalPrice && product.originalPrice > currentPrice && (
+                    <span className="text-2xl md:text-3xl font-display font-black text-slate-400 line-through">₹{product.originalPrice}</span>
+                  )}
                   <span className="text-4xl md:text-5xl font-display font-black text-emerald-955">₹{currentPrice}</span>
                 </div>
               </div>
@@ -505,9 +508,14 @@ export default function ProductDetailPage() {
 
               <div className="flex flex-col gap-1 items-end pr-2">
                 <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest block text-right leading-none">Subtotal</span>
-                <div className="text-3xl font-display font-black text-emerald-955 flex items-baseline gap-0.5">
-                  <span className="text-sm font-bold">₹</span>
-                  {currentPrice * quantity}
+                <div className="flex items-baseline gap-2">
+                  {product.originalPrice && product.originalPrice > currentPrice && (
+                    <span className="text-xl font-display font-black text-slate-400 line-through">₹{product.originalPrice * quantity}</span>
+                  )}
+                  <div className="text-3xl font-display font-black text-emerald-955 flex items-baseline gap-0.5">
+                    <span className="text-sm font-bold">₹</span>
+                    {currentPrice * quantity}
+                  </div>
                 </div>
               </div>
             </div>

@@ -5,6 +5,7 @@ export interface CartLineItem {
   id: string;
   name: string;
   price: number;
+  originalPrice?: number;
   image: string;
   quantity: number;
   seller: { name: string; shopName: string };
@@ -40,6 +41,7 @@ export async function refreshCartLinesFromCatalog(items: CartLineItem[]): Promis
           id: p._id,
           name: p.name,
           price: p.price,
+          originalPrice: p.originalPrice,
           image: resolveProductImages(p.images)[0],
           quantity: item.quantity,
           seller: {

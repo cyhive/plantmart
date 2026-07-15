@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Droplets, 
@@ -32,73 +32,21 @@ const journalCategories = [
   { id: 'repotting', name: 'Repotting', icon: <Hammer className="w-5 h-5" /> },
 ];
 
-const articles = [
-  {
-    id: '1',
-    category: 'watering',
-    title: 'The Golden Rule of Watering: The Finger Test',
-    excerpt: 'Overwatering is the #1 killer of houseplants. Learn how to tell exactly when your plant is thirsty.',
-    image: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&q=80&w=800',
-    author: 'Dr. Greenleaf',
-    readTime: '5 min read',
-    date: 'May 12, 2024',
-    featured: true
-  },
-  {
-    id: '2',
-    category: 'sunlight',
-    title: 'Decoding Light Levels: From Low to Bright Indirect',
-    excerpt: 'North-facing? South-facing? We break down what these terms actually mean for your leafy friends.',
-    image: 'https://images.unsplash.com/photo-1416879598056-0c8227656910?auto=format&fit=crop&q=80&w=800',
-    author: 'Sun Specialist',
-    readTime: '8 min read',
-    date: 'May 10, 2024'
-  },
-  {
-    id: '3',
-    category: 'pest-control',
-    title: 'Say Goodbye to Fungus Gnats Forever',
-    excerpt: 'Those tiny black flies are annoying, but they dont have to be permanent residents.',
-    image: 'https://images.unsplash.com/photo-1599591037488-8a306485987a?auto=format&fit=crop&q=80&w=800',
-    author: 'Bug Buster',
-    readTime: '6 min read',
-    date: 'May 08, 2024'
-  },
-  {
-    id: '4',
-    category: 'propagation',
-    title: 'Water Propagation: How to Multiply Your Pothos',
-    excerpt: 'The easiest way to turn one plant into ten. A step-by-step guide for beginners.',
-    image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=800',
-    author: 'Prop Queen',
-    readTime: '10 min read',
-    date: 'May 05, 2024'
-  },
-  {
-    id: '5',
-    category: 'repotting',
-    title: 'Is Your Plant Root-Bound? Signs to Look For',
-    excerpt: 'Repotting at the wrong time can cause shock. Learn how to identify when it is truly time for a new home.',
-    image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80&w=800',
-    author: 'Soil Scientist',
-    readTime: '7 min read',
-    date: 'May 02, 2024'
-  },
-  {
-    id: '6',
-    category: 'watering',
-    title: 'The Humidity Hack: Do Misting Bottles Actually Work?',
-    excerpt: 'There is a lot of debate about misting. We look at the science of tropical plant humidity.',
-    image: 'https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&q=80&w=800',
-    author: 'Dr. Greenleaf',
-    readTime: '4 min read',
-    date: 'April 28, 2024'
-  }
-];
-
 export default function CareJournalPage() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [articles, setArticles] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/care-journals')
+      .then(res => res.json())
+      .then(data => {
+        if (data.journals) {
+          setArticles(data.journals);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const filteredArticles = articles.filter(article => {
     const matchesCategory = activeCategory === 'all' || article.category === activeCategory;
@@ -115,20 +63,21 @@ export default function CareJournalPage() {
 
       {/* Hero Section */}
       <section className="relative h-[500px] md:h-[600px] rounded-[60px] overflow-hidden group">
-        <Image src={featuredArticle?.image || ''} 
-          alt={featuredArticle?.title || 'Featured'} 
-          className="object-cover transition-transform duration-1000 group-hover:scale-105" fill />
+        {featuredArticle?.image && (
+          <Image src={featuredArticle.image} 
+            alt={featuredArticle?.title || 'Featured'} 
+            className="object-cover transition-transform duration-1000 group-hover:scale-105" fill />
+        )}
         <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/20 to-transparent" />
         
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 space-y-6">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
-
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-3"
           >
             <span className="px-4 py-1.5 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full">Featured Article</span>
-            <span className="text-white/60 text-xs font-bold">{featuredArticle?.date}</span>
+            <span className="text-white/60 text-xs font-bold">{featuredArticle?.createdAt ? new Date(featuredArticle.createdAt).toLocaleDateString() : ''}</span>
           </motion.div>
           
           <motion.h1 
@@ -139,7 +88,7 @@ export default function CareJournalPage() {
           >
             {featuredArticle?.title}
           </motion.h1>
-          
+
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

@@ -10,6 +10,7 @@ function normalizeStoredLine(item: CartLineItem): CartLineItem {
     id: normalizeCartProductId(item.id),
     name: item.name,
     price: item.price,
+    originalPrice: item.originalPrice,
     image: item.image,
     quantity: item.quantity,
     seller: {
@@ -33,6 +34,7 @@ export async function refreshCartLinesOnServer(items: CartLineItem[]): Promise<C
           id: product._id,
           name: product.name,
           price: product.price,
+          originalPrice: product.originalPrice,
           image: resolveProductImages(product.images)[0],
           quantity: item.quantity,
           seller: {

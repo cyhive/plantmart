@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     const products = await db.collection('products').find({ sellerId: new ObjectId(sellerId) }).toArray();
     const productIds = products.map(p => p._id.toString());
     
-    let productReviews = [];
+    let productReviews: any[] = [];
     if (productIds.length > 0) {
       productReviews = await db.collection('productReviews')
         .find({ productId: { $in: productIds } })

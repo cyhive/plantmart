@@ -251,8 +251,15 @@ function CheckoutContent() {
                       <h3 className="text-sm font-bold leading-tight line-clamp-1">{item.name}</h3>
                       <p className="text-[10px] font-medium text-slate-400">Qty: {item.quantity}</p>
                     </div>
-                    <div className="text-sm font-black text-emerald-400">
-                      ₹{item.price * item.quantity}
+                    <div className="text-right">
+                      {item.originalPrice && item.originalPrice > item.price && (
+                        <div className="text-[10px] font-medium text-slate-500 line-through">
+                          ₹{(item.originalPrice * item.quantity).toFixed(0)}
+                        </div>
+                      )}
+                      <div className="text-sm font-black text-emerald-400">
+                        ₹{item.price * item.quantity}
+                      </div>
                     </div>
                   </div>
                 ))}

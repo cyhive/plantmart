@@ -39,7 +39,7 @@ const heroSlides = [
     tag: 'Free Shipping',
     title: 'Garden',
     highlight: 'To Door',
-    desc: 'Get free express shipping on all orders over â‚¹2000. Fresh plants, delivered straight to your doorstep.',
+    desc: 'Get free express shipping on all orders over . Fresh plants, delivered straight to your doorstep.',
     image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=800',
     color: 'green'
   }
@@ -80,6 +80,7 @@ export default function HomePage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [promotions, setPromotions] = useState<any[]>([]);
   const [topNurseries, setTopNurseries] = useState<any[]>([]);
+  const [featuredJournals, setFeaturedJournals] = useState<any[]>([]);
   const { addItem } = useCart();
 
   const handleCopyCode = (code: string) => {
@@ -98,6 +99,12 @@ export default function HomePage() {
     fetch('/api/sellers').then(res => res.json()).then(data => {
       if (data.sellers) {
         setTopNurseries(data.sellers);
+      }
+    }).catch(console.error);
+
+    fetch('/api/care-journals?featured=true&limit=3').then(res => res.json()).then(data => {
+      if (data.journals) {
+        setFeaturedJournals(data.journals);
       }
     }).catch(console.error);
   }, []);
@@ -477,23 +484,47 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 gap-8">
-              {careTips.map((tip, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex gap-6 p-8 rounded-[32px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-default"
-                >
-                  <div className="w-14 h-14 bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-400 flex-shrink-0 shadow-inner">
-                    {tip.icon}
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="text-xl font-bold text-white">{tip.title}</h4>
-                    <p className="text-slate-400 font-medium">{tip.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
+              {featuredJournals.length > 0 ? (
+                featuredJournals.map((journal, i) => (
+                  <motion.div
+                    key={journal.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex gap-6 p-8 rounded-[32px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-default"
+                  >
+                    <div className="w-14 h-14 bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-400 flex-shrink-0 shadow-inner overflow-hidden">
+                      {journal.image ? (
+                        <Image src={journal.image} alt={journal.title} width={56} height={56} className="w-full h-full object-cover" />
+                      ) : (
+                        <Leaf className="w-6 h-6" />
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-xl font-bold text-white">{journal.title}</h4>
+                      <p className="text-slate-400 font-medium">{journal.excerpt || 'Read this care guide to learn more about keeping your plants happy and healthy.'}</p>
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                careTips.map((tip, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex gap-6 p-8 rounded-[32px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-default"
+                  >
+                    <div className="w-14 h-14 bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-400 flex-shrink-0 shadow-inner">
+                      {tip.icon}
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-xl font-bold text-white">{tip.title}</h4>
+                      <p className="text-slate-400 font-medium">{tip.desc}</p>
+                    </div>
+                  </motion.div>
+                ))
+              )}
             </div>
 
             <Link href="/care-journal" className="bg-white text-slate-900 px-10 py-5 rounded-[24px] font-black hover:bg-emerald-500 hover:text-white transition-all inline-block">Read Care Journal</Link>

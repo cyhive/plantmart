@@ -37,6 +37,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { id: 'sellers', href: '/admin/sellers', icon: <Users className="w-5 h-5" />, label: 'Sellers' },
     { id: 'products', href: '/admin/products', icon: <ShoppingCart className="w-5 h-5" />, label: 'Products' },
     { id: 'promotions', href: '/admin/promotions', icon: <Tag className="w-5 h-5" />, label: 'Promotions' },
+    { id: 'care-journals', href: '/admin/care-journals', icon: <Leaf className="w-5 h-5" />, label: 'Care Journals' },
     { id: 'notifications', href: '/admin/notifications', icon: <Bell className="w-5 h-5" />, label: 'Notifications' },
     { id: 'settings', href: '/admin/settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
   ];

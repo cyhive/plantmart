@@ -12,6 +12,7 @@ type CatalogProduct = {
   _id: string;
   name: string;
   price: number;
+  originalPrice?: number;
   category: string;
   images: string[];
   ratings: { average: number; count: number };
@@ -178,6 +179,9 @@ export function CatalogProductsSection() {
                          Starting from
                        </span>
                        <div className="flex items-baseline gap-1.5 flex-wrap justify-end">
+                         {product.originalPrice && product.originalPrice > product.price && (
+                           <span className="text-[10px] font-bold text-slate-400 line-through">₹{product.originalPrice}</span>
+                         )}
                          <div className="flex items-baseline gap-0.5">
                            <span className="text-xs font-black text-emerald-600 italic">₹</span>
                            <span className="text-lg font-display font-black text-slate-900">{product.price}</span>
