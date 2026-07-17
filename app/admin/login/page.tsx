@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
           </div>
           <div className="space-y-1">
             <h2 className="text-3xl font-display font-bold text-white tracking-tight">Admin Terminal</h2>
-            <p className="text-slate-400 font-medium text-sm">PlantMart Management System</p>
+            <p className="text-slate-400 font-medium text-sm">Pacha Bhoomi Management System</p>
           </div>
         </div>
 
@@ -85,7 +85,7 @@ export default function AdminLoginPage() {
                   value={email} 
                   onChange={e => setEmail(e.target.value)}
                   className="w-full pl-14 pr-6 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white focus:bg-slate-950 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-300 font-medium placeholder:text-slate-700"
-                  placeholder="admin@plantmart.com" 
+                  placeholder="admin@pachabhoomi.com" 
                 />
               </div>
             </div>

@@ -17,7 +17,7 @@ let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
 const globalForMongo = globalThis as unknown as {
-  _plantmartMongoClientPromise?: Promise<MongoClient>;
+  _mongoClientPromise?: Promise<MongoClient>;
 };
 
 function getClientPromise(): Promise<MongoClient> {
@@ -25,11 +25,11 @@ function getClientPromise(): Promise<MongoClient> {
     return Promise.reject(new Error('MONGODB_URI is not configured'));
   }
   if (process.env.NODE_ENV === 'development') {
-    if (!globalForMongo._plantmartMongoClientPromise) {
+    if (!globalForMongo._mongoClientPromise) {
       client = new MongoClient(uri, options);
-      globalForMongo._plantmartMongoClientPromise = client.connect();
+      globalForMongo._mongoClientPromise = client.connect();
     }
-    return globalForMongo._plantmartMongoClientPromise;
+    return globalForMongo._mongoClientPromise;
   }
   if (!clientPromise) {
     client = new MongoClient(uri, options);
@@ -44,6 +44,6 @@ export async function getMongoClient(): Promise<MongoClient> {
 
 export async function getDb() {
   const c = await getMongoClient();
-  const name = process.env.MONGODB_DB ?? 'plantmart';
+  const name = process.env.MONGODB_DB ?? 'Pacha Bhoomi';
   return c.db(name);
 }

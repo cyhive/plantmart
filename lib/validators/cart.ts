@@ -6,6 +6,7 @@ export const cartLineSchema = z.object({
   price: z.number().min(0),
   image: z.string(),
   quantity: z.number().int().min(1).max(99),
+  stock: z.number().int().min(0).optional(),
   seller: z.object({
     name: z.string().min(1),
     shopName: z.string().min(1),

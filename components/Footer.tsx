@@ -18,7 +18,7 @@ export function Footer() {
     return (
       <footer className="bg-[#0F172B] border-t border-white/5 py-6 text-center">
         <p className="text-xs text-slate-400 font-medium">
-          © {currentYear} PlantMart Dashboard. All rights reserved. 
+          © {currentYear} Pacha Bhoomi Dashboard. All rights reserved. 
           <span className="mx-2">•</span>
           <Link href="/privacy" className="hover:text-emerald-400 transition-colors">Privacy</Link>
           <span className="mx-2">•</span>
@@ -74,12 +74,7 @@ export function Footer() {
           {/* Brand Section */}
           <div className="lg:col-span-2 space-y-8">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:rotate-12 transition-transform">
-                <Leaf className="text-white w-7 h-7" />
-              </div>
-              <span className="text-2xl font-display font-black text-white tracking-tighter uppercase">
-                Plant<span className="text-emerald-500">Mart</span>
-              </span>
+              <img src="/logo.png" alt="Pacha Bhoomi" className="h-24 w-auto object-contain group-hover:scale-105 transition-transform duration-500  p-2 rounded-2xl" />
             </Link>
             <p className="text-lg leading-relaxed max-w-sm">
               Connecting nature lovers with verified nurseries across India. 
@@ -150,14 +145,14 @@ export function Footer() {
             </div>
             <div>
               <p className="text-white font-bold">Email Support</p>
-              <p className="text-sm">hello@plantmart.in</p>
+              <p className="text-sm">hello@pachabhoomi.in</p>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="pt-10 flex flex-col md:flex-row items-center justify-between gap-6 text-sm">
-          <p>© {currentYear} PlantMart. All rights reserved.</p>
+          <p>© {currentYear} Pacha Bhoomi. All rights reserved.</p>
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />

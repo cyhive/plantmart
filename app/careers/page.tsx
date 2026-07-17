@@ -80,8 +80,8 @@ export default function CareersPage() {
       <section className="relative pt-32 pb-24 overflow-hidden mesh-gradient">
         <div className="absolute inset-0 bg-slate-900/40 z-10" />
         <div className="absolute inset-0 z-0">
-          <Image src="/plantmart_team_office_1778929897558.png" 
-            alt="PlantMart Team" 
+          <Image src="/pachabhoomi_team_office_1778929897558.png" 
+            alt="Pacha Bhoomi Team" 
             className="object-cover" fill />
         </div>
 
@@ -92,7 +92,7 @@ export default function CareersPage() {
             className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-500/20 backdrop-blur-md rounded-full text-emerald-400 text-sm font-bold border border-emerald-500/30"
           >
             <Star className="w-4 h-4" />
-            <span className="tracking-widest uppercase">Careers at PlantMart</span>
+            <span className="tracking-widest uppercase">Careers at Pacha Bhoomi</span>
           </motion.div>
 
           <motion.h1 
@@ -215,7 +215,7 @@ export default function CareersPage() {
           <p className="text-slate-500 mb-8 max-w-xl mx-auto">
             We're always looking for talented people who are passionate about nature and technology. Send us your resume anyway!
           </p>
-          <a href="mailto:careers@plantmart.in" className="text-emerald-600 font-black text-sm uppercase tracking-widest hover:underline underline-offset-8 decoration-2">
+          <a href="mailto:careers@pachabhoomi.in" className="text-emerald-600 font-black text-sm uppercase tracking-widest hover:underline underline-offset-8 decoration-2">
             Send spontaneous application
           </a>
         </div>
@@ -232,7 +232,7 @@ export default function CareersPage() {
                 Our mission is to bring greenery to every home. Help us build the future of botanical commerce.
               </p>
               <Link href="/" className="inline-block bg-white text-emerald-950 px-12 py-5 rounded-2xl font-black hover:bg-emerald-400 hover:text-emerald-950 transition-all shadow-2xl">
-                Explore PlantMart
+                Explore Pacha Bhoomi
               </Link>
             </div>
           </div>

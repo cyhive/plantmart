@@ -23,6 +23,27 @@ export async function GET(
     
     const publicUser = toPublicUser(doc);
     
+    const { getProductsCollection } = await import('@/lib/products/collection');
+    const productCol = await getProductsCollection();
+    
+    const sellerProducts = await productCol.find({ sellerId: doc._id }).toArray();
+    const plantsCount = sellerProducts.length;
+    
+    let averageRating = 0;
+    let totalScore = 0;
+    let totalCount = 0;
+    
+    sellerProducts.forEach(product => {
+      if (product.ratings && product.ratings.count > 0) {
+        totalScore += (product.ratings.average * product.ratings.count);
+        totalCount += product.ratings.count;
+      }
+    });
+    
+    if (totalCount > 0) {
+      averageRating = Number((totalScore / totalCount).toFixed(1));
+    }
+    
     const seller = {
       id: publicUser.id,
       name: publicUser.shopName || publicUser.name,
@@ -30,8 +51,8 @@ export async function GET(
       location: publicUser.address?.city 
         ? `${publicUser.address.city}, ${publicUser.address.state || ''}`
         : 'India',
-      rating: 4.8, // Default
-      plants: 150, // Default 
+      rating: averageRating,
+      plants: plantsCount,
       image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=1200',
       description: (doc as any).businessDescription || 'Providing high-quality botanical specimens and expert plant care advice.',
       joinedDate: publicUser.createdAt ? new Date(publicUser.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Jan 2024',

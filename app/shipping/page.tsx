@@ -145,7 +145,7 @@ export default function ShippingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="space-y-12">
               <div className="space-y-4">
-                <span className="text-emerald-500 text-xs font-black uppercase tracking-[0.3em]">The PlantMart Standard</span>
+                <span className="text-emerald-500 text-xs font-black uppercase tracking-[0.3em]">The Pacha Bhoomi Standard</span>
                 <h2 className="text-5xl font-display font-bold text-white tracking-tight">Zero-Plastic <br /><span className="text-emerald-500 italic font-serif">Botanical Armour</span></h2>
                 <p className="text-slate-400 text-lg leading-relaxed max-w-lg">
                   Standard shipping kills plants. Ours nourishes them. We use custom-engineered packaging that maintains humidity while allowing airflow.

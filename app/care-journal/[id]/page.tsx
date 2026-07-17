@@ -256,7 +256,7 @@ export default function JournalEntryPage() {
             <div className="text-center sm:text-left">
               <h4 className="text-xl font-display font-bold text-stone-900 mb-2">Written by {article.author}</h4>
               <p className="text-stone-500 text-base leading-relaxed">
-                Plant enthusiast and expert curator at PlantMart. Bringing you the best tips for maintaining a thriving indoor jungle, one leaf at a time.
+                Plant enthusiast and expert curator at Pacha Bhoomi. Bringing you the best tips for maintaining a thriving indoor jungle, one leaf at a time.
               </p>
             </div>
           </div>

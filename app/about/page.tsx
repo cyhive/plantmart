@@ -38,7 +38,7 @@ const milestones = [
   {
     year: "2023",
     title: "The Seed is Sown",
-    description: "PlantMart was founded in a small balcony in Bangalore with a simple mission: to make premium greenery accessible to everyone."
+    description: "Pacha Bhoomi was founded in a small balcony in Bangalore with a simple mission: to make premium greenery accessible to everyone."
   },
   {
     year: "2024",
@@ -226,7 +226,7 @@ export default function AboutPage() {
               <p className="text-slate-800 font-serif italic text-lg leading-relaxed">
                 "We didn't just want to sell plants; we wanted to preserve the wisdom of those who grow them."
               </p>
-              <p className="text-emerald-600 font-black text-xs uppercase tracking-widest mt-6">— Founders, PlantMart</p>
+              <p className="text-emerald-600 font-black text-xs uppercase tracking-widest mt-6">— Founders, Pacha Bhoomi</p>
             </div>
             {/* Decorative background circle */}
             <div className="absolute -top-10 -left-10 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full -z-10" />
@@ -240,7 +240,7 @@ export default function AboutPage() {
             
             <div className="space-y-6 text-slate-500 text-lg leading-relaxed">
               <p>
-                PlantMart was born from a frustrating weekend spent searching for healthy plants in Bangalore. We realized that while India has thousands of incredible nurseries, the gap between these heritage growers and modern homes was vast.
+                Pacha Bhoomi was born from a frustrating weekend spent searching for healthy plants in Bangalore. We realized that while India has thousands of incredible nurseries, the gap between these heritage growers and modern homes was vast.
               </p>
               <p>
                 We set out to bridge that gap. By creating a platform that empowers local nurseries and provides buyers with verified, high-quality botanical companions, we've transformed how India buys plants.

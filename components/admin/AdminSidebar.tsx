@@ -52,11 +52,8 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         {/* Sidebar Header */}
         <div className="p-8 flex items-center justify-between">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <ShieldCheck className="text-white w-6 h-6" />
-            </div>
+            <img src="/logo.png" alt="Pacha Bhoomi" className="h-16 w-auto object-contain bg-white rounded-xl p-1.5" />
             <div className="flex flex-col">
-              <span className="font-display font-bold text-xl text-white leading-none">PlantMart</span>
               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mt-1">Admin Console</span>
             </div>
           </Link>
@@ -89,9 +86,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         <div className="p-6 space-y-4">
           <div className="bg-slate-800/50 rounded-3xl p-6 space-y-4 border border-white/5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center border border-white/10">
-                <Leaf className="w-5 h-5 text-emerald-400" />
-              </div>
+              <img src="/logo.png" alt="Pacha Bhoomi" className="w-10 h-10 object-contain bg-white rounded-xl p-1" />
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-white">Buyer View</span>
                 <span className="text-[10px] text-slate-400 font-medium italic tracking-tight">Return to Store</span>

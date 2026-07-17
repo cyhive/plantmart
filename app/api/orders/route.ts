@@ -59,6 +59,10 @@ export async function POST(request: Request) {
       const product = products.find(p => p._id.toString() === item.productId);
       if (!product) continue;
 
+      if (item.quantity > product.stock) {
+        return NextResponse.json({ error: `Not enough stock for ${product.name}. Available: ${product.stock}` }, { status: 400 });
+      }
+
       const sellerIdStr = product.sellerId.toString();
       if (!ordersBySeller.has(sellerIdStr)) {
         ordersBySeller.set(sellerIdStr, []);

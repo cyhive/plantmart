@@ -326,7 +326,7 @@ export default function SellersPage() {
           <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-800 rounded-full blur-[120px] -mr-48 -mt-48 opacity-50" />
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
             <div className="space-y-6 text-center lg:text-left max-w-xl">
-              <h2 className="text-4xl md:text-5xl font-display font-black text-white tracking-tight leading-none">Want to sell on <br /><span className="text-emerald-500">PlantMart?</span></h2>
+              <h2 className="text-4xl md:text-5xl font-display font-black text-white tracking-tight leading-none">Want to sell on <br /><span className="text-emerald-500">Pacha Bhoomi?</span></h2>
               <p className="text-emerald-100/60 text-lg font-medium">Join our network of verified nurseries and reach thousands of plant enthusiasts nationwide.</p>
               <div className="flex flex-wrap justify-center lg:justify-start gap-4">
                 <Link href="/become-a-seller" className="bg-white text-emerald-950 px-10 py-5 rounded-[24px] font-black hover:bg-emerald-400 transition-all shadow-2xl active:scale-95">

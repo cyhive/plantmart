@@ -32,7 +32,7 @@ const initiatives = [
   },
   {
     title: "Reforestation Projects",
-    content: "With every rare plant purchase, PlantMart donates a portion of the proceeds to local reforestation initiatives across India, restoring vital ecosystems.",
+    content: "With every rare plant purchase, Pacha Bhoomi donates a portion of the proceeds to local reforestation initiatives across India, restoring vital ecosystems.",
     icon: <TreePine className="w-6 h-6 text-emerald-500" />
   }
 ];
@@ -79,7 +79,7 @@ export default function SustainabilityPage() {
             transition={{ delay: 0.2 }}
             className="text-emerald-50/80 text-xl max-w-2xl mx-auto font-medium"
           >
-            At PlantMart, sustainability isn't an afterthought—it's the root of everything we do. We're dedicated to nurturing nature while delivering it to your doorstep.
+            At Pacha Bhoomi, sustainability isn't an afterthought—it's the root of everything we do. We're dedicated to nurturing nature while delivering it to your doorstep.
           </motion.p>
         </div>
       </section>
@@ -143,11 +143,11 @@ export default function SustainabilityPage() {
             </div>
             
             <p className="text-slate-500 leading-relaxed text-lg">
-              "When we started PlantMart, we realized that the business of selling plants wasn't always green. The immense amount of plastic pots, styrofoam packaging, and transport emissions contradicted the very essence of what we loved: nature. We made a pledge on day one to build a marketplace that gives back more to the earth than it takes."
+              "When we started Pacha Bhoomi, we realized that the business of selling plants wasn't always green. The immense amount of plastic pots, styrofoam packaging, and transport emissions contradicted the very essence of what we loved: nature. We made a pledge on day one to build a marketplace that gives back more to the earth than it takes."
             </p>
             
             <p className="text-slate-500 leading-relaxed text-lg">
-              We continuously audit our partnered nurseries to ensure they meet our rigorous eco-standards. By choosing PlantMart, you are not just decorating your living room; you are actively participating in a movement towards conscious consumerism and environmental restoration.
+              We continuously audit our partnered nurseries to ensure they meet our rigorous eco-standards. By choosing Pacha Bhoomi, you are not just decorating your living room; you are actively participating in a movement towards conscious consumerism and environmental restoration.
             </p>
           </div>
 
@@ -158,7 +158,7 @@ export default function SustainabilityPage() {
               </div>
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-slate-400">Join the movement</p>
-                <p className="font-bold text-slate-900">eco@plantmart.in</p>
+                <p className="font-bold text-slate-900">eco@pachabhoomi.in</p>
               </div>
             </div>
             

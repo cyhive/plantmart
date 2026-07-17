@@ -51,6 +51,15 @@ export async function POST(
 
     const result = await db.collection('productReviews').insertOne(newReview);
     
+    const allReviews = await db.collection('productReviews').find({ productId: id }).toArray();
+    const count = allReviews.length;
+    const average = count > 0 ? allReviews.reduce((acc, rev) => acc + rev.rating, 0) / count : 0;
+    
+    await db.collection('products').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { "ratings.average": average, "ratings.count": count } }
+    );
+    
     return NextResponse.json({ 
       review: { 
         _id: result.insertedId,

@@ -174,13 +174,13 @@ export default function SellerPromotionsPage() {
   // Save promocodes to localStorage
   const savePromocodes = (updated: PromoCode[]) => {
     setPromocodes(updated);
-    localStorage.setItem('plantmart_promotions', JSON.stringify(updated));
+    localStorage.setItem('pachabhoomi_promotions', JSON.stringify(updated));
   };
 
   // Save discounts to localStorage
   const saveDiscounts = (updated: ProductDiscount[]) => {
     setDiscounts(updated);
-    localStorage.setItem('plantmart_seller_discounts', JSON.stringify(updated));
+    localStorage.setItem('pachabhoomi_seller_discounts', JSON.stringify(updated));
   };
 
   // Handle Promocode Submit

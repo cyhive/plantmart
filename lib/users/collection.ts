@@ -14,7 +14,7 @@ async function ensureUserIndexes() {
 async function ensureDbReady() {
   await ensureUserIndexes();
   await ensureSeededAdmin().catch((err) => {
-    console.error('[plantmart] Admin seed failed:', err);
+    console.error('[Pacha Bhoomi] Admin seed failed:', err);
   });
 }
 

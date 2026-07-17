@@ -183,7 +183,7 @@ export default function AccountVerificationPage() {
             <div className="mt-6 flex items-start gap-3 bg-amber-50/50 p-4 rounded-xl border border-amber-100">
               <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-amber-800">
-                Verifying your phone number is required to place cash-on-delivery orders and to register as a seller on PlantMart.
+                Verifying your phone number is required to place cash-on-delivery orders and to register as a seller on Pacha Bhoomi.
               </p>
             </div>
           )}

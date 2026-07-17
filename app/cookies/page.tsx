@@ -128,7 +128,7 @@ export default function CookiesPage() {
                 2. How do we use cookies?
               </h2>
               <p className="text-slate-500 leading-relaxed">
-                We use cookies to ensure that we give you the best experience on our website. This includes cookies from third party social media websites if you visit a page which contains embedded content from social media. Such third party cookies may track your use of PlantMart.
+                We use cookies to ensure that we give you the best experience on our website. This includes cookies from third party social media websites if you visit a page which contains embedded content from social media. Such third party cookies may track your use of Pacha Bhoomi.
               </p>
             </div>
 
@@ -150,7 +150,7 @@ export default function CookiesPage() {
               </div>
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-slate-400">Data & Privacy</p>
-                <p className="font-bold text-slate-900">privacy@plantmart.in</p>
+                <p className="font-bold text-slate-900">privacy@pachabhoomi.in</p>
               </div>
             </div>
             

@@ -113,7 +113,7 @@ export default function PrivacyPage() {
             <div className="space-y-4">
               <h2 className="text-3xl font-display font-bold text-slate-900">1. Introduction</h2>
               <p className="text-slate-500 leading-relaxed">
-                Welcome to PlantMart. This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from plantmart.in (the "Site"). We take your privacy seriously and are committed to transparency in our data practices.
+                Welcome to Pacha Bhoomi. This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from Pacha Bhoomi.in (the "Site"). We take your privacy seriously and are committed to transparency in our data practices.
               </p>
             </div>
 
@@ -146,7 +146,7 @@ export default function PrivacyPage() {
               </div>
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-slate-400">Privacy Inquiries</p>
-                <p className="font-bold text-slate-900">privacy@plantmart.in</p>
+                <p className="font-bold text-slate-900">privacy@pachabhoomi.in</p>
               </div>
             </div>
             

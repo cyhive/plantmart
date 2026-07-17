@@ -18,7 +18,7 @@ import Image from 'next/image';
 const sections = [
   {
     title: "User Agreement",
-    content: "By accessing PlantMart, you agree to abide by these terms. This includes providing accurate information during registration and respecting our community guidelines.",
+    content: "By accessing Pacha Bhoomi, you agree to abide by these terms. This includes providing accurate information during registration and respecting our community guidelines.",
     icon: <BookOpen className="w-6 h-6 text-emerald-500" />
   },
   {
@@ -28,7 +28,7 @@ const sections = [
   },
   {
     title: "Limitation of Liability",
-    content: "While we ensure secure transactions and verified sellers, PlantMart acts as a marketplace. The final responsibility for live plant care rests with the buyer upon delivery.",
+    content: "While we ensure secure transactions and verified sellers, Pacha Bhoomi acts as a marketplace. The final responsibility for live plant care rests with the buyer upon delivery.",
     icon: <ShieldAlert className="w-6 h-6 text-emerald-500" />
   },
   {
@@ -129,7 +129,7 @@ export default function TermsPage() {
                 2. Marketplace Roles
               </h2>
               <p className="text-slate-500 leading-relaxed">
-                PlantMart operates as an online marketplace facilitating transactions between independent nurseries ("Sellers") and individual buyers ("Customers"). We do not directly own or manage the plant inventory listed by third-party sellers unless explicitly marked as "PlantMart Direct".
+                Pacha Bhoomi operates as an online marketplace facilitating transactions between independent nurseries ("Sellers") and individual buyers ("Customers"). We do not directly own or manage the plant inventory listed by third-party sellers unless explicitly marked as "Pacha Bhoomi Direct".
               </p>
             </div>
 
@@ -149,7 +149,7 @@ export default function TermsPage() {
                 4. Liability Limitations
               </h2>
               <p className="text-slate-500 leading-relaxed">
-                In no case shall PlantMart, our directors, officers, employees, affiliates, or agents be liable for any injury, loss, claim, or any direct, indirect, incidental, punitive, special, or consequential damages of any kind, arising from your use of any of the service or any products procured using the service.
+                In no case shall Pacha Bhoomi, our directors, officers, employees, affiliates, or agents be liable for any injury, loss, claim, or any direct, indirect, incidental, punitive, special, or consequential damages of any kind, arising from your use of any of the service or any products procured using the service.
               </p>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function TermsPage() {
               </div>
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-slate-400">Legal Inquiries</p>
-                <p className="font-bold text-slate-900">legal@plantmart.in</p>
+                <p className="font-bold text-slate-900">legal@pachabhoomi.in</p>
               </div>
             </div>
             
@@ -181,7 +181,7 @@ export default function TermsPage() {
           </div>
           <h2 className="text-3xl md:text-5xl font-display font-bold text-white tracking-tight">Fair & <span className="text-emerald-500 italic font-serif">Transparent</span></h2>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Our guidelines help us maintain the highest standards of quality and service across the PlantMart network.
+            Our guidelines help us maintain the highest standards of quality and service across the Pacha Bhoomi network.
           </p>
           <div className="flex justify-center gap-6">
             <Link href="/privacy" className="text-emerald-400 font-bold hover:underline underline-offset-8">Privacy Policy</Link>

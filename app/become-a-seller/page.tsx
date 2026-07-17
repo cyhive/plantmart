@@ -187,7 +187,7 @@ export default function BecomeSellerPage() {
             <div className="w-10 h-10 bg-emerald-600 rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-all duration-500 shadow-lg shadow-emerald-500/20">
               <Leaf className="text-white w-6 h-6" />
             </div>
-            <span className="font-display font-bold text-2xl text-emerald-900 tracking-tight">PlantMart</span>
+            <span className="font-display font-bold text-2xl text-emerald-900 tracking-tight">Pacha Bhoomi</span>
           </Link>
         </div>
 
@@ -206,7 +206,7 @@ export default function BecomeSellerPage() {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-5xl font-display font-bold text-slate-900 tracking-tight"
           >
-            Become a <span className="text-emerald-600">PlantMart</span> Seller
+            Become a <span className="text-emerald-600">Pacha Bhoomi</span> Seller
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: -10 }}
@@ -626,7 +626,7 @@ export default function BecomeSellerPage() {
                         <CheckCircle2 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
                       </div>
                       <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">
-                        I agree to the <Link href="#" className="text-emerald-600 font-bold underline">Seller Terms of Service</Link> and <Link href="#" className="text-emerald-600 font-bold underline">Privacy Policy</Link>. I understand that my shop will be reviewed by the PlantMart team.
+                        I agree to the <Link href="#" className="text-emerald-600 font-bold underline">Seller Terms of Service</Link> and <Link href="#" className="text-emerald-600 font-bold underline">Privacy Policy</Link>. I understand that my shop will be reviewed by the Pacha Bhoomi team.
                       </span>
                     </label>
                   </div>

@@ -90,7 +90,7 @@ export default function SellerLoginPage() {
                   value={email} 
                   onChange={e => setEmail(e.target.value)}
                   className="w-full pl-14 pr-6 py-4 bg-slate-100/50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-emerald-500/30 focus:ring-8 focus:ring-emerald-500/5 outline-none transition-all duration-300 font-medium"
-                  placeholder="vendor@plantmart.com" 
+                  placeholder="vendor@pachabhoomi.com" 
                 />
               </div>
             </div>

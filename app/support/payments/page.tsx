@@ -119,7 +119,7 @@ export default function PaymentMethodsPage() {
                 Bank-Grade Security
               </h2>
               <p className="text-slate-500 leading-relaxed">
-                All transactions on PlantMart are protected by 256-bit SSL encryption. We do not store your credit card details or UPI PINs on our servers. All payments are processed through RBI-approved, PCI-DSS compliant payment gateways like Razorpay and Stripe.
+                All transactions on Pacha Bhoomi are protected by 256-bit SSL encryption. We do not store your credit card details or UPI PINs on our servers. All payments are processed through RBI-approved, PCI-DSS compliant payment gateways like Razorpay and Stripe.
               </p>
             </div>
 
@@ -148,7 +148,7 @@ export default function PaymentMethodsPage() {
               </div>
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-slate-400">Payment Support</p>
-                <p className="font-bold text-slate-900">billing@plantmart.in</p>
+                <p className="font-bold text-slate-900">billing@pachabhoomi.in</p>
               </div>
             </div>
             

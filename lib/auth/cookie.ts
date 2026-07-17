@@ -1,1 +1,1 @@
-export const AUTH_COOKIE = 'plantmart_session';
+export const AUTH_COOKIE = 'pachabhoomi_session';

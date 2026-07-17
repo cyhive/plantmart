@@ -122,7 +122,7 @@ export default function ModifyOrdersPage() {
             <a href="tel:+918012345678" className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors">
               <PhoneCall className="w-5 h-5" />
             </a>
-            <a href="mailto:support@plantmart.in" className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors">
+            <a href="mailto:support@pachabhoomi.in" className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors">
               <Mail className="w-5 h-5" />
             </a>
           </div>

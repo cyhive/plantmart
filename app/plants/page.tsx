@@ -584,13 +584,13 @@ function CatalogPageContent() {
                              </div>
                              <span className="text-[8.5px] font-black uppercase tracking-widest text-slate-400 group-hover/seller:text-emerald-600 transition-colors truncate max-w-[90px]">{product.seller?.shopName}</span>
                            </button>
-                           <div className="flex items-center gap-1 text-amber-500">
-                             <Star className="w-3 h-3 fill-current" />
-                             <span className="text-[11px] font-black text-slate-900">{product.ratings?.average || '4.5'}</span>
+                           <div className={`flex items-center gap-1 ${product.ratings?.average ? 'text-amber-500' : 'text-slate-400'}`}>
+                             <Star className={`w-3 h-3 ${product.ratings?.average ? 'fill-current' : ''}`} />
+                             <span className="text-[11px] font-black text-slate-900">{product.ratings?.average ? product.ratings.average.toFixed(1) : '0.0'}</span>
                            </div>
                         </div>
                         <Link href={`/plants/${product._id}`} className="block">
-                          <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 group-hover:text-emerald-700 transition-colors tracking-tight line-clamp-1 italic">{product.name}</h3>
+                          <h3 className="font-sans font-semibold text-base sm:text-lg text-slate-900 group-hover:text-emerald-700 transition-colors tracking-tight line-clamp-1">{product.name}</h3>
                         </Link>
                         <div className="flex items-center gap-2 text-[8.5px] font-bold text-slate-400 italic">
                            <span className="flex items-center gap-1 truncate max-w-[80px]"><MapPin className="w-2.5 h-2.5" /> {product.seller?.address?.city}</span>
@@ -613,8 +613,8 @@ function CatalogPageContent() {
                                <span className="text-[10px] text-slate-400 font-medium line-through">₹{product.originalPrice}</span>
                              )}
                              <div className="flex items-baseline gap-0.5">
-                               <span className="text-xs font-black text-emerald-600 italic">₹</span>
-                               <span className="text-lg font-display font-black text-slate-900">{product.price}</span>
+                               <span className="text-xs font-semibold text-emerald-600">₹</span>
+                               <span className="text-lg font-bold text-slate-900">{product.price}</span>
                              </div>
                            </div>
                         </div>
@@ -630,6 +630,7 @@ function CatalogPageContent() {
                                 price: product.price,
                                 image: product.images[0] || '',
                                 quantity: 1,
+                                stock: product.stock,
                                 seller: { name: product.seller.name, shopName: product.seller.shopName }
                               });
                             }}
@@ -648,6 +649,7 @@ function CatalogPageContent() {
                                 price: product.price,
                                 image: product.images[0] || '',
                                 quantity: 1,
+                                stock: product.stock,
                                 seller: { name: product.seller.name, shopName: product.seller.shopName }
                               });
                               router.push('/cart');

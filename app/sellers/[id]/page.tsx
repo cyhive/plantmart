@@ -210,8 +210,8 @@ export default function NurseryDetailPage() {
             
             <div className="flex gap-4">
                <div className="glass px-8 py-4 rounded-[32px] text-center border-white/20">
-                  <div className="flex items-center justify-center gap-1 text-amber-400">
-                     <Star className="w-5 h-5 fill-amber-400" />
+                  <div className={`flex items-center justify-center gap-1 ${averageRating !== '0.0' ? 'text-amber-400' : 'text-slate-300'}`}>
+                     <Star className={`w-5 h-5 ${averageRating !== '0.0' ? 'fill-current' : ''}`} />
                      <span className="text-2xl font-black text-white">{averageRating}</span>
                   </div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mt-1">Average Rating</p>
@@ -304,12 +304,13 @@ export default function NurseryDetailPage() {
                                  {plant.originalPrice && plant.originalPrice > plant.price && (
                                    <span className="text-[10px] font-bold text-slate-400 line-through leading-none mt-1">₹{plant.originalPrice}</span>
                                  )}
-                                 <div className="text-lg font-display font-black text-emerald-900 leading-none">₹{plant.price}</div>
+                                 <div className="text-lg font-bold text-emerald-900 leading-none">₹{plant.price}</div>
                                </div>
                             </div>
-                            <div className="flex items-center gap-0.5 text-amber-400">
-                               {[...Array(5)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}
-                            </div>
+                             <div className={`flex items-center gap-1 ${plant.ratings?.average ? 'text-amber-500' : 'text-slate-400'}`}>
+                               <Star className={`w-3.5 h-3.5 ${plant.ratings?.average ? 'fill-current' : ''}`} />
+                               <span className="text-xs font-black text-slate-900">{plant.ratings?.average ? plant.ratings.average.toFixed(1) : '0.0'}</span>
+                             </div>
                          </div>
                          <div className="px-1.5 pt-3 mt-auto border-t border-slate-100 flex items-center gap-2">
                            <button 
@@ -323,6 +324,7 @@ export default function NurseryDetailPage() {
                                  price: plant.price,
                                  image: plant.images?.[0] || '',
                                  quantity: 1,
+                                 stock: plant.stock,
                                  seller: { name: nursery.name, shopName: nursery.shopName }
                                });
                              }}
@@ -341,6 +343,7 @@ export default function NurseryDetailPage() {
                                  price: plant.price,
                                  image: plant.images?.[0] || '',
                                  quantity: 1,
+                                 stock: plant.stock,
                                  seller: { name: nursery.name, shopName: nursery.shopName }
                                });
                                router.push('/cart');

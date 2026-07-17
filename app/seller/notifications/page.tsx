@@ -52,7 +52,7 @@ const mockNotifications: NotificationProps[] = [
     id: 'n4',
     type: 'system',
     title: 'System Update',
-    message: 'PlantMart seller dashboard will be undergoing scheduled maintenance on Sunday.',
+    message: 'Pacha Bhoomi seller dashboard will be undergoing scheduled maintenance on Sunday.',
     time: '2 days ago',
     isRead: true,
   }

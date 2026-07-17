@@ -1,8 +1,8 @@
-# PlantMart — Backend structure (handoff)
+# Pacha Bhoomi — Backend structure (handoff)
 
 **Branch:** `dev-ashik`  
 **Stack:** Next.js 15 App Router (Route Handlers) + MongoDB Atlas + JWT session cookies  
-**Database:** `plantmart` (default; override with `MONGODB_DB`)  
+**Database:** `Pacha Bhoomi` (default; override with `MONGODB_DB`)  
 **Last updated:** May 2026
 
 This document describes how the backend is organized today, how auth and roles work, and where new API modules should live.
@@ -43,7 +43,7 @@ flowchart LR
 - Route handlers stay thin: parse input, authorize, call `lib/`, return JSON.
 - MongoDB access goes through `lib/mongodb.ts` and collection helpers (not ad-hoc clients in routes).
 - Request bodies are validated with **Zod** in `lib/validators/`.
-- Passwords are hashed with **bcryptjs**; sessions are **JWT** in an **httpOnly** cookie (`plantmart_session`), signed with **jose** and `AUTH_SECRET`.
+- Passwords are hashed with **bcryptjs**; sessions are **JWT** in an **httpOnly** cookie (`pachabhoomi_session`), signed with **jose** and `AUTH_SECRET`.
 
 ---
 
@@ -52,7 +52,7 @@ flowchart LR
 ### 2.1 Implemented (Phase 1 — identity)
 
 ```text
-plantmart/
+Pacha Bhoomi/
 ├── app/api/
 │   ├── auth/
 │   │   ├── bootstrap-admin/route.ts   # One-time first admin (env secret)
@@ -130,7 +130,7 @@ lib/
 | `seller`| `POST /api/auth/register` + `shopName` | Own products, seller orders (future)     |
 | `admin` | `POST /api/auth/bootstrap-admin` once | `GET /api/users`, admin modules (future) |
 
-**Session:** After login or register, the server sets cookie `plantmart_session`. `GET /api/auth/me` returns the current user or `{ user: null }`. Logout clears the cookie.
+**Session:** After login or register, the server sets cookie `pachabhoomi_session`. `GET /api/auth/me` returns the current user or `{ user: null }`. Logout clears the cookie.
 
 **Authorization today:** Each route checks the session inline (e.g. `session.role === 'admin'` on `GET /api/users`). Phase 2 should centralize checks in `lib/middleware/require-role.ts`.
 
@@ -140,7 +140,7 @@ lib/
 
 ### 4.1 Connection
 
-- **Env:** `MONGODB_URI` (required), `MONGODB_DB` (optional, default `plantmart`).
+- **Env:** `MONGODB_URI` (required), `MONGODB_DB` (optional, default `Pacha Bhoomi`).
 - **Client:** `lib/mongodb.ts` — single reused client; small pool (`maxPoolSize: 5`) suited to Next.js serverless/route handlers.
 - **Never commit** real credentials; use `.env.local` (gitignored). See `.env.example`.
 
@@ -237,7 +237,7 @@ POST /api/auth/register
 | Variable                 | Required | Purpose |
 |--------------------------|----------|---------|
 | `MONGODB_URI`            | Yes      | Atlas connection string (include DB name in path when possible). |
-| `MONGODB_DB`             | No       | Database name if not in URI (default `plantmart`). |
+| `MONGODB_DB`             | No       | Database name if not in URI (default `Pacha Bhoomi`). |
 | `AUTH_SECRET`            | Yes      | JWT signing secret, minimum 32 characters. |
 | `BOOTSTRAP_ADMIN_SECRET` | No*      | *Required only to create the first admin; unset after use. |
 | `NEXT_PUBLIC_APP_URL`    | No       | Public site URL for absolute links. |

@@ -8,7 +8,7 @@ import { Footer } from '@/components/Footer';
 import { MobileTabBar } from '@/components/MobileTabBar';
 
 export const metadata: Metadata = {
-  title: 'PlantMart – Multi-Vendor Plant Marketplace',
+  title: 'Pacha Bhoomi – Multi-Vendor Plant Marketplace',
   description: 'Discover 1000+ varieties of hand-picked plants from verified nurseries across the country.',
   keywords: 'plants, indoor plants, outdoor plants, succulents, nursery, buy plants online',
 };

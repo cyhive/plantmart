@@ -150,12 +150,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           i.id === line.id
             ? {
                 ...line,
-                quantity: i.quantity + line.quantity,
+                quantity: Math.min(i.quantity + line.quantity, line.stock ?? Infinity),
               }
             : i,
         );
       }
-      return [...prev, line];
+      return [...prev, { ...line, quantity: Math.min(line.quantity, line.stock ?? Infinity) }];
     });
   };
 
@@ -168,7 +168,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       removeItem(id);
       return;
     }
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity } : i)));
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity: Math.min(quantity, i.stock ?? Infinity) } : i)));
   };
 
   const clearCart = () => setItems([]);

@@ -265,7 +265,7 @@ export default function SettingsPage() {
                       <AlertTriangle className="w-6 h-6" />
                       <h4 className="text-xl font-bold">Privacy Consent</h4>
                    </div>
-                   <p className="text-amber-800/70 text-sm font-medium leading-relaxed">By using PlantMart, you agree to our <Link href="/privacy" className="font-black underline">Privacy Policy</Link> and how we use cookies to personalize your experience.</p>
+                   <p className="text-amber-800/70 text-sm font-medium leading-relaxed">By using Pacha Bhoomi, you agree to our <Link href="/privacy" className="font-black underline">Privacy Policy</Link> and how we use cookies to personalize your experience.</p>
                 </div>
               </motion.div>
             )}

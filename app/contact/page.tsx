@@ -74,8 +74,8 @@ export default function ContactPage() {
             </div>
             <h3 className="text-2xl font-bold text-slate-900 mb-4">Email Us</h3>
             <p className="text-slate-500 mb-6 leading-relaxed">For general inquiries, partnership proposals, and support.</p>
-            <a href="mailto:hello@plantmart.in" className="text-emerald-600 font-black text-sm uppercase tracking-widest flex items-center gap-2 group/link">
-              hello@plantmart.in <ExternalLink className="w-3 h-3 group-hover/link:translate-x-1 transition-all" />
+            <a href="mailto:hello@pachabhoomi.in" className="text-emerald-600 font-black text-sm uppercase tracking-widest flex items-center gap-2 group/link">
+              hello@pachabhoomi.in <ExternalLink className="w-3 h-3 group-hover/link:translate-x-1 transition-all" />
             </a>
           </motion.div>
 

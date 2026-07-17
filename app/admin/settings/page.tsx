@@ -22,10 +22,10 @@ export default function AdminSettingsPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('General');
   const [settings, setSettings] = useState({
-    siteName: 'PlantMart',
+    siteName: 'Pacha Bhoomi',
     platformFeePercent: 5,
     maintenanceMode: false,
-    contactEmail: 'support@plantmart.com',
+    contactEmail: 'support@pachabhoomi.com',
     currency: 'INR',
     enable2FA: false,
     emailNotifications: true,
@@ -39,10 +39,10 @@ export default function AdminSettingsPage() {
   const fetchSettings = () => {
     // Mock Settings Data
     const mockData = {
-      siteName: 'PlantMart',
+      siteName: 'Pacha Bhoomi',
       platformFeePercent: 5,
       maintenanceMode: false,
-      contactEmail: 'support@plantmart.com',
+      contactEmail: 'support@pachabhoomi.com',
       currency: 'INR',
       enable2FA: false,
       emailNotifications: true,

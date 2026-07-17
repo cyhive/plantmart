@@ -81,7 +81,7 @@ const helpCategories = [
   },
   {
     title: "Seller Support",
-    description: "Everything you need to know about selling on PlantMart.",
+    description: "Everything you need to know about selling on Pacha Bhoomi.",
     icon: <ShieldCheck className="w-8 h-8" />,
     color: "teal",
     links: [
@@ -235,7 +235,7 @@ export default function SupportPage() {
                   <Mail className="w-6 h-6 md:w-8 md:h-8 text-emerald-500 mb-3 md:mb-4" />
                   <h4 className="text-white font-bold text-lg md:text-xl mb-1 md:mb-2">Email Us</h4>
                   <p className="text-slate-400 text-xs md:text-sm mb-3 md:mb-4">Response within 24 hours</p>
-                  <a href="mailto:support@plantmart.in" className="text-emerald-400 font-black text-xs md:text-sm uppercase tracking-widest flex items-center gap-2 group">
+                  <a href="mailto:support@pachabhoomi.in" className="text-emerald-400 font-black text-xs md:text-sm uppercase tracking-widest flex items-center gap-2 group">
                     Send Mail <ExternalLink className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                   </a>
                 </div>

@@ -57,11 +57,8 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
         {/* Sidebar Header */}
         <div className="p-8 flex items-center justify-between">
           <Link href="/seller" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <Leaf className="text-white w-6 h-6" />
-            </div>
+            <img src="/logo.png" alt="Pacha Bhoomi" className="h-16 w-auto object-contain" />
             <div className="flex flex-col">
-              <span className="font-display font-bold text-xl text-emerald-900 leading-none">PlantMart</span>
               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mt-1">Seller Hub</span>
             </div>
           </Link>

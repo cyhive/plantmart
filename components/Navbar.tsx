@@ -86,10 +86,7 @@ export function Navbar() {
             {/* Logo & Address Area */}
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-3 group">
-                <div className="w-10 h-10 bg-emerald-600 rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-all duration-500 shadow-lg shadow-emerald-500/20">
-                  <Leaf className="text-white w-6 h-6" />
-                </div>
-                <span className="font-display font-bold text-2xl text-emerald-900 tracking-tight">PlantMart</span>
+                <img src="/logo.png" alt="Pacha Bhoomi" className="h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-500" />
               </Link>
 
               {/* Address Selector */}

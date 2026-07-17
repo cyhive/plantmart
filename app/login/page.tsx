@@ -149,7 +149,7 @@ export default function LoginPage() {
                     value={email} 
                     onChange={e => setEmail(e.target.value)}
                     className="w-full px-6 py-4 bg-white/50 border-2 border-transparent rounded-[24px] focus:bg-white focus:border-emerald-500/30 focus:ring-8 focus:ring-emerald-500/5 outline-none transition-all duration-300 font-medium"
-                    placeholder="hello@plantmart.com" 
+                    placeholder="hello@pachabhoomi.com" 
                   />
                 </div>
                 <div className="space-y-2">

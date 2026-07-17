@@ -63,7 +63,7 @@ const categories = [
 
 const testimonials = [
   { name: 'Sarah J.', role: 'Plant Enthusiast', text: 'The quality of the plants I received was exceptional. They were packaged so carefully!', stars: 5 },
-  { name: 'Michael R.', role: 'Interior Designer', text: 'PlantMart has become my go-to for all my client projects. The variety is unmatched.', stars: 5 },
+  { name: 'Michael R.', role: 'Interior Designer', text: 'Pacha Bhoomi has become my go-to for all my client projects. The variety is unmatched.', stars: 5 },
   { name: 'Elena D.', role: 'New Hobbyist', text: 'Great customer support and very healthy plants. Highly recommend for beginners!', stars: 4 },
 ];
 
@@ -458,8 +458,8 @@ export default function HomePage() {
                     <p className="text-xl font-display font-black text-slate-900">{nursery.plants}+ Plants</p>
                   </div>
                   <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex flex-col items-center justify-center border border-emerald-100 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-500">
-                    <Star className="w-4 h-4 text-amber-500 fill-amber-500 group-hover:text-white group-hover:fill-white" />
-                    <span className="text-emerald-700 font-black text-sm group-hover:text-white">{nursery.rating}</span>
+                    <Star className={`w-4 h-4 group-hover:text-white group-hover:fill-white ${nursery.rating ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} />
+                    <span className="text-emerald-700 font-black text-sm group-hover:text-white">{nursery.rating ? nursery.rating.toFixed(1) : '0.0'}</span>
                   </div>
                 </div>
               </motion.div>

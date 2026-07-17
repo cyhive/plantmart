@@ -296,6 +296,7 @@ export default function ProductDetailPage() {
       price: product.price,
       image: product.images[0],
       quantity: quantity,
+      stock: product.stock,
       seller: product.seller,
     });
     setShowCheckoutPreview(true);
@@ -309,6 +310,7 @@ export default function ProductDetailPage() {
       price: product.price,
       image: product.images[0],
       quantity: quantity,
+      stock: product.stock,
       seller: product.seller,
     });
     router.push('/cart');
@@ -452,10 +454,11 @@ export default function ProductDetailPage() {
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
                 <div className="flex items-center gap-2">
-                  <div className="flex text-amber-400">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
+                  <div className="flex text-amber-400 items-center">
+                    {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.floor(parseFloat(averageRating)) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />)}
+                    <span className="text-slate-900 font-bold text-sm ml-2">{averageRating}</span>
                   </div>
-                  <span className="text-slate-500 font-bold text-xs">({product.ratings.count} Verified Reviews)</span>
+                  <span className="text-slate-500 font-bold text-xs">({totalReviews} Verified Reviews)</span>
                 </div>
                 <div className="hidden sm:block w-px h-6 bg-slate-200" />
                 <div className="text-slate-500 text-sm font-semibold flex items-center gap-1.5">

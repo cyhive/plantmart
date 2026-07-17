@@ -19,7 +19,7 @@ export async function ensureSeededAdmin(): Promise<void> {
   }
 
   if (!process.env.MONGODB_URI) {
-    console.warn('[plantmart] ADMIN_SEED_* is set but MONGODB_URI is missing; skipping admin seed.');
+    console.warn('[Pacha Bhoomi] ADMIN_SEED_* is set but MONGODB_URI is missing; skipping admin seed.');
     return;
   }
 
@@ -29,7 +29,7 @@ export async function ensureSeededAdmin(): Promise<void> {
 
   if (existing && existing.role !== 'admin') {
     console.warn(
-      `[plantmart] ADMIN_SEED_EMAIL ${emailRaw} is already registered as ${existing.role}; not overwriting.`,
+      `[Pacha Bhoomi] ADMIN_SEED_EMAIL ${emailRaw} is already registered as ${existing.role}; not overwriting.`,
     );
     return;
   }

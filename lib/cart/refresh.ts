@@ -8,6 +8,7 @@ export interface CartLineItem {
   originalPrice?: number;
   image: string;
   quantity: number;
+  stock?: number;
   seller: { name: string; shopName: string };
   size?: string;
 }
@@ -44,6 +45,7 @@ export async function refreshCartLinesFromCatalog(items: CartLineItem[]): Promis
           originalPrice: p.originalPrice,
           image: resolveProductImages(p.images)[0],
           quantity: item.quantity,
+          stock: p.stock,
           seller: {
             name: p.seller.name,
             shopName: p.seller.shopName,
