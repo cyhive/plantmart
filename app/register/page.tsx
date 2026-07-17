@@ -54,8 +54,7 @@ function RegisterForm() {
   };
 
   return (
-    <div className="min-h-[90vh] flex items-center justify-center px-4 py-20 mesh-gradient relative">
-      <div className="absolute inset-0 bg-white/60 pointer-events-none" />
+    <div className="min-h-[90vh] flex items-center justify-center px-4 py-20 bg-[#92B031]/20 relative">
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}

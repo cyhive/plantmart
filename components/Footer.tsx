@@ -65,7 +65,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-slate-950 text-slate-400 py-20 border-t border-white/5 relative overflow-hidden">
+    <footer className="bg-slate-900 text-slate-400 py-20 border-t border-white/5 relative overflow-hidden">
       {/* Decorative background element */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
       
@@ -74,7 +74,7 @@ export function Footer() {
           {/* Brand Section */}
           <div className="lg:col-span-2 space-y-8">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/logo.png" alt="Pacha Bhoomi" className="h-24 w-auto object-contain group-hover:scale-105 transition-transform duration-500  p-2 rounded-2xl" />
+              <img src="/Pachabhoomi footer.png" alt="Pacha Bhoomi" className="h-24 w-auto object-contain group-hover:scale-100 transition-transform duration-500  p-2 " />
             </Link>
             <p className="text-lg leading-relaxed max-w-sm">
               Connecting nature lovers with verified nurseries across India. 
@@ -82,15 +82,15 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-4">
               {[
-                { icon: <Facebook className="w-5 h-5" />, href: '#' },
-                { icon: <Twitter className="w-5 h-5" />, href: '#' },
-                { icon: <Instagram className="w-5 h-5" />, href: '#' },
-                { icon: <Github className="w-5 h-5" />, href: '#' },
+                { icon: <Facebook className="w-7 h-7" />, href: '#' },
+                { icon: <Twitter className="w-7 h-7" />, href: '#' },
+                { icon: <Instagram className="w-7 h-7" />, href: '#' },
+                { icon: <Github className="w-7 h-7" />, href: '#' },
               ].map((social, i) => (
                 <a 
                   key={i} 
                   href={social.href} 
-                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-emerald-500 hover:text-white transition-all hover:-translate-y-1 border border-white/10"
+                  className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center text-white hover:bg-emerald-500 hover:text-white transition-all hover:-translate-y-1 border border-white/10"
                 >
                   {social.icon}
                 </a>
@@ -122,8 +122,8 @@ export function Footer() {
         {/* Contact Info Bar */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-10 border-y border-white/5">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-              <MapPin className="w-6 h-6" />
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+              <MapPin className="w-8 h-8" />
             </div>
             <div>
               <p className="text-white font-bold">Visit Us</p>
@@ -131,8 +131,8 @@ export function Footer() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-              <Phone className="w-6 h-6" />
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+              <Phone className="w-8 h-8" />
             </div>
             <div>
               <p className="text-white font-bold">Call Anytime</p>
@@ -140,8 +140,8 @@ export function Footer() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-              <Mail className="w-6 h-6" />
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+              <Mail className="w-8 h-8" />
             </div>
             <div>
               <p className="text-white font-bold">Email Support</p>

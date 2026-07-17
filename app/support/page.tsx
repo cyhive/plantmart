@@ -116,7 +116,7 @@ export default function SupportPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   return (
-    <div className="bg-[#f8fafc] min-h-screen">
+    <div className="bg-[#92B031]/20 min-h-screen">
       {/* Hero Section with Search */}
       <section className="relative pt-24 md:pt-32 pb-16 md:pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-emerald-950 z-0">

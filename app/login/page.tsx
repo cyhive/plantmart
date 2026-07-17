@@ -86,8 +86,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[90vh] flex items-center justify-center px-4 py-20 mesh-gradient relative overflow-hidden">
-      <div className="absolute inset-0 bg-white/60 pointer-events-none" />
+    <div className="min-h-[90vh] flex items-center justify-center px-4 py-20 bg-[#92B031]/20 relative overflow-hidden">
       
       {/* Decorative Blobs */}
       <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-100 rounded-full blur-[120px] opacity-50" />

@@ -43,7 +43,7 @@ export default function PrivacyPage() {
   const lastUpdated = "May 16, 2026";
 
   return (
-    <div className="bg-[#f8fafc] min-h-screen">
+    <div className="bg-[#92B031]/20 min-h-screen">
       {/* Hero Section */}
       <section className="relative pt-32 pb-24 overflow-hidden mesh-gradient">
         <div className="absolute inset-0 bg-slate-900/40 z-10" />

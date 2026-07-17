@@ -148,7 +148,7 @@ function TrackOrderContent() {
   ];
 
   return (
-    <div className="bg-[#f8fafc] min-h-screen">
+    <div className="bg-[#92B031]/20 min-h-screen">
       {/* Hero Section */}
       <section className="relative pt-24 md:pt-32 pb-16 md:pb-20 overflow-hidden mesh-gradient">
         <div className="absolute inset-0 bg-slate-900/60 z-10" />
@@ -383,7 +383,7 @@ function TrackOrderContent() {
 
 export default function TrackOrderPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#f8fafc] flex items-center justify-center"><div className="animate-pulse text-emerald-600 font-bold">Loading Tracker...</div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#92B031]/20 flex items-center justify-center"><div className="animate-pulse text-emerald-600 font-bold">Loading Tracker...</div></div>}>
       <TrackOrderContent />
     </Suspense>
   );

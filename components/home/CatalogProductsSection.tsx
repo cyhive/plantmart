@@ -86,13 +86,13 @@ export function CatalogProductsSection() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:space-y-16">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:space-y-16 " >
       <motion.div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <motion.div className="text-center sm:text-left space-y-4">
-          <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 tracking-tight">Fresh from our nurseries</h2>
-          <p className="text-slate-500 text-base md:text-lg font-medium">Live specimens listed by verified sellers</p>
+          <h2 className="text-3xl md:text-5xl font-display font-bold text-white tracking-tight">Fresh from our nurseries</h2>
+          <p className="text-emerald-50/80 text-base md:text-lg font-medium">Live specimens listed by verified sellers</p>
         </motion.div>
-        <Link href="/plants" className="inline-flex items-center gap-2 text-emerald-700 font-bold hover:text-emerald-800">
+        <Link href="/plants" className="inline-flex items-center gap-2 text-white font-bold hover:text-emerald-200">
           View all plants <ArrowRight className="w-5 h-5" />
         </Link>
       </motion.div>
