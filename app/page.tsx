@@ -128,7 +128,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative min-h-[700px] flex items-center overflow-hidden bg-[linear-gradient(to_right,#214513,#92B031)]">
+      <section className="relative min-h-[700px] flex items-center overflow-hidden bg-[linear-gradient(to_right,#214513,#92B03180)]">
         <div className="absolute inset-0 bg-slate-900/40 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative pt-12">
@@ -341,7 +341,7 @@ export default function HomePage() {
 </div>
       </section>
 
-      <section className="bg-[linear-gradient(to_right,#214513,#92B031)] py-16">
+      <section className="bg-[linear-gradient(to_right,#214513,#92B03180)] py-16">
         <CatalogProductsSection />
       </section>
 
@@ -373,7 +373,7 @@ export default function HomePage() {
       </section>
 
       {/* Categories Section */}
-      <section className="bg-[linear-gradient(to_right,#214513,#92B031)] py-24">
+      <section className="bg-[linear-gradient(to_right,#214513,#92B03180)] py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 text-center md:text-left">
           <div className="space-y-2">
@@ -470,7 +470,7 @@ export default function HomePage() {
       </section>
 
       {/* Plant Care Section */}
-      <section className="relative py-32 overflow-hidden bg-[linear-gradient(to_right,#214513,#92B031)]">
+      <section className="relative py-32 overflow-hidden bg-[linear-gradient(to_right,#214513,#92B03180)]">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_30%,#10b981_0%,transparent_50%)]" />
         </div>
@@ -588,7 +588,7 @@ export default function HomePage() {
 
 
       {/* Newsletter */}
-      <section className="bg-[linear-gradient(to_right,#214513,#92B031)] py-24">
+      <section className="bg-[linear-gradient(to_right,#214513,#92B03180)] py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mesh-gradient rounded-[60px] p-12 md:p-24 relative overflow-hidden text-center space-y-10 border-4 border-white/10 shadow-2xl">
           <div className="absolute inset-0 bg-emerald-900/60 pointer-events-none" />
